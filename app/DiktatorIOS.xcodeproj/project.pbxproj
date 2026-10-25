@@ -1,0 +1,562 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0981F2A397B18B476B11425F /* DiktatorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55B72067199EB9EA9F55A949 /* DiktatorApp.swift */; };
+		2867A03EAC5A8336EF9160A4 /* AppStanje.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97891DDD9878C4AD3F561229 /* AppStanje.swift */; };
+		3AB15F7EE012DA8C2DBADC62 /* PogledPomoc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 609B090256ACE0FC4B6BDB10 /* PogledPomoc.swift */; };
+		428FE717448B5350457A881D /* Putanje.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3EC31002A94081E2BD18ECA /* Putanje.swift */; };
+		43348C2B24175D212CD296F8 /* Snimac.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189D48705D4DAA54A219CC28 /* Snimac.swift */; };
+		4EC9B10BAAC1DED16857C4EC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7921CEE446B6B8121718CD08 /* Assets.xcassets */; };
+		58735B81EB834F2BBB3FC49D /* PonudaModela.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5C631B7C4BC7D5E1DF680F1 /* PonudaModela.swift */; };
+		589916A2679B3B7EFA8A3BFF /* Modeli.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C8F1B72EEE3D1C830799DF0 /* Modeli.swift */; };
+		796854552884166C7468B414 /* PogledPodesavanja.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EF0085283F4D8BF5410BDF9 /* PogledPodesavanja.swift */; };
+		8AEFD397044454A822A042B1 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D319E51BA1C441F49CF777D /* KeyboardViewController.swift */; };
+		933944E1BC2F012E332A1849 /* PogledIstorija.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6D579545458783F98DD33B /* PogledIstorija.swift */; };
+		9B1AD4661F980D3502864CF7 /* PogledDiktat.swift in Sources */ = {isa = PBXBuildFile; fileRef = E98742B6EFA7462CED1983E6 /* PogledDiktat.swift */; };
+		A9741BFAC2D228E53F350A8E /* Podesavanja.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31EB7D7F59EF1CFE3D869AEF /* Podesavanja.swift */; };
+		B3E208BCDBD1BBC8B9775661 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C4FAE80C4EFAF0BF8C7C6E5 /* ContentView.swift */; };
+		BF63604AFF2519489C66144A /* Preuzimanje.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275C7CD6E540C9810103E49D /* Preuzimanje.swift */; };
+		C241022513AC7959AE509F2C /* Transliteracija.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9311828B20AEC74CF5529CB7 /* Transliteracija.swift */; };
+		D15633B282DFD84931A0F53A /* PogledRecnik.swift in Sources */ = {isa = PBXBuildFile; fileRef = 975766D460CC5AA45203E4E8 /* PogledRecnik.swift */; };
+		EC5FC89216C4C0D8E6BFE4C9 /* DiktatorKeyboard.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 028BADA4F19CAFBD0194A000 /* DiktatorKeyboard.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		F07D6AF7774E528B355D0D59 /* Prepisivac.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20316097F523817AD4BBA083 /* Prepisivac.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		12CD7F87B29CDC203C6C9DB8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 51AAC9225B7A0FE23C3CBA3E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A24689E6ECC1FF4144C3065C;
+			remoteInfo = DiktatorKeyboard;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		E29758DFEF89DD3F71CDFF64 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				EC5FC89216C4C0D8E6BFE4C9 /* DiktatorKeyboard.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		028BADA4F19CAFBD0194A000 /* DiktatorKeyboard.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = DiktatorKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		0827D1D5A6339E92ECEE10C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		189D48705D4DAA54A219CC28 /* Snimac.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Snimac.swift; sourceTree = "<group>"; };
+		20316097F523817AD4BBA083 /* Prepisivac.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Prepisivac.swift; sourceTree = "<group>"; };
+		20D32D4B2AE29E2AFB813307 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		259106C1BF634E27DD77F3E9 /* DiktatorIOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = DiktatorIOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		275C7CD6E540C9810103E49D /* Preuzimanje.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preuzimanje.swift; sourceTree = "<group>"; };
+		2C4FAE80C4EFAF0BF8C7C6E5 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		31EB7D7F59EF1CFE3D869AEF /* Podesavanja.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Podesavanja.swift; sourceTree = "<group>"; };
+		3EF0085283F4D8BF5410BDF9 /* PogledPodesavanja.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PogledPodesavanja.swift; sourceTree = "<group>"; };
+		4B6D579545458783F98DD33B /* PogledIstorija.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PogledIstorija.swift; sourceTree = "<group>"; };
+		4C8F1B72EEE3D1C830799DF0 /* Modeli.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Modeli.swift; sourceTree = "<group>"; };
+		55B72067199EB9EA9F55A949 /* DiktatorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiktatorApp.swift; sourceTree = "<group>"; };
+		609B090256ACE0FC4B6BDB10 /* PogledPomoc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PogledPomoc.swift; sourceTree = "<group>"; };
+		7921CEE446B6B8121718CD08 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		7D319E51BA1C441F49CF777D /* KeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; };
+		9311828B20AEC74CF5529CB7 /* Transliteracija.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transliteracija.swift; sourceTree = "<group>"; };
+		975766D460CC5AA45203E4E8 /* PogledRecnik.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PogledRecnik.swift; sourceTree = "<group>"; };
+		97891DDD9878C4AD3F561229 /* AppStanje.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStanje.swift; sourceTree = "<group>"; };
+		A5C631B7C4BC7D5E1DF680F1 /* PonudaModela.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PonudaModela.swift; sourceTree = "<group>"; };
+		DA613E2FCC4C47914E7A962B /* DiktatorIOS-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "DiktatorIOS-Bridging-Header.h"; sourceTree = "<group>"; };
+		E98742B6EFA7462CED1983E6 /* PogledDiktat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PogledDiktat.swift; sourceTree = "<group>"; };
+		F3EC31002A94081E2BD18ECA /* Putanje.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Putanje.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		183AC06C5E2C5A98969FB93F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				259106C1BF634E27DD77F3E9 /* DiktatorIOS.app */,
+				028BADA4F19CAFBD0194A000 /* DiktatorKeyboard.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		83680484F0E961DC58423542 /* DiktatorIOS */ = {
+			isa = PBXGroup;
+			children = (
+				97891DDD9878C4AD3F561229 /* AppStanje.swift */,
+				7921CEE446B6B8121718CD08 /* Assets.xcassets */,
+				2C4FAE80C4EFAF0BF8C7C6E5 /* ContentView.swift */,
+				55B72067199EB9EA9F55A949 /* DiktatorApp.swift */,
+				DA613E2FCC4C47914E7A962B /* DiktatorIOS-Bridging-Header.h */,
+				0827D1D5A6339E92ECEE10C6 /* Info.plist */,
+				4C8F1B72EEE3D1C830799DF0 /* Modeli.swift */,
+				31EB7D7F59EF1CFE3D869AEF /* Podesavanja.swift */,
+				E98742B6EFA7462CED1983E6 /* PogledDiktat.swift */,
+				4B6D579545458783F98DD33B /* PogledIstorija.swift */,
+				3EF0085283F4D8BF5410BDF9 /* PogledPodesavanja.swift */,
+				609B090256ACE0FC4B6BDB10 /* PogledPomoc.swift */,
+				975766D460CC5AA45203E4E8 /* PogledRecnik.swift */,
+				A5C631B7C4BC7D5E1DF680F1 /* PonudaModela.swift */,
+				20316097F523817AD4BBA083 /* Prepisivac.swift */,
+				275C7CD6E540C9810103E49D /* Preuzimanje.swift */,
+				F3EC31002A94081E2BD18ECA /* Putanje.swift */,
+				189D48705D4DAA54A219CC28 /* Snimac.swift */,
+				9311828B20AEC74CF5529CB7 /* Transliteracija.swift */,
+			);
+			path = DiktatorIOS;
+			sourceTree = "<group>";
+		};
+		934A7DEC0A32D6358B0FFE9C /* DiktatorKeyboard */ = {
+			isa = PBXGroup;
+			children = (
+				20D32D4B2AE29E2AFB813307 /* Info.plist */,
+				7D319E51BA1C441F49CF777D /* KeyboardViewController.swift */,
+			);
+			path = DiktatorKeyboard;
+			sourceTree = "<group>";
+		};
+		E74D73F44D5A63AC21E3C0AB = {
+			isa = PBXGroup;
+			children = (
+				83680484F0E961DC58423542 /* DiktatorIOS */,
+				934A7DEC0A32D6358B0FFE9C /* DiktatorKeyboard */,
+				183AC06C5E2C5A98969FB93F /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4B004AF766922BF2E8A93A6A /* DiktatorIOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7725A4DF825F4DEE7CF6F2CB /* Build configuration list for PBXNativeTarget "DiktatorIOS" */;
+			buildPhases = (
+				D67F94F13ACE6998BACAB865 /* Sources */,
+				860826D4CEB6556E65634707 /* Resources */,
+				E29758DFEF89DD3F71CDFF64 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				521D339C2454A41EDACA53DF /* PBXTargetDependency */,
+			);
+			name = DiktatorIOS;
+			packageProductDependencies = (
+			);
+			productName = DiktatorIOS;
+			productReference = 259106C1BF634E27DD77F3E9 /* DiktatorIOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A24689E6ECC1FF4144C3065C /* DiktatorKeyboard */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 67DD8B58BFE2409A63C665B6 /* Build configuration list for PBXNativeTarget "DiktatorKeyboard" */;
+			buildPhases = (
+				0257A1FC30BC352E734BE94D /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DiktatorKeyboard;
+			packageProductDependencies = (
+			);
+			productName = DiktatorKeyboard;
+			productReference = 028BADA4F19CAFBD0194A000 /* DiktatorKeyboard.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		51AAC9225B7A0FE23C3CBA3E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					4B004AF766922BF2E8A93A6A = {
+						ProvisioningStyle = Automatic;
+					};
+					A24689E6ECC1FF4144C3065C = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 9767342DD5328E0F7F021BE0 /* Build configuration list for PBXProject "DiktatorIOS" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = E74D73F44D5A63AC21E3C0AB;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 183AC06C5E2C5A98969FB93F /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4B004AF766922BF2E8A93A6A /* DiktatorIOS */,
+				A24689E6ECC1FF4144C3065C /* DiktatorKeyboard */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		860826D4CEB6556E65634707 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4EC9B10BAAC1DED16857C4EC /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0257A1FC30BC352E734BE94D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8AEFD397044454A822A042B1 /* KeyboardViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D67F94F13ACE6998BACAB865 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2867A03EAC5A8336EF9160A4 /* AppStanje.swift in Sources */,
+				B3E208BCDBD1BBC8B9775661 /* ContentView.swift in Sources */,
+				0981F2A397B18B476B11425F /* DiktatorApp.swift in Sources */,
+				589916A2679B3B7EFA8A3BFF /* Modeli.swift in Sources */,
+				A9741BFAC2D228E53F350A8E /* Podesavanja.swift in Sources */,
+				9B1AD4661F980D3502864CF7 /* PogledDiktat.swift in Sources */,
+				933944E1BC2F012E332A1849 /* PogledIstorija.swift in Sources */,
+				796854552884166C7468B414 /* PogledPodesavanja.swift in Sources */,
+				3AB15F7EE012DA8C2DBADC62 /* PogledPomoc.swift in Sources */,
+				D15633B282DFD84931A0F53A /* PogledRecnik.swift in Sources */,
+				58735B81EB834F2BBB3FC49D /* PonudaModela.swift in Sources */,
+				F07D6AF7774E528B355D0D59 /* Prepisivac.swift in Sources */,
+				BF63604AFF2519489C66144A /* Preuzimanje.swift in Sources */,
+				428FE717448B5350457A881D /* Putanje.swift in Sources */,
+				43348C2B24175D212CD296F8 /* Snimac.swift in Sources */,
+				C241022513AC7959AE509F2C /* Transliteracija.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		521D339C2454A41EDACA53DF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A24689E6ECC1FF4144C3065C /* DiktatorKeyboard */;
+			targetProxy = 12CD7F87B29CDC203C6C9DB8 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		000C4081A2DC78C278F37C64 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/vendor-ios/whisper/include",
+				);
+				INFOPLIST_FILE = DiktatorIOS/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/vendor-ios/whisper/lib",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-force_load",
+					"$(SRCROOT)/vendor-ios/whisper/lib/libggml-metal.a",
+					"-force_load",
+					"$(SRCROOT)/vendor-ios/whisper/lib/libggml-cpu.a",
+					"-force_load",
+					"$(SRCROOT)/vendor-ios/whisper/lib/libggml-blas.a",
+					"$(SRCROOT)/vendor-ios/whisper/lib/libwhisper.a",
+					"$(SRCROOT)/vendor-ios/whisper/lib/libggml.a",
+					"$(SRCROOT)/vendor-ios/whisper/lib/libggml-base.a",
+					"-framework",
+					Metal,
+					"-framework",
+					MetalKit,
+					"-framework",
+					Accelerate,
+					"-framework",
+					AVFoundation,
+					"-framework",
+					UIKit,
+					"-lc++",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.cedomirovic.diktator.ios;
+				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "DiktatorIOS/DiktatorIOS-Bridging-Header.h";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		131C6C014193EEF1B78E2626 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				INFOPLIST_FILE = DiktatorKeyboard/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.cedomirovic.diktator.ios.keyboard;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		1ECEA383356C71A1242E3505 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				INFOPLIST_FILE = DiktatorKeyboard/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.cedomirovic.diktator.ios.keyboard;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9908D5C925C2B3BF33B509D8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_LANGUAGE = sr;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E58C11EC37EF4B71D6850629 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_LANGUAGE = sr;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		FBC6E3391BF2E0EAD3443E1A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/vendor-ios/whisper/include",
+				);
+				INFOPLIST_FILE = DiktatorIOS/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/vendor-ios/whisper/lib",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-force_load",
+					"$(SRCROOT)/vendor-ios/whisper/lib/libggml-metal.a",
+					"-force_load",
+					"$(SRCROOT)/vendor-ios/whisper/lib/libggml-cpu.a",
+					"-force_load",
+					"$(SRCROOT)/vendor-ios/whisper/lib/libggml-blas.a",
+					"$(SRCROOT)/vendor-ios/whisper/lib/libwhisper.a",
+					"$(SRCROOT)/vendor-ios/whisper/lib/libggml.a",
+					"$(SRCROOT)/vendor-ios/whisper/lib/libggml-base.a",
+					"-framework",
+					Metal,
+					"-framework",
+					MetalKit,
+					"-framework",
+					Accelerate,
+					"-framework",
+					AVFoundation,
+					"-framework",
+					UIKit,
+					"-lc++",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.cedomirovic.diktator.ios;
+				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "DiktatorIOS/DiktatorIOS-Bridging-Header.h";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		67DD8B58BFE2409A63C665B6 /* Build configuration list for PBXNativeTarget "DiktatorKeyboard" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1ECEA383356C71A1242E3505 /* Debug */,
+				131C6C014193EEF1B78E2626 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		7725A4DF825F4DEE7CF6F2CB /* Build configuration list for PBXNativeTarget "DiktatorIOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FBC6E3391BF2E0EAD3443E1A /* Debug */,
+				000C4081A2DC78C278F37C64 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		9767342DD5328E0F7F021BE0 /* Build configuration list for PBXProject "DiktatorIOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9908D5C925C2B3BF33B509D8 /* Debug */,
+				E58C11EC37EF4B71D6850629 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 51AAC9225B7A0FE23C3CBA3E /* Project object */;
+}

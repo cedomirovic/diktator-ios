@@ -15,9 +15,10 @@ Projekat je nastao iz macOS aplikacije
 
 ## Status
 
-Skelet projekta je napravljen; Xcode još nije instaliran na razvojnom Macu,
-pa build nije pokrenut. Odluke o arhitekturi, modelu i instalaciji su
-potvrđene.
+Xcode projekat sa dva targeta (`DiktatorIOS` i `DiktatorKeyboard`) je
+napravljen, a Swift kod za snimanje, whisper, modele, istoriju, rečnik i punu
+tastaturu je u repou. Xcode još nije instaliran na razvojnom Macu, pa build i
+test na iPhone-u nisu pokrenuti.
 
 ## Šta je odlučeno
 
@@ -35,13 +36,16 @@ potvrđene.
 Detalji: [PLAN.md](PLAN.md) i
 [docs/instalacija-bez-naloga.md](docs/instalacija-bez-naloga.md).
 
-## Predviđena struktura
+## Struktura
 
 ```text
 app/
   DiktatorIOS/       SwiftUI aplikacija: snimanje, whisper, modeli, istorija
-  DiktatorKeyboard/  custom tastatura: Diktiraj + Nalepi
-  Shared/            transliteracija, modeli, pomoćne funkcije
+  DiktatorKeyboard/  puna custom tastatura: Diktiraj + Nalepi
+  DiktatorIOS.xcodeproj
+  project.yml        XcodeGen specifikacija
+  pripremi-whisper-ios.sh
+scripts/             pravljenje IPA za AltStore/SideStore
 docs/                arhitektura i uputstvo za instalaciju
 ```
 

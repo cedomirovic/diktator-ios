@@ -123,7 +123,7 @@ Kada je projekat napravljen, IPA se pravi iz Xcode-a ili skriptom
 `scripts/napravi-ipa.sh`. Ručni postupak:
 
 ```bash
-xcodebuild -project DiktatorIOS.xcodeproj \
+xcodebuild -project app/DiktatorIOS.xcodeproj \
   -scheme DiktatorIOS \
   -configuration Release \
   -sdk iphoneos \

@@ -18,6 +18,9 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
   - MVP: diktat + tastatura, istorija, rečnik; **bez** LLM doterivanja.
 - Xcode još nije instaliran na ovom Macu (aktivan je Command Line Tools).
   Korisnik će ga instalirati; bez Xcode-a nema builda ni potpisa.
+- Xcode projekat (`app/DiktatorIOS.xcodeproj`), Swift kod, puna tastatura,
+  modeli, istorija i rečnik su u repou. Build i test na iPhone-u čekaju Xcode
+  i whisper.cpp biblioteke za iOS.
 
 ## Cilj
 
@@ -82,10 +85,9 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Sledeći korak
 
-1. Napraviti GitHub repo i prvi push.
-2. Napraviti Xcode projekat sa dva targeta (app + keyboard).
-3. Pripremiti whisper.cpp za iOS i portovati snimanje/prepis.
-4. Napraviti clipboard tok i punu tastaturu.
-5. Dodati istoriju i rečnik.
-6. Napraviti IPA i uputstvo za AltStore/SideStore.
-7. Proveriti na iPhone-u sa iOS 26.
+1. Instalirati Xcode 26.x i postaviti `xcode-select` na njega.
+2. Pokrenuti `app/pripremi-whisper-ios.sh` (whisper.cpp za iOS).
+3. Otvoriti `app/DiktatorIOS.xcodeproj`, izabrati Personal Team i build.
+4. Testirati snimanje/prepis, `diktator-ios://dictate`, Full Access i Nalepi.
+5. Napraviti IPA i testirati AltStore/SideStore.
+6. Ažurirati dokumentaciju rezultatima testa.
