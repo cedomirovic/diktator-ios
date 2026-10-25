@@ -13,19 +13,24 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
   - Tastatura: bundle ID `com.cedomirovic.diktator.ios.keyboard`.
   - Arhitektura: **puna tastatura + clipboard**, bez App Group-a.
   - Podrazumevani model: **Large v3 Turbo q5_0** (~547 MB).
-  - Minimum iOS 17; test na iOS 26.
+  - Minimum iOS 17; testirano na iOS 27.0.1.
   - Instalacija: **AltStore/SideStore**; Xcode služi za build i potpis.
   - MVP: diktat + tastatura, istorija, rečnik; **bez** LLM doterivanja.
-- Xcode 26.6 je instaliran (iOS SDK 26.5); `app/pripremi-whisper-ios.sh` je
-  napravio whisper.cpp biblioteke za iOS arm64 (Metal + Accelerate).
+- macOS 26.7.1 i Xcode 27.1 (27A9275) su instalirani; `xcode-select` pokazuje
+  na Xcode. `app/pripremi-whisper-ios.sh` je napravio whisper.cpp biblioteke za
+  iOS arm64 (Metal + Accelerate).
 - Xcode projekat (`app/DiktatorIOS.xcodeproj`), Swift kod, puna tastatura,
   modeli, istorija i rečnik su u repou. Debug i Release build prolaze.
+- Potpisivanje besplatnim **Personal Team**-om radi: Xcode je napravio profile
+  za oba targeta, a aplikacija je instalirana i pokrenuta na iPhone 16
+  (iOS 27.0.1). Developer Mode je uključen; developer profil je trustovan na
+  uređaju.
 - `build/DiktatorIOS.ipa` je napravljen (nepotpisan, ~1.6 MB bez modela).
-  Nema potpisnog identiteta ni povezanog iPhone-a, pa potpisivanje i test na
-  uređaju tek slede.
+  AltStore/SideStore potpisivanje i instalacija još nisu testirani.
 - Simulator (iPhone 17, iOS 26.5): aplikacija se pokreće, UI se prikazuje, a
   `diktator-ios://dictate` pokreće snimanje. iOS prikaže
   **„Open in Diktator?“** i traži potvrdu **Open**.
+- Korisnik je potvrdio da aplikacija radi na fizičkom iPhone-u.
 
 ## Cilj
 
@@ -90,9 +95,8 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Sledeći korak
 
-1. Otvoriti `app/DiktatorIOS.xcodeproj`, dodati Apple ID/Personal Team za oba
-   targeta, izabrati povezani iPhone i pokrenuti Run.
-2. Testirati snimanje/prepis, `diktator-ios://dictate`, Full Access i Nalepi.
-3. Napraviti IPA i testirati AltStore/SideStore potpisivanje (uključujući
-   keyboard extension).
-4. Ažurirati dokumentaciju rezultatima testa.
+1. Testirati AltStore/SideStore potpisivanje i instalaciju IPA-e, uključujući
+   keyboard extension.
+2. Proveriti osvežavanje profila posle 7 dana.
+3. Ažurirati dokumentaciju rezultatima AltStore/SideStore testa.
+4. Pripremiti release tag i završni IPA.

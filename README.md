@@ -11,16 +11,22 @@ Projekat je nastao iz macOS aplikacije
 - Aplikacija: **Diktator iOS** (`com.cedomirovic.diktator.ios`)
 - Tastatura: `com.cedomirovic.diktator.ios.keyboard`
 - Podrazumevani model: **Large v3 Turbo q5_0** (~547 MB)
-- Minimum iOS 17; ciljani test na iOS 26
+- Minimum iOS 17; testirano na iOS 27.0.1
 
 ## Status
 
-Xcode 26.6 je instaliran i whisper.cpp za iOS (arm64, Metal + Accelerate) je
-izgrađen. **Debug i Release build prolaze**, a skripta pravi nepotpisan
-`build/DiktatorIOS.ipa` (~1.6 MB bez modela). Simulator (iPhone 17, iOS 26.5)
-potvrđuje da se aplikacija pokreće i da `diktator-ios://dictate` počinje
-snimanje. Potpisivanje i test na iPhone-u tek slede: na Macu trenutno nema
-potpisnog identiteta ni povezanog uređaja.
+Razvoj je na macOS 26.7.1 i Xcode 27.1, a whisper.cpp za iOS (arm64,
+Metal + Accelerate) je izgrađen. **Debug i Release build prolaze**, a skripta
+pravi nepotpisan `build/DiktatorIOS.ipa` (~1.6 MB bez modela).
+
+Potpisivanje besplatnim **Personal Team**-om je potvrđeno: Xcode pravi profile
+za oba targeta, a aplikacija je instalirana i pokrenuta na iPhone 16
+(iOS 27.0.1). Developer Mode i trust developer profila su uključeni. Simulator
+(iPhone 17, iOS 26.5) takođe potvrđuje da se aplikacija pokreće i da
+`diktator-ios://dictate` počinje snimanje.
+
+Sledeće je testiranje **AltStore/SideStore** potpisivanja i instalacije IPA-e,
+uključujući keyboard extension.
 
 ## Šta je odlučeno
 

@@ -53,12 +53,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		028BADA4F19CAFBD0194A000 /* DiktatorKeyboard.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = DiktatorKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		028BADA4F19CAFBD0194A000 /* DiktatorKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = DiktatorKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		0827D1D5A6339E92ECEE10C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		189D48705D4DAA54A219CC28 /* Snimac.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Snimac.swift; sourceTree = "<group>"; };
 		20316097F523817AD4BBA083 /* Prepisivac.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Prepisivac.swift; sourceTree = "<group>"; };
 		20D32D4B2AE29E2AFB813307 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		259106C1BF634E27DD77F3E9 /* DiktatorIOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = DiktatorIOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		259106C1BF634E27DD77F3E9 /* DiktatorIOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DiktatorIOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		275C7CD6E540C9810103E49D /* Preuzimanje.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preuzimanje.swift; sourceTree = "<group>"; };
 		2C4FAE80C4EFAF0BF8C7C6E5 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		31EB7D7F59EF1CFE3D869AEF /* Podesavanja.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Podesavanja.swift; sourceTree = "<group>"; };
@@ -179,7 +179,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1430;
+				LastUpgradeCheck = 2710;
 				TargetAttributes = {
 					4B004AF766922BF2E8A93A6A = {
 						ProvisioningStyle = Automatic;
@@ -386,8 +386,10 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_LANGUAGE = sr;
+				DEVELOPMENT_TEAM = LHQ4Q44425;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -409,6 +411,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -455,8 +458,10 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_LANGUAGE = sr;
+				DEVELOPMENT_TEAM = LHQ4Q44425;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -471,6 +476,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;

@@ -113,14 +113,16 @@ bez App Group-a; tastatura ga čita samo kada korisnik uključi **Full Access**.
 3. **Xcode projekat** — app + keyboard target, Swift kod. ✅
 4. **Whisper iOS** — biblioteke za arm64, Metal + Accelerate. ✅
 5. **Snimanje i prepis** — build prolazi; simulator potvrđuje snimanje preko
-   URL scheme; prepis/model i test na uređaju čekaju.
+   URL scheme; aplikacija je instalirana i pokrenuta na iPhone-u.
 6. **Clipboard i tastatura** — Diktiraj/Nalepi i puna tastatura; build prolazi;
-   URL scheme radi u simulatoru; Full Access i Nalepi čekaju uređaj.
+   URL scheme radi u simulatoru; korisnik potvrdio rad na iPhone-u.
 7. **Modeli i podešavanja** — download, izbor modela, režim; build prolazi;
-   test na uređaju čeka.
-8. **Istorija/rečnik** — kod u glavnoj aplikaciji; build prolazi; test čeka.
-9. **Instalacija** — uputstvo i nepotpisan IPA; AltStore test čeka.
-10. **Release** — tag, zip/IPA, uputstvo; posle testa na iPhone-u.
+   korisnik potvrdio rad na iPhone-u.
+8. **Istorija/rečnik** — kod u glavnoj aplikaciji; build prolazi; korisnik
+   potvrdio rad na iPhone-u.
+9. **Instalacija** — uputstvo i nepotpisan IPA; Xcode potpisivanje,
+   instalacija i pokretanje na iPhone-u rade; AltStore/SideStore test čeka.
+10. **Release** — tag, zip/IPA, uputstvo; posle AltStore/SideStore testa.
 
 ## 6. Rizici
 
@@ -131,8 +133,9 @@ bez App Group-a; tastatura ga čita samo kada korisnik uključi **Full Access**.
   statusna traka „Back to …“ je najbrži put.
 - **Memorija** — Turbo model je ~547 MB; na starijim iPhone-ima može da bude
   tesno. Zato Small/Base ostaju opcije.
-- **Xcode** — instaliran (26.6); potpisni identitet i povezani iPhone još nisu
-  podešeni, pa nema instalacije na uređaj.
+- **Xcode** — Xcode 27.1 i besplatni Personal Team rade; potpisivanje,
+  instalacija i pokretanje na iPhone-u su potvrđeni. AltStore/SideStore tok
+  još treba testirati.
 - **App Store** — tastatura sa Full Access-om je osetljiva za review; ovo je
   za sada sideload/lična instalacija, ne App Store distribucija.
 - **Apple Speech** — ne podržava srpski; ne koristimo ga za srpski.

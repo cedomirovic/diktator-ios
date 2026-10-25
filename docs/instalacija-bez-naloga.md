@@ -25,8 +25,9 @@ Oba targeta moraju da budu potpisana istim timom.
 
 ## 1. Šta je potrebno
 
-- Mac sa **Xcode 26.x** (App Store). Samo Command Line Tools nije dovoljno.
-- iPhone/iPad sa **iOS 17 ili novijim** (preporučeno iOS 26).
+- Mac sa **Xcode 27.1 ili novijim** (App Store) i macOS-om **26.6+**.
+  Samo Command Line Tools nije dovoljno.
+- iPhone/iPad sa **iOS 17 ili novijim**; testirano na iOS 27.0.1.
 - USB kabl (prvi put), Apple ID, internet za prvi build i preuzimanje modela.
 - Dovoljno prostora na disku za Xcode (~10 GB) i modele (od ~57 MB do ~1 GB).
 
@@ -48,8 +49,11 @@ koristan ako AltStore/SideStore ne uspe da potpiše keyboard extension.
 
    ```bash
    sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+   sudo xcodebuild -license accept
    xcodebuild -version
    ```
+
+   Treba da piše **Xcode 27.1** (ili noviji).
 
 ### 2.2. Dodaj Apple ID i napravi Personal Team
 
@@ -75,12 +79,31 @@ U projektu postoje dva targeta. Za oba:
 Ne dodaj App Group, push, iCloud ni Keychain Sharing — nisu potrebni i traže
 plaćeni nalog.
 
+Ako se projekat ponovo generiše iz `app/project.yml`, Xcode može da izgubi
+izabrani tim. U tom slučaju ponovo izaberi **Personal Team** za oba targeta.
+
 ### 2.4. Uključi Developer Mode na iPhone-u
 
-1. Poveži iPhone kablom sa Macom.
-2. Na iPhone-u: **Settings → Privacy & Security → Developer Mode → On**.
-3. Potvrdi restart i posle restarta uključi Developer Mode.
-4. Ako iPhone pita „Trust This Computer?“, tapni **Trust** i unesi šifru.
+1. Poveži iPhone kablom sa Macom i otključaj ga.
+2. Ako iPhone pita „Trust This Computer?“, tapni **Trust** i unesi passcode.
+3. U Xcode-u 27.1 otvori **Xcode → Open Developer Tool → Device Hub**
+   (opcija `Window → Devices and Simulators` više ne postoji).
+4. Sačekaj da se iPhone pojavi u Device Hub-u.
+5. Na iPhone-u: **Settings → Privacy & Security → Developer Mode → On**.
+6. Potvrdi restart; posle restarta prevuci prstom gore, tapni **Enable** i
+   unesi passcode.
+
+Ako se **Developer Mode** ne pojavljuje u Settings-u, Device Hub prvo mora da
+započne uparivanje. Kao pomoć, ako je instaliran `libimobiledevice`, možeš iz
+Terminala da otkriješ skriveni meni:
+
+```bash
+idevicedevmodectl reveal
+idevicedevmodectl list
+```
+
+Prva komanda otkriva meni, a druga treba da pokaže `disabled` dok ga ne
+uključiš. Posle uključivanja treba da piše `enabled`.
 
 ### 2.5. Pokreni aplikaciju
 
@@ -89,9 +112,20 @@ plaćeni nalog.
 3. **Run** (⌘R).
 4. Xcode će prvi put napraviti profil i potpisati oba targeta. Ako traži
    dozvolu za pristup ključevima, dozvoli.
-5. Kada se aplikacija pojavi na iPhone-u, ako se ne otvori, idi na
+5. Ako u **Signing & Capabilities** piše da nema profila, klikni **Try Again**.
+   Ako i dalje ne uspe, iz Terminala pokreni build koji dozvoljava kreiranje
+   profila:
+
+   ```bash
+   xcodebuild -project app/DiktatorIOS.xcodeproj \
+     -scheme DiktatorIOS \
+     -destination 'platform=iOS,id=TVOJ-UDID' \
+     -allowProvisioningUpdates build
+   ```
+
+6. Kada se aplikacija pojavi na iPhone-u, ako se ne otvori, idi na
    **Settings → General → VPN & Device Management → Developer App** i tapni
-   **Trust**.
+   **Trust**. Bez toga iOS prijavi da potpis/profil nije trustovan.
 
 ### 2.6. Dodaj tastaturu
 
@@ -147,6 +181,9 @@ zip -r DiktatorIOS.ipa Payload
 Apple ID-jem. Ako alat ne uspe da potpiše ugrađeni keyboard extension,
 instaliraj direktno iz Xcode-a (odeljak 2) ili koristi Xcode za osvežavanje.
 
+Xcode 27.1 direktno potpisivanje i instalacija na iPhone su potvrđeni. Sam
+AltStore/SideStore tok sa ugrađenim keyboard extension-om još nije testiran.
+
 ---
 
 ## 4. Osvežavanje posle 7 dana
@@ -183,15 +220,18 @@ Xcode je jedini siguran način za prvi build.
 |---|---|
 | `xcodebuild` ne radi / „requires Xcode“ | `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer` |
 | `xcodebuild` traži prihvatanje licence | `sudo xcodebuild -license accept` |
+| Nema `Window → Devices and Simulators` | U Xcode 27.1 koristi **Xcode → Open Developer Tool → Device Hub**. |
 | „No signing certificate“ | Xcode → Settings → Accounts → Apple ID → Personal Team; uključi Automatically manage signing. |
+| „No profiles … were found“ | U **Signing & Capabilities** klikni **Try Again**; ako ne pomogne, pokreni `xcodebuild -allowProvisioningUpdates`. |
 | „Bundle identifier is not available“ | Promeni bundle ID za oba targeta, zadrži isti prefiks. |
-| Aplikacija se ne otvara posle instalacije | Settings → General → VPN & Device Management → Trust developer. |
+| Aplikacija se ne otvara posle instalacije | Settings → General → VPN & Device Management → Developer App → **Trust**. |
+| iPhone se ne pojavljuje u Device Hub-u | Otključaj iPhone, tapni **Trust**, proveri passcode; ako je Developer Mode sakriven, pokreni `idevicedevmodectl reveal`. |
+| Developer Mode nema u Settings-u | Poveži iPhone i otvori Device Hub; ili `idevicedevmodectl reveal`, pa Settings → Privacy & Security → Developer Mode. |
 | Tastatura se ne vidi | Settings → General → Keyboard → Keyboards → Add New Keyboard → Diktator. |
 | **Nalepi** ne radi | Uključi **Allow Full Access** za Diktator tastaturu. |
 | Nema zvuka / mikrofon ne radi | Settings → Privacy & Security → Microphone → Diktator. |
 | Posle 7 dana „Unable to Verify App“ | Obnovi build preko Xcode-a ili AltStore/SideStore. |
 | Model se ne preuzima | Proveri internet i prostor; modeli su veliki (57 MB–1 GB). |
-| Aplikacija traži Developer Mode | Settings → Privacy & Security → Developer Mode → On. |
 
 ---
 
