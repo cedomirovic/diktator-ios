@@ -7,10 +7,17 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 ## Status
 
 - **25.10.2026.** — napravljen novi folder, git repo i skelet dokumentacije.
-  Arhitektura, GitHub repo, model i potpisivanje još nisu potvrđeni.
-- Xcode na ovom Macu **nije instaliran** (aktivan je samo Command Line Tools).
-  Za build i potpisivanje potreban je Xcode 26.x iz App Store-a.
-- macOS projekat `Pitchi` se **ne dira** iz ovog repoa; on je referenca.
+  Odluke su potvrđene:
+  - GitHub: <https://github.com/cedomirovic/diktator-ios> (javan).
+  - Aplikacija: **Diktator iOS**, bundle ID `com.cedomirovic.diktator.ios`.
+  - Tastatura: bundle ID `com.cedomirovic.diktator.ios.keyboard`.
+  - Arhitektura: **puna tastatura + clipboard**, bez App Group-a.
+  - Podrazumevani model: **Large v3 Turbo q5_0** (~547 MB).
+  - Minimum iOS 17; test na iOS 26.
+  - Instalacija: **AltStore/SideStore**; Xcode služi za build i potpis.
+  - MVP: diktat + tastatura, istorija, rečnik; **bez** LLM doterivanja.
+- Xcode još nije instaliran na ovom Macu (aktivan je Command Line Tools).
+  Korisnik će ga instalirati; bez Xcode-a nema builda ni potpisa.
 
 ## Cilj
 
@@ -28,23 +35,26 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
    tastatura ne dele fajlove ni podešavanja preko App Group-a.
 3. Rešenje: glavna aplikacija snima i prepisuje; rezultat ide u
    **UIPasteboard**. Tastatura ima dugme **Diktiraj** (otvara app preko URL
-   scheme) i **Nalepi** (ubacuje tekst iz clipboarda preko
-   `textDocumentProxy.insertText`).
+   scheme `diktator-ios://dictate`) i **Nalepi** (ubacuje tekst iz clipboarda
+   preko `textDocumentProxy.insertText`).
 4. Tastatura traži **Full Access** da bi čitala clipboard. Bez Full Access-a
    korisnik može ručno da nalepi tekst u ciljnoj aplikaciji.
 5. Besplatni Apple ID daje profil od **7 dana**; posle toga build treba
-   obnoviti (Xcode ili AltStore/SideStore). Nema App Groups, push, iCloud.
+   obnoviti (AltStore/SideStore ili Xcode). Nema App Groups, push, iCloud.
 6. Apple Speech / SpeechAnalyzer **ne podržava srpski** (lista locale-a od
    2026. ne uključuje `sr`). Zato je za srpski potreban whisper.cpp.
 
-## Predložena arhitektura (čeka potvrdu)
+## Potvrđena arhitektura
 
 - `DiktatorIOS` (SwiftUI): snimanje, whisper.cpp, modeli, istorija, rečnik,
-  podešavanja, kopiranje u clipboard, URL scheme `diktator://dictate`.
-- `DiktatorKeyboard` (`UIInputViewController`): slova/razmaci, dugme
-  **Diktiraj** (otvara app), dugme **Nalepi** (clipboard → tekst), status.
+  podešavanja, kopiranje u clipboard, URL scheme `diktator-ios://dictate`.
+- `DiktatorKeyboard` (`UIInputViewController`): **puna tastatura** — QWERTY
+  slova, srpska slova `čćžšđ`, brojevi, shift, brisanje, razmak, enter, globus;
+  gornja traka sa **Diktiraj** i **Nalepi**.
 - Bez App Group-a; jedini deljeni kanal je `UIPasteboard.general`.
 - Whisper.cpp statički za iOS (arm64); modeli se preuzimaju u aplikaciji.
+- Podrazumevani model je Turbo q5_0; korisnik može da preuzme i Small/Base.
+- Istorija i rečnik žive u glavnoj aplikaciji; tastatura ih ne vidi.
 - Srpski UI i komentari; imena funkcija i promenljivih na srpskom, bez
   dijakritika.
 
@@ -70,21 +80,12 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 - Posle svakog završenog koraka `git add` + `git commit`, poruka na srpskom.
 - Ne dirati macOS projekat `Pitchi` iz ovog repoa.
 
-## Otvorena pitanja
-
-- Ime repo-a, vidljivost i vlasnik.
-- Ime aplikacije i bundle ID.
-- Tastatura + clipboard ili samo aplikacija + clipboard.
-- Podrazumevani model (Small q5_1 / Turbo / Base / Large).
-- Xcode i iPhone/iOS verzija.
-- Način instalacije (Xcode, AltStore/SideStore).
-- MVP: istorija, rečnik, LLM doterivanje.
-
 ## Sledeći korak
 
-1. Potvrditi gore navedene odluke.
-2. Napraviti GitHub repo i prvi commit.
-3. Napraviti Xcode projekat sa dva targeta (app + keyboard).
-4. Pripremiti whisper.cpp za iOS i portovati snimanje/prepis.
-5. Napraviti clipboard tok i tastaturu.
-6. Napisati i proveriti uputstvo za instalaciju bez plaćenog naloga.
+1. Napraviti GitHub repo i prvi push.
+2. Napraviti Xcode projekat sa dva targeta (app + keyboard).
+3. Pripremiti whisper.cpp za iOS i portovati snimanje/prepis.
+4. Napraviti clipboard tok i punu tastaturu.
+5. Dodati istoriju i rečnik.
+6. Napraviti IPA i uputstvo za AltStore/SideStore.
+7. Proveriti na iPhone-u sa iOS 26.

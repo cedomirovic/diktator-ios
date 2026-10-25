@@ -16,7 +16,8 @@ ograničenja koja moraju da se znaju:
 Aplikacija se sastoji iz **dva targeta**:
 
 1. `DiktatorIOS` — glavna aplikacija (snima, prepisuje, čuva modele).
-2. `DiktatorKeyboard` — custom tastatura (otvara aplikaciju i ubacuje tekst).
+2. `DiktatorKeyboard` — puna custom tastatura (kuca, otvara aplikaciju i
+   ubacuje tekst iz clipboarda).
 
 Oba targeta moraju da budu potpisana istim timom.
 
@@ -29,13 +30,14 @@ Oba targeta moraju da budu potpisana istim timom.
 - USB kabl (prvi put), Apple ID, internet za prvi build i preuzimanje modela.
 - Dovoljno prostora na disku za Xcode (~10 GB) i modele (od ~57 MB do ~1 GB).
 
-Prvi put je **najpouzdanije instalirati direktno iz Xcode-a**. AltStore i
-SideStore su korisni za kasnije osvežavanje, ali kod aplikacija sa extension-ima
-ume da bude problema sa potpisivanjem; Xcode je referentni način.
+Izabrani tok je **AltStore/SideStore**: Xcode služi da se napravi IPA, a
+AltStore/SideStore potpisuje i instalira aplikaciju tvojim besplatnim Apple
+ID-jem. Xcode može i direktno da instalira aplikaciju; to je rezervni način,
+koristan ako AltStore/SideStore ne uspe da potpiše keyboard extension.
 
 ---
 
-## 2. Instalacija preko Xcode-a (preporučeno)
+## 2. Build i potpisivanje u Xcode-u
 
 ### 2.1. Pripremi Xcode
 
@@ -63,8 +65,8 @@ U projektu postoje dva targeta. Za oba:
 2. Uključi **Automatically manage signing**.
 3. **Team**: izaberi svoj Personal Team.
 4. **Bundle Identifier** mora da bude jedinstven. Predlog:
-   - aplikacija: `com.cedomirovic.diktator`
-   - tastatura: `com.cedomirovic.diktator.keyboard`
+   - aplikacija: `com.cedomirovic.diktator.ios`
+   - tastatura: `com.cedomirovic.diktator.ios.keyboard`
 5. Ako Xcode prijavi da je ID zauzet, dodaj svoj jedinstveni deo, npr.
    `com.cedomirovic.diktator.ios2026` i
    `com.cedomirovic.diktator.ios2026.keyboard`. **Oba ID-ja moraju da počinju
@@ -99,13 +101,15 @@ plaćeni nalog.
    - Full Access je potreban da tastatura pročita clipboard i ubaci tekst.
    - Bez njega možeš ručno da nalepiš tekst u ciljnoj aplikaciji.
 4. U aplikaciji Diktator dozvoli **mikrofon** kada se pojavi pitanje.
-5. Otvori aplikaciju, preuzmi model (npr. Small q5_1) i probaj diktat.
+5. Otvori aplikaciju, preuzmi model (podrazumevano **Large v3 Turbo q5_0**,
+   ~547 MB) i probaj diktat.
 
 ### 2.7. Kako se koristi
 
 1. U bilo kojoj aplikaciji otvori tekstualno polje i prebaci tastaturu na
    **Diktator** (globus/ikona tastature).
-2. Tapni **Diktiraj** — otvoriće se Diktator aplikacija.
+2. Možeš da kucaš direktno na Diktator tastaturi (QWERTY + `čćžšđ`), ili da
+   tapneš **Diktiraj** — otvoriće se Diktator aplikacija.
 3. Snimi govor; aplikacija prepisuje lokalno i kopira tekst u clipboard.
 4. Vrati se u prethodnu aplikaciju preko **„Back to …“** u statusnoj traci ili
    preko app switcher-a.
@@ -113,18 +117,42 @@ plaćeni nalog.
 
 ---
 
-## 3. Osvežavanje posle 7 dana
+## 3. IPA za AltStore/SideStore
+
+Kada je projekat napravljen, IPA se pravi iz Xcode-a ili skriptom
+`scripts/napravi-ipa.sh`. Ručni postupak:
+
+```bash
+xcodebuild -project DiktatorIOS.xcodeproj \
+  -scheme DiktatorIOS \
+  -configuration Release \
+  -sdk iphoneos \
+  -derivedDataPath build \
+  CODE_SIGNING_ALLOWED=NO build
+
+mkdir -p build/Payload
+cp -R build/Build/Products/Release-iphoneos/DiktatorIOS.app build/Payload/
+cd build
+zip -r DiktatorIOS.ipa Payload
+```
+
+1. Instaliraj **AltServer** na Mac i **AltStore** na iPhone (ili SideStore).
+2. Prijavi se svojim Apple ID-jem u AltStore/SideStore.
+3. Prenesi `DiktatorIOS.ipa` na iPhone (AirDrop, Files, iCloud Drive…).
+4. Otvori IPA u AltStore/SideStore i instaliraj.
+5. Uključi Developer Mode i trust developer ako se traži.
+
+**Napomena:** IPA je nepotpisan; AltStore/SideStore ga potpisuje tvojim
+Apple ID-jem. Ako alat ne uspe da potpiše ugrađeni keyboard extension,
+instaliraj direktno iz Xcode-a (odeljak 2) ili koristi Xcode za osvežavanje.
+
+---
+
+## 4. Osvežavanje posle 7 dana
 
 Besplatni profil ističe posle 7 dana. Aplikacija tada neće da se pokrene.
 
-### Opcija A: ponovo iz Xcode-a
-
-1. Poveži iPhone (ili koristi bežično povezivanje).
-2. Otvori projekat u Xcode-u.
-3. Izaberi iPhone i **Run** ponovo.
-4. Ako je istekao profil, Xcode će ga obnoviti.
-
-### Opcija B: AltStore / SideStore
+### Opcija A: AltStore / SideStore
 
 AltStore i SideStore mogu da potpišu aplikaciju tvojim besplatnim Apple ID-jem
 i da je osvežavaju pre isteka.
@@ -135,13 +163,20 @@ i da je osvežavaju pre isteka.
 - **SideStore**: slično, ali može da osvežava na samom iPhone-u preko lokalnog
   VPN-a; prvo podešavanje i dalje traži Mac.
 
+### Opcija B: ponovo iz Xcode-a
+
+1. Poveži iPhone (ili koristi bežično povezivanje).
+2. Otvori projekat u Xcode-u.
+3. Izaberi iPhone i **Run** ponovo.
+4. Ako je istekao profil, Xcode će ga obnoviti.
+
 **Napomena:** pošto aplikacija ima keyboard extension, nije svaki IPA tok
 podržan. Ako AltStore/SideStore ne uspe da potpiše extension, koristi Xcode.
 Xcode je jedini siguran način za prvi build.
 
 ---
 
-## 4. Česte greške
+## 5. Česte greške
 
 | Problem | Rešenje |
 |---|---|
@@ -158,24 +193,25 @@ Xcode je jedini siguran način za prvi build.
 
 ---
 
-## 5. Privatnost i bezbednost
+## 6. Privatnost i bezbednost
 
 - Snimak se obrađuje **lokalno**; zvuk se ne šalje na server.
 - Tastatura sa **Full Access** tehnički može da vidi ono što kucaš. Diktator
   tastatura ne šalje podatke na mrežu i ne čuva istoriju; clipboard čita samo
   kada tapneš **Nalepi**.
-- Ako uključiš opciono LLM doterivanje, **samo tekst** se šalje izabranom
-  servisu (Gemini/DeepSeek/OpenAI/…); zvuk nikada.
+- LLM doterivanje nije u prvoj verziji. Ako se kasnije doda, **samo tekst** bi
+  se slao izabranom servisu (Gemini/DeepSeek/OpenAI/…); zvuk nikada.
 - API ključevi se čuvaju u Keychain-u, ne u git-u.
 
 ---
 
-## 6. Šta ovo rešenje ne može
+## 7. Šta ovo rešenje ne može
 
 - Tastatura **ne može da snima** — Apple to zabranjuje. Zato se snima u
   glavnoj aplikaciji i vraćaš se u ciljnu aplikaciju.
 - Ne postoji automatski povratak u prethodnu aplikaciju; koristi se statusna
   traka „Back to …“.
-- Nema App Group-a, pa tastatura i aplikacija ne dele istoriju ni podešavanja.
+- Nema App Group-a, pa tastatura i aplikacija ne dele istoriju ni podešavanja;
+  istorija i rečnik su samo u glavnoj aplikaciji.
 - Nema App Store distribucije; ovo je lična instalacija.
 - Besplatni profil traje 7 dana.

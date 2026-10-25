@@ -1,13 +1,13 @@
 # Plan · Diktator iOS
 
-## 1. Arhitektura (preporučena)
+## 1. Arhitektura (potvrđena)
 
 ```text
 ┌─────────────────────────────┐        ┌──────────────────────────────┐
 │  DiktatorIOS (glavna app)   │        │  DiktatorKeyboard (extension)│
 │                             │        │                              │
-│  mikrofon → AVAudioEngine   │        │  slova / razmaci             │
-│  whisper.cpp → tekst        │        │  [Diktiraj] → diktator://    │
+│  mikrofon → AVAudioEngine   │        │  puna QWERTY tastatura       │
+│  whisper.cpp → tekst        │        │  [Diktiraj] → diktator-ios://│
 │  UIPasteboard.general = txt │        │  [Nalepi] ← clipboard        │
 │  istorija / rečnik / modeli │        │  textDocumentProxy.insert    │
 └──────────────┬──────────────┘        └──────────────┬───────────────┘
@@ -20,7 +20,7 @@
 
 1. Korisnik u bilo kojoj aplikaciji prebaci tastaturu na **Diktator**.
 2. Tapne **Diktiraj** — tastatura otvara glavnu aplikaciju preko
-   `diktator://dictate` (`extensionContext.open`).
+   `diktator-ios://dictate` (`extensionContext.open`).
 3. Aplikacija odmah počinje snimanje (ili pokaže veliko dugme za snimanje).
 4. Posle prepisa aplikacija kopira tekst u `UIPasteboard.general` i prikaže
    „Tekst je spreman — vrati se i nalepi“.
@@ -44,8 +44,8 @@ bez App Group-a; tastatura ga čita samo kada korisnik uključi **Full Access**.
 
 ### Glavna aplikacija `DiktatorIOS`
 
-- SwiftUI, minimum iOS 17 (ili iOS 26 ako se kasnije doda SpeechAnalyzer).
-- `DiktatorApp` — ulaz, URL scheme, stanje.
+- SwiftUI, minimum iOS 17.
+- `DiktatorApp` — ulaz, URL scheme `diktator-ios`, stanje.
 - `Snimac` — `AVAudioEngine`, 16 kHz mono, ograničenje 5 min.
 - `Prepisivac` — whisper.cpp C API; jezik `auto` (sr/en), režim kvalitet /
   štedljiv.
@@ -55,13 +55,17 @@ bez App Group-a; tastatura ga čita samo kada korisnik uključi **Full Access**.
 - `Podesavanja` — UserDefaults; API ključevi u Keychain-u.
 - `Istorija`, `Recnik`, `PogledPomoc`, `PogledPodesavanja`.
 - `Clipboard` — upis u `UIPasteboard.general`.
+- Podrazumevani model: **Large v3 Turbo q5_0** (~547 MB).
 
 ### Tastatura `DiktatorKeyboard`
 
-- `UIInputViewController`.
-- Standardna slova, brojevi, razmaci, brisanje, enter; srpska latinica.
-- Dugme **Diktiraj**: `extensionContext?.open(URL(string: "diktator://dictate")!)`.
-- Dugme **Nalepi**: čita `UIPasteboard.general.string` i zove
+- `UIInputViewController`, puna tastatura.
+- QWERTY slova, srpska slova `čćžšđ`, brojevi, shift, brisanje, razmak,
+  enter, globus.
+- Gornja traka: **Diktiraj** i **Nalepi**.
+- **Diktiraj**:
+  `extensionContext?.open(URL(string: "diktator-ios://dictate")!)`.
+- **Nalepi**: čita `UIPasteboard.general.string` i zove
   `textDocumentProxy.insertText`.
 - Bez mreže i bez čuvanja istorije u tastaturi.
 - `RequestsOpenAccess = true` u `Info.plist`; korisnik mora da uključi
@@ -79,19 +83,20 @@ bez App Group-a; tastatura ga čita samo kada korisnik uključi **Full Access**.
   - proizvodi `libwhisper.a`, `libggml*.a` i Metal shader.
 - Modeli se ne stavljaju u git; preuzimaju se u
   `Application Support/Diktator/models/`.
-- Podrazumevano: **Small q5_1** (~181 MB) ili **Turbo q5_0** (~547 MB).
-- Veliki model (Large v3) ostaje opcija, ali nije podrazumevan na iPhone-u.
+- Podrazumevano: **Turbo q5_0** (~547 MB); opcije Small q5_1 (~181 MB),
+  Base q5_1 (~57 MB), Large v3 q5_0 (~1 GB).
 
 ## 4. Xcode projekat
 
 - Dva targeta:
-  - `DiktatorIOS` (application), bundle ID npr. `com.cedomirovic.diktator`;
+  - `DiktatorIOS` (application), bundle ID
+    `com.cedomirovic.diktator.ios`;
   - `DiktatorKeyboard` (app extension), bundle ID
-    `com.cedomirovic.diktator.keyboard`.
+    `com.cedomirovic.diktator.ios.keyboard`.
 - Bez App Group entitlement-a.
 - `Info.plist` aplikacije:
   - `NSMicrophoneUsageDescription`;
-  - URL scheme `diktator`.
+  - URL scheme `diktator-ios`.
 - `Info.plist` tastature:
   - `NSExtensionPointIdentifier = com.apple.keyboard-service`;
   - `RequestsOpenAccess = true`;
@@ -103,15 +108,15 @@ bez App Group-a; tastatura ga čita samo kada korisnik uključi **Full Access**.
 
 ## 5. Faze
 
-1. **Skelet** — folder, git, dokumentacija, odluke.
-2. **GitHub** — repo, README, licenca, prvi push.
+1. **Skelet** — folder, git, dokumentacija, odluke. ✅
+2. **GitHub** — repo, README, licenca, prvi push. ✅
 3. **Xcode projekat** — app + keyboard target, prazni ekrani.
 4. **Whisper iOS** — build biblioteka, `--test-whisper` ekvivalent.
 5. **Snimanje i prepis** — `AVAudioEngine` + whisper, sr/en.
 6. **Clipboard i tastatura** — Diktiraj/Nalepi, Full Access.
 7. **Modeli i podešavanja** — download, izbor modela, režim.
-8. **Istorija/rečnik** — po dogovoru.
-9. **Instalacija** — Xcode uputstvo, AltStore/SideStore, proba na iPhone-u.
+8. **Istorija/rečnik** — u glavnoj aplikaciji.
+9. **Instalacija** — IPA, AltStore/SideStore, proba na iPhone-u.
 10. **Release** — tag, zip/IPA, uputstvo.
 
 ## 6. Rizici
@@ -121,8 +126,8 @@ bez App Group-a; tastatura ga čita samo kada korisnik uključi **Full Access**.
   ručno lepljenje.
 - **Dva prelaska između aplikacija** — iOS ne dozvoljava automatski povratak;
   statusna traka „Back to …“ je najbrži put.
-- **Memorija** — whisper model i runtime moraju da stanu u glavnu aplikaciju;
-  tastatura je laka i ne učitava model.
+- **Memorija** — Turbo model je ~547 MB; na starijim iPhone-ima može da bude
+  tesno. Zato Small/Base ostaju opcije.
 - **Xcode** — trenutno nije instaliran; bez njega nema builda ni potpisa.
 - **App Store** — tastatura sa Full Access-om je osetljiva za review; ovo je
   za sada sideload/lična instalacija, ne App Store distribucija.
@@ -136,3 +141,4 @@ bez App Group-a; tastatura ga čita samo kada korisnik uključi **Full Access**.
   deli tekst/podešavanja, a traži plaćeni nalog. Nema prednost za snimanje.
 - **Cloud prepis**: brži i lakši, ali krši privatnost i cilj projekta.
 - **Apple Speech**: nema srpski; otpada.
+- **LLM doterivanje**: nije u MVP-u; može kasnije, opciono.
