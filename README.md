@@ -17,8 +17,10 @@ Projekat je nastao iz macOS aplikacije
 
 Xcode 26.6 je instaliran i whisper.cpp za iOS (arm64, Metal + Accelerate) je
 izgrađen. **Debug i Release build prolaze**, a skripta pravi nepotpisan
-`build/DiktatorIOS.ipa` (~1.6 MB bez modela). Potpisivanje i test na iPhone-u
-tek slede: na Macu trenutno nema potpisnog identiteta ni povezanog uređaja.
+`build/DiktatorIOS.ipa` (~1.6 MB bez modela). Simulator (iPhone 17, iOS 26.5)
+potvrđuje da se aplikacija pokreće i da `diktator-ios://dictate` počinje
+snimanje. Potpisivanje i test na iPhone-u tek slede: na Macu trenutno nema
+potpisnog identiteta ni povezanog uređaja.
 
 ## Šta je odlučeno
 

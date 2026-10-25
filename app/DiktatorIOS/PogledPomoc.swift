@@ -17,7 +17,7 @@ struct PogledPomoc: View {
                     Text("Diktat")
                         .font(.title2.bold())
                     Text("1. U bilo kojoj aplikaciji prebaci na Diktator tastaturu.")
-                    Text("2. Tapni Diktiraj — otvara se aplikacija.")
+                    Text("2. Tapni Diktiraj — otvara se aplikacija (ako iOS pita, tapni Open).")
                     Text("3. Snimi govor i sačekaj prepis.")
                     Text("4. Vrati se preko „Back to …“ i tapni Nalepi.")
 

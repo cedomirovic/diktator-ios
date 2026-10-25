@@ -23,6 +23,9 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 - `build/DiktatorIOS.ipa` je napravljen (nepotpisan, ~1.6 MB bez modela).
   Nema potpisnog identiteta ni povezanog iPhone-a, pa potpisivanje i test na
   uređaju tek slede.
+- Simulator (iPhone 17, iOS 26.5): aplikacija se pokreće, UI se prikazuje, a
+  `diktator-ios://dictate` pokreće snimanje. iOS prikaže
+  **„Open in Diktator?“** i traži potvrdu **Open**.
 
 ## Cilj
 

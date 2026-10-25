@@ -112,9 +112,10 @@ bez App Group-a; tastatura ga čita samo kada korisnik uključi **Full Access**.
 2. **GitHub** — repo, README, licenca, prvi push. ✅
 3. **Xcode projekat** — app + keyboard target, Swift kod. ✅
 4. **Whisper iOS** — biblioteke za arm64, Metal + Accelerate. ✅
-5. **Snimanje i prepis** — kod portovan; build prolazi; test na uređaju čeka.
+5. **Snimanje i prepis** — build prolazi; simulator potvrđuje snimanje preko
+   URL scheme; prepis/model i test na uređaju čekaju.
 6. **Clipboard i tastatura** — Diktiraj/Nalepi i puna tastatura; build prolazi;
-   test na uređaju čeka.
+   URL scheme radi u simulatoru; Full Access i Nalepi čekaju uređaj.
 7. **Modeli i podešavanja** — download, izbor modela, režim; build prolazi;
    test na uređaju čeka.
 8. **Istorija/rečnik** — kod u glavnoj aplikaciji; build prolazi; test čeka.
@@ -130,7 +131,8 @@ bez App Group-a; tastatura ga čita samo kada korisnik uključi **Full Access**.
   statusna traka „Back to …“ je najbrži put.
 - **Memorija** — Turbo model je ~547 MB; na starijim iPhone-ima može da bude
   tesno. Zato Small/Base ostaju opcije.
-- **Xcode** — trenutno nije instaliran; bez njega nema builda ni potpisa.
+- **Xcode** — instaliran (26.6); potpisni identitet i povezani iPhone još nisu
+  podešeni, pa nema instalacije na uređaj.
 - **App Store** — tastatura sa Full Access-om je osetljiva za review; ovo je
   za sada sideload/lična instalacija, ne App Store distribucija.
 - **Apple Speech** — ne podržava srpski; ne koristimo ga za srpski.

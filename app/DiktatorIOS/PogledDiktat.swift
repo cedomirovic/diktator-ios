@@ -100,7 +100,7 @@ struct PogledDiktat: View {
                         Text("Kako radi")
                             .font(.headline)
                         Text("1. U bilo kojoj aplikaciji otvori Diktator tastaturu.")
-                        Text("2. Tapni Diktiraj — aplikacija se otvara i snima.")
+                        Text("2. Tapni Diktiraj — ako iOS pita „Open in Diktator?“, tapni Open.")
                         Text("3. Vrati se preko „Back to …“ i tapni Nalepi.")
                     }
                     .font(.footnote)

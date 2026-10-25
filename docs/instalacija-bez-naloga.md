@@ -109,7 +109,8 @@ plaćeni nalog.
 1. U bilo kojoj aplikaciji otvori tekstualno polje i prebaci tastaturu na
    **Diktator** (globus/ikona tastature).
 2. Možeš da kucaš direktno na Diktator tastaturi (QWERTY + `čćžšđ`), ili da
-   tapneš **Diktiraj** — otvoriće se Diktator aplikacija.
+   tapneš **Diktiraj** — otvoriće se Diktator aplikacija. Ako iOS prikaže
+   **„Open in Diktator?“**, tapni **Open**.
 3. Snimi govor; aplikacija prepisuje lokalno i kopira tekst u clipboard.
 4. Vrati se u prethodnu aplikaciju preko **„Back to …“** u statusnoj traci ili
    preko app switcher-a.
