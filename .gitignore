@@ -1,0 +1,26 @@
+# macOS / Xcode
+.DS_Store
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+project.xcworkspace/xcuserdata/
+*.dSYM
+*.ipa
+*.xcarchive
+*.moved-aside
+
+# Swift Package Manager (ne koristimo, ali da ne uđe slučajno)
+.build/
+.swiftpm/
+
+# Whisper biblioteke i modeli — veliki fajlovi, ne idu u git
+app/vendor-ios/
+app/vendor/
+models/
+*.bin
+*.gguf
+
+# Korisnikovi snimci i prepisi
+snimci/
+izlaz/
