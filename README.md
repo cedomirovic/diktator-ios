@@ -11,14 +11,14 @@ Projekat je nastao iz macOS aplikacije
 - Aplikacija: **Diktator iOS** (`com.cedomirovic.diktator.ios`)
 - Tastatura: `com.cedomirovic.diktator.ios.keyboard`
 - Podrazumevani model: **Large v3 Turbo q5_0** (~547 MB)
-- Minimum iOS 17; testirano na iOS 26
+- Minimum iOS 17; ciljani test na iOS 26
 
 ## Status
 
-Xcode projekat sa dva targeta (`DiktatorIOS` i `DiktatorKeyboard`) je
-napravljen, a Swift kod za snimanje, whisper, modele, istoriju, rečnik i punu
-tastaturu je u repou. Xcode još nije instaliran na razvojnom Macu, pa build i
-test na iPhone-u nisu pokrenuti.
+Xcode 26.6 je instaliran i whisper.cpp za iOS (arm64, Metal + Accelerate) je
+izgrađen. **Debug i Release build prolaze**, a skripta pravi nepotpisan
+`build/DiktatorIOS.ipa` (~1.6 MB bez modela). Potpisivanje i test na iPhone-u
+tek slede: na Macu trenutno nema potpisnog identiteta ni povezanog uređaja.
 
 ## Šta je odlučeno
 

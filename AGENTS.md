@@ -16,11 +16,13 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
   - Minimum iOS 17; test na iOS 26.
   - Instalacija: **AltStore/SideStore**; Xcode služi za build i potpis.
   - MVP: diktat + tastatura, istorija, rečnik; **bez** LLM doterivanja.
-- Xcode još nije instaliran na ovom Macu (aktivan je Command Line Tools).
-  Korisnik će ga instalirati; bez Xcode-a nema builda ni potpisa.
+- Xcode 26.6 je instaliran (iOS SDK 26.5); `app/pripremi-whisper-ios.sh` je
+  napravio whisper.cpp biblioteke za iOS arm64 (Metal + Accelerate).
 - Xcode projekat (`app/DiktatorIOS.xcodeproj`), Swift kod, puna tastatura,
-  modeli, istorija i rečnik su u repou. Build i test na iPhone-u čekaju Xcode
-  i whisper.cpp biblioteke za iOS.
+  modeli, istorija i rečnik su u repou. Debug i Release build prolaze.
+- `build/DiktatorIOS.ipa` je napravljen (nepotpisan, ~1.6 MB bez modela).
+  Nema potpisnog identiteta ni povezanog iPhone-a, pa potpisivanje i test na
+  uređaju tek slede.
 
 ## Cilj
 
@@ -85,9 +87,9 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Sledeći korak
 
-1. Instalirati Xcode 26.x i postaviti `xcode-select` na njega.
-2. Pokrenuti `app/pripremi-whisper-ios.sh` (whisper.cpp za iOS).
-3. Otvoriti `app/DiktatorIOS.xcodeproj`, izabrati Personal Team i build.
-4. Testirati snimanje/prepis, `diktator-ios://dictate`, Full Access i Nalepi.
-5. Napraviti IPA i testirati AltStore/SideStore.
-6. Ažurirati dokumentaciju rezultatima testa.
+1. Otvoriti `app/DiktatorIOS.xcodeproj`, dodati Apple ID/Personal Team za oba
+   targeta, izabrati povezani iPhone i pokrenuti Run.
+2. Testirati snimanje/prepis, `diktator-ios://dictate`, Full Access i Nalepi.
+3. Napraviti IPA i testirati AltStore/SideStore potpisivanje (uključujući
+   keyboard extension).
+4. Ažurirati dokumentaciju rezultatima testa.

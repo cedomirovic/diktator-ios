@@ -237,11 +237,12 @@ final class AppStanje: ObservableObject {
         guard let sekunde = OslobadjanjeModela.iz(podesavanja.oslobadjanjeModela).sekunde else {
             return
         }
+        let prepisivac = self.prepisivac
         timerOslobadjanja = Timer.scheduledTimer(
             withTimeInterval: max(1, sekunde),
             repeats: false
-        ) { [weak self] _ in
-            self?.prepisivac.oslobodi()
+        ) { _ in
+            prepisivac.oslobodi()
         }
     }
 

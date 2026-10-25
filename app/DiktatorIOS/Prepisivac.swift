@@ -19,7 +19,9 @@ enum GreskaPrepisa: LocalizedError {
     }
 }
 
-final class Prepisivac {
+/// Pristup whisper kontekstu je serijalizovan preko `red`, a stanje učitavanja
+/// preko `bravaStanja`, pa je instancu bezbedno koristiti iz pozadinskih niti.
+final class Prepisivac: @unchecked Sendable {
     private var kontekst: OpaquePointer?
     private let red = DispatchQueue(label: "com.cedomirovic.diktator.ios.whisper")
     private let bravaStanja = NSLock()

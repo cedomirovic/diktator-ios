@@ -8,9 +8,17 @@ VER="${WHISPER_VER:-v1.9.5}"
 SRC="${WHISPER_SRC:-${TMPDIR:-/tmp}/whisper-cpp-ios-$VER}"
 BUILD="$SRC/build-ios"
 
+# Ako je xcode-select još na Command Line Tools, koristi Xcode.app direktno.
+if ! xcodebuild -version >/dev/null 2>&1; then
+  if [ -x /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild ]; then
+    export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
+  fi
+fi
+
 if ! xcodebuild -version >/dev/null 2>&1; then
   echo "Nedostaje Xcode. Instaliraj Xcode 26.x iz App Store-a i pokreni:" >&2
   echo "  sudo xcode-select -s /Applications/Xcode.app/Contents/Developer" >&2
+  echo "  sudo xcodebuild -license accept" >&2
   exit 1
 fi
 

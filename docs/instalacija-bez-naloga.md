@@ -181,6 +181,7 @@ Xcode je jedini siguran način za prvi build.
 | Problem | Rešenje |
 |---|---|
 | `xcodebuild` ne radi / „requires Xcode“ | `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer` |
+| `xcodebuild` traži prihvatanje licence | `sudo xcodebuild -license accept` |
 | „No signing certificate“ | Xcode → Settings → Accounts → Apple ID → Personal Team; uključi Automatically manage signing. |
 | „Bundle identifier is not available“ | Promeni bundle ID za oba targeta, zadrži isti prefiks. |
 | Aplikacija se ne otvara posle instalacije | Settings → General → VPN & Device Management → Trust developer. |

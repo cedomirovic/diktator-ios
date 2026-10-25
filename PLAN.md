@@ -110,14 +110,15 @@ bez App Group-a; tastatura ga čita samo kada korisnik uključi **Full Access**.
 
 1. **Skelet** — folder, git, dokumentacija, odluke. ✅
 2. **GitHub** — repo, README, licenca, prvi push. ✅
-3. **Xcode projekat** — app + keyboard target, Swift kod. ✅ (build čeka Xcode)
-4. **Whisper iOS** — skripta `pripremi-whisper-ios.sh`; build čeka Xcode.
-5. **Snimanje i prepis** — kod portovan; test čeka build.
-6. **Clipboard i tastatura** — kod za Diktiraj/Nalepi i punu tastaturu;
-   test čeka build.
-7. **Modeli i podešavanja** — download, izbor modela, režim; test čeka build.
-8. **Istorija/rečnik** — kod u glavnoj aplikaciji; test čeka build.
-9. **Instalacija** — uputstvo i skripta za IPA; test čeka build.
+3. **Xcode projekat** — app + keyboard target, Swift kod. ✅
+4. **Whisper iOS** — biblioteke za arm64, Metal + Accelerate. ✅
+5. **Snimanje i prepis** — kod portovan; build prolazi; test na uređaju čeka.
+6. **Clipboard i tastatura** — Diktiraj/Nalepi i puna tastatura; build prolazi;
+   test na uređaju čeka.
+7. **Modeli i podešavanja** — download, izbor modela, režim; build prolazi;
+   test na uređaju čeka.
+8. **Istorija/rečnik** — kod u glavnoj aplikaciji; build prolazi; test čeka.
+9. **Instalacija** — uputstvo i nepotpisan IPA; AltStore test čeka.
 10. **Release** — tag, zip/IPA, uputstvo; posle testa na iPhone-u.
 
 ## 6. Rizici

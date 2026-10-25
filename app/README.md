@@ -14,7 +14,8 @@ app/
 
 ## Prvi build
 
-Xcode 26.x je obavezan; samo Command Line Tools nije dovoljno.
+Xcode 26.x je obavezan; samo Command Line Tools nije dovoljno. Proveren build:
+Xcode 26.6, iOS SDK 26.5, Debug i Release prolaze.
 
 ```bash
 # 1. whisper.cpp za iOS (arm64, Metal + Accelerate)
