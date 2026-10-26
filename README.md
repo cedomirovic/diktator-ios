@@ -12,7 +12,7 @@ Projekat je nastao iz macOS aplikacije
 **snimak i tekst ostaju na uređaju**, bez slanja zvuka na server.
 
 - GitHub: <https://github.com/cedomirovic/diktator-ios>
-- Verzija: **0.1.1 (2)**
+- Verzija: **0.1.5 (6)**
 - Aplikacija: **Diktator iOS** (`com.cedomirovic.diktator.ios`)
 - Tastatura: `com.cedomirovic.diktator.ios.keyboard`
 - Preporučeni model: **Large v3 q5_0** (~1,0 GB) — tačniji za srpski.
@@ -21,7 +21,7 @@ Projekat je nastao iz macOS aplikacije
 
 ## Status
 
-Verzija **0.1.1 (2)** je potpisana i instalirana na **iPhone 15 Pro**
+Verzija **0.1.5 (6)** je potpisana i instalirana na **iPhone 15 Pro**
 (iOS 27.0.1). Debug i Release build prolaze na macOS 26.7.1 i Xcode 27.1;
 whisper.cpp za iOS (arm64, Metal + Accelerate) je izgrađen. Skripta pravi
 nepotpisan `build/DiktatorIOS.ipa` (~1.6 MB bez modela).
@@ -31,9 +31,23 @@ clipboard, istorija, rečnik i puna tastatura. Tastatura na iOS 26+ traži
 **Allow Full Access** za čitanje clipboarda i otvaranje aplikacije dugmetom
 **Diktiraj**; u gornjoj traci treba da piše **Full Access ✓**.
 
+Nova pozadinska sesija omogućava da tastatura snima dok je otvorena bilo koja
+aplikacija. Prvi `Diktiraj` otvara Diktator da uključi sesiju i odmah počinje
+snimanje; posle toga tastatura ostaje u host aplikaciji i šalje `start`/`stop`.
+Status i komande idu preko imenovanih pasteboard-a i Darwin notifikacija, a
+gotov tekst preko clipboarda.
+
 Na srpskom sistemu aplikacija podrazumevano bira jezik **Srpski**, a ne
 automatsku detekciju. Za srpski je preporučen **Large v3**; Turbo je brži, ali
 na srpskom ume više da pogreši.
+
+## Statistika
+
+Glavni ekran ima karticu **Statistika**: današnje reči, niz dana i ušteđeno
+vreme. Tap na karticu otvara detalje: ukupno reči i diktata, prosečnu brzinu
+(reči/min), grafikon poslednjih 7 dana, vreme govora, najduži niz, jezike i
+prosečan diktat. Statistika se računa lokalno iz broja reči i trajanja; ne
+čuva tekst i može se obrisati nezavisno od istorije.
 
 Ako Xcode ili `devicectl` prijave da uređaj nije uparen, prvo ga upari:
 
@@ -49,19 +63,24 @@ Posle toga rade i `devicectl device install app` i
 
 1. U bilo kojoj aplikaciji otvori tekstualno polje i prebaci tastaturu na
    **Diktator**.
-2. Tapni **Diktiraj** — otvara se Diktator. Ako iOS prikaže
-   **„Open in Diktator?“**, tapni **Open**.
-3. Snimi govor; aplikacija prepisuje lokalno i kopira tekst u clipboard.
-4. Vrati se u prethodnu aplikaciju preko **„Back to …“** ili app switcher-a.
-5. Tapni **Nalepi** — tekst se ubacuje u polje.
+2. Tapni **Diktiraj**. Prvi put se otvara Diktator, uključuje pozadinsku
+   sesiju i odmah počinje snimanje. Ako iOS prikaže **„Open in Diktator?“**,
+   tapni **Open**.
+3. Vrati se u host aplikaciju i govori. Tastatura preuzima status i prikazuje
+   **Snimam…**.
+4. Tapni **Stop** — aplikacija prepisuje lokalno, a tastatura automatski
+   ubacuje tekst. Nema potrebe za **„Back to …“**.
+5. Sledeći put tapni **Diktiraj** direktno u tastaturi; Diktator se ne otvara
+   dok je sesija aktivna (do 15 minuta).
 
 ## Šta je odlučeno
 
 - iOS tastatura **ne može da pristupi mikrofonu** — Apple to zabranjuje svim
   app extension-ima. Zato glavna aplikacija snima i prepisuje.
 - **App Groups nisu dostupne sa besplatnim Apple ID-jem**, pa ih ne koristimo.
+  Status i komande idu preko imenovanih pasteboard-a i **Darwin notifikacija**.
 - Tekst se predaje tastaturi preko **clipboarda**: aplikacija kopira prepis,
-  tastatura ga ubacuje dugmetom **Nalepi**.
+  tastatura ga ubacuje automatski ili dugmetom **Nalepi**.
 - Tastatura je **puna QWERTY tastatura** sa srpskim slovima `čćžšđ`, brojevima
   i dugmadima **Diktiraj** / **Nalepi**.
 - Za srpski je potreban **whisper.cpp**; Apple Speech ne podržava srpski.

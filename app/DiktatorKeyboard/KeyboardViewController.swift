@@ -1,5 +1,94 @@
 import UIKit
 
+/// Dijagnostika tastature ide u njen sopstveni container; posle testa se
+/// fajl izvuče preko devicectl-a.
+private enum Dnevnik {
+    static let putanja: URL = {
+        let folder = FileManager.default.urls(
+            for: .documentDirectory,
+            in: .userDomainMask
+        )[0]
+        return folder.appendingPathComponent("diktator-tastatura-dnevnik.txt")
+    }()
+
+    static func pisi(_ tekst: String) {
+        let red = "\(Date().formatted(date: .numeric, time: .standard)) \(tekst)\n"
+        guard let podaci = red.data(using: .utf8) else { return }
+        if FileManager.default.fileExists(atPath: putanja.path) {
+            guard let rucica = try? FileHandle(forWritingTo: putanja) else { return }
+            rucica.seekToEndOfFile()
+            rucica.write(podaci)
+            try? rucica.close()
+        } else {
+            try? podaci.write(to: putanja)
+        }
+    }
+}
+
+private enum DiktatorClipboard {
+    static let tekst = "public.utf8-plain-text"
+    static let token = "com.cedomirovic.diktator.token"
+    static let vreme = "com.cedomirovic.diktator.vreme"
+}
+
+/// Imenovani pasteboard-i dele aplikacija i tastatura (isti Team ID), pa ne
+/// treba App Group. Preko njih tastatura šalje start/stop, a aplikacija vraća
+/// status i gotov tekst.
+private enum DiktatorIPC {
+    static let komande = UIPasteboard.Name(rawValue: "com.cedomirovic.diktator.komande")
+    static let stanje = UIPasteboard.Name(rawValue: "com.cedomirovic.diktator.stanje")
+    static let komanda = "komanda"
+    static let id = "id"
+    static let vreme = "vreme"
+    static let sesija = "sesija"
+    static let stanjeKljuc = "stanje"
+    static let token = "token"
+    static let tokenVreme = "tokenVreme"
+    static let tekst = "tekst"
+    static let greska = "greska"
+
+    static let notifKomanda = "com.cedomirovic.diktator.cmd"
+    static let notifStanje = "com.cedomirovic.diktator.st"
+
+    static func tabla(_ ime: UIPasteboard.Name) -> UIPasteboard? {
+        UIPasteboard(name: ime, create: true)
+    }
+
+    static func pisi(_ ime: UIPasteboard.Name, _ vrednosti: [String: String]) {
+        guard let tabla = tabla(ime) else { return }
+        tabla.items = [vrednosti.mapValues { Data($0.utf8) }]
+    }
+
+    static func citaj(_ ime: UIPasteboard.Name) -> [String: String] {
+        guard let predmet = tabla(ime)?.items.first else { return [:] }
+        var rezultat: [String: String] = [:]
+        for (kljuc, vrednost) in predmet {
+            if let tekst = vrednost as? String {
+                rezultat[kljuc] = tekst
+            } else if let podaci = vrednost as? Data,
+                      let tekst = String(data: podaci, encoding: .utf8) {
+                rezultat[kljuc] = tekst
+            }
+        }
+        return rezultat
+    }
+
+    static func posaljiNotifikaciju(_ ime: String) {
+        CFNotificationCenterPostNotification(
+            CFNotificationCenterGetDarwinNotifyCenter(),
+            CFNotificationName(rawValue: ime as CFString),
+            nil,
+            nil,
+            true
+        )
+    }
+
+    static func imeKomande(_ komanda: String, id: String, vreme: Double) -> String {
+        let ms = Int(vreme * 1000)
+        return "\(notifKomanda).\(komanda).\(id).\(ms)"
+    }
+}
+
 final class KeyboardViewController: UIInputViewController {
     private enum TipTastature {
         case slova
@@ -10,11 +99,31 @@ final class KeyboardViewController: UIInputViewController {
     private let gornjaTraka = UIStackView()
     private let tastatura = UIStackView()
     private let status = UILabel()
+    private var dugmeDiktiraj: UIButton?
 
     private var tip: TipTastature = .slova
     private var velikaSlova = false
     private var slovaDugmad: [(dugme: UIButton, osnovni: String)] = []
     private var dugmeShift: UIButton?
+    private let zadnjiTokenKey = "diktator.zadnjiToken"
+    private let cekaDiktatKey = "diktator.cekaDiktat"
+    private let cekaSesijuKey = "diktator.cekaSesiju"
+    private let cekaSesijuVremeKey = "diktator.cekaSesijuVreme"
+    private var autoNalepiUToku = false
+    private var timerAutoNalepi: Timer?
+    private var timerIPC: Timer?
+    private var timerSesijaTimeout: Timer?
+    private var sesijaAktivna = false
+    private var snimaSesijom = false
+    private var obradaSesije = false
+    private var cekaStartSesije = false
+    private var zadnjiKomandniId: String?
+    private var privremeniStatus: String?
+    private var privremeniStatusVreme: Date?
+    private var zadnjeStanjeVreme: Double = 0
+    private var zadnjaNotifikacija: Date?
+    private var darwinRegistrovan = false
+    private var zadnjiDnevnikStanja = ""
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,7 +135,92 @@ final class KeyboardViewController: UIInputViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        azurirajStatus()
+        Dnevnik.pisi(
+            "viewWillAppear, cekaSesiju=\(UserDefaults.standard.bool(forKey: cekaSesijuKey)), cekaDiktat=\(UserDefaults.standard.bool(forKey: cekaDiktatKey))"
+        )
+        NSLog("Diktator tastatura: viewWillAppear")
+        registrujDarwin()
+        pokreniIPCPolling()
+        NotificationCenter.default.removeObserver(
+            self,
+            name: UIPasteboard.changedNotification,
+            object: UIPasteboard.general
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(pasteboardPromenjen),
+            name: UIPasteboard.changedNotification,
+            object: UIPasteboard.general
+        )
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak self] in
+            self?.pokreniCekanjeAkoTreba()
+        }
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        NSLog("Diktator tastatura: viewDidAppear")
+        // Tastatura se posle povratka iz aplikacije ponekad pojavi pre nego
+        // što je textDocumentProxy spreman; kratak delay rešava taj slučaj.
+        osveziIPCStanje()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) { [weak self] in
+            self?.pokreniCekanjeAkoTreba()
+        }
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        timerAutoNalepi?.invalidate()
+        timerAutoNalepi = nil
+        timerIPC?.invalidate()
+        timerIPC = nil
+        timerSesijaTimeout?.invalidate()
+        timerSesijaTimeout = nil
+        NotificationCenter.default.removeObserver(
+            self,
+            name: UIPasteboard.changedNotification,
+            object: UIPasteboard.general
+        )
+        odjaviDarwin()
+    }
+
+    private func registrujDarwin() {
+        guard !darwinRegistrovan else { return }
+        darwinRegistrovan = true
+        CFNotificationCenterAddObserver(
+            CFNotificationCenterGetDarwinNotifyCenter(),
+            Unmanaged.passUnretained(self).toOpaque(),
+            { _, observer, ime, _, _ in
+                guard let observer, let ime else { return }
+                let tastatura = Unmanaged<KeyboardViewController>
+                    .fromOpaque(observer)
+                    .takeUnretainedValue()
+                let tekst = ime.rawValue as String
+                Task { @MainActor in
+                    tastatura.primljenaNotifikacija(tekst)
+                }
+            },
+            nil,
+            nil,
+            .deliverImmediately
+        )
+    }
+
+    private func odjaviDarwin() {
+        guard darwinRegistrovan else { return }
+        darwinRegistrovan = false
+        CFNotificationCenterRemoveObserver(
+            CFNotificationCenterGetDarwinNotifyCenter(),
+            Unmanaged.passUnretained(self).toOpaque(),
+            nil,
+            nil
+        )
+    }
+
+    @objc private func pasteboardPromenjen() {
+        DispatchQueue.main.async { [weak self] in
+            self?.autoNalepiAkoTreba()
+        }
     }
 
     private func postaviVisinu() {
@@ -51,6 +245,7 @@ final class KeyboardViewController: UIInputViewController {
         diktiraj.setTitleColor(.white, for: .normal)
         diktiraj.titleLabel?.font = .systemFont(ofSize: 15, weight: .semibold)
         diktiraj.widthAnchor.constraint(equalToConstant: 92).isActive = true
+        dugmeDiktiraj = diktiraj
 
         let nalepi = napraviDugme(
             "Nalepi",
@@ -290,21 +485,92 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     @objc private func diktiraj() {
-        guard let url = URL(string: "diktator-ios://dictate") else { return }
-
-        // iOS 26 traži Full Access i za otvaranje matične aplikacije.
-        // Bez njega `extensionContext.open` vrati false, pa odmah objasnimo
-        // korisniku šta treba uključiti umesto nejasne poruke.
         guard hasFullAccess else {
             prikaziStatus("Uključi Full Access.")
             return
         }
 
-        prikaziStatus("Otvaram…")
-        NSLog("Diktator tastatura: otvaram %@, Full Access = %@", url.absoluteString, hasFullAccess ? "da" : "ne")
+        Dnevnik.pisi(
+            "Diktiraj: sesija=\(sesijaAktivna), snima=\(snimaSesijom), obrada=\(obradaSesije), cekaSesiju=\(UserDefaults.standard.bool(forKey: cekaSesijuKey))"
+        )
+        osveziIPCStanje()
+
+        if UserDefaults.standard.bool(forKey: cekaSesijuKey) {
+            ocistiCekanjeSesije()
+            UserDefaults.standard.set(false, forKey: cekaDiktatKey)
+            timerSesijaTimeout?.invalidate()
+            timerSesijaTimeout = nil
+            prikaziStatus("Otkazano.")
+            azurirajPrikaz()
+            return
+        }
+
+        if snimaSesijom {
+            cekaStartSesije = false
+            posaljiKomandu("stop")
+            snimaSesijom = false
+            obradaSesije = true
+            prikaziStatus("Obrada…")
+            azurirajPrikaz()
+            return
+        }
+
+        if obradaSesije {
+            prikaziStatus("Sačekaj da se završi prepis.")
+            return
+        }
+
+        if sesijaAktivna {
+            UserDefaults.standard.set(true, forKey: cekaDiktatKey)
+            cekaStartSesije = true
+            posaljiKomandu("start")
+            snimaSesijom = true
+            prikaziStatus("Snimam…")
+            pokreniTimeoutSesije()
+            azurirajPrikaz()
+            return
+        }
+
+        // Prvi put, ili posle isteka sesije: otvori aplikaciju da uključi
+        // pozadinsku sesiju. Kada se korisnik vrati, tastatura automatski
+        // pošalje start, pa nema potrebe da ponovo tapne Diktiraj.
+        UserDefaults.standard.set(true, forKey: cekaDiktatKey)
+        postaviCekanjeSesije()
+        prikaziStatus("Uključujem sesiju…")
+        otvoriAplikaciju("diktator-ios://sesija")
+        pokreniTimeoutSesije()
+        azurirajPrikaz()
+    }
+
+    private func posaljiKomandu(_ komanda: String) {
+        let id = UUID().uuidString
+        let vreme = Date().timeIntervalSince1970
+        zadnjiKomandniId = id
+        DiktatorIPC.pisi(DiktatorIPC.komande, [
+            DiktatorIPC.komanda: komanda,
+            DiktatorIPC.id: id,
+            DiktatorIPC.vreme: String(vreme)
+        ])
+        DiktatorIPC.posaljiNotifikaciju(
+            DiktatorIPC.imeKomande(komanda, id: id, vreme: vreme)
+        )
+        Dnevnik.pisi("Poslata komanda \(komanda) (\(id))")
+        NSLog("Diktator tastatura: poslata komanda %@ (%@).", komanda, id)
+    }
+
+    private func otvoriAplikaciju(_ adresa: String) {
+        guard let url = URL(string: adresa) else { return }
+        Dnevnik.pisi("Otvaram \(adresa), Full Access=\(hasFullAccess)")
+        NSLog(
+            "Diktator tastatura: otvaram %@, Full Access = %@",
+            url.absoluteString,
+            hasFullAccess ? "da" : "ne"
+        )
 
         guard let kontekst = extensionContext else {
             if !otvoriPrekoResponderLanca(url) {
+                UserDefaults.standard.set(false, forKey: cekaDiktatKey)
+                ocistiCekanjeSesije()
                 prikaziStatus("Otvori app ručno.")
             }
             return
@@ -322,8 +588,35 @@ final class KeyboardViewController: UIInputViewController {
                 if self.otvoriPrekoResponderLanca(url) {
                     self.prikaziStatus("Otvaram…")
                 } else {
+                    UserDefaults.standard.set(false, forKey: self.cekaDiktatKey)
+                    self.ocistiCekanjeSesije()
                     self.prikaziStatus("Otvori app ručno.")
                 }
+            }
+        }
+    }
+
+    private func pokreniTimeoutSesije() {
+        timerSesijaTimeout?.invalidate()
+        let cekanjeSesije = UserDefaults.standard.bool(forKey: cekaSesijuKey)
+        timerSesijaTimeout = Timer.scheduledTimer(
+            withTimeInterval: cekanjeSesije ? 8 : 1.8,
+            repeats: false
+        ) { [weak self] _ in
+            guard let self else { return }
+            if self.snimaSesijom || self.obradaSesije {
+                return
+            }
+
+            if UserDefaults.standard.bool(forKey: self.cekaSesijuKey) {
+                self.ocistiCekanjeSesije()
+                NSLog("Diktator tastatura: sesija nije odgovorila, otvaram app.")
+                self.prikaziStatus("Otvaram…")
+                self.otvoriAplikaciju("diktator-ios://dictate")
+            } else if !self.sesijaAktivna {
+                NSLog("Diktator tastatura: start nije odgovorio, otvaram app.")
+                self.prikaziStatus("Otvaram…")
+                self.otvoriAplikaciju("diktator-ios://dictate")
             }
         }
     }
@@ -362,28 +655,398 @@ final class KeyboardViewController: UIInputViewController {
             prikaziStatus("Uključi Full Access.")
             return
         }
-        guard let tekst = UIPasteboard.general.string?
-            .trimmingCharacters(in: .whitespacesAndNewlines),
-            !tekst.isEmpty else {
+        guard let (tekst, token) = tekstIzClipboarda() else {
             prikaziStatus("Clipboard je prazan.")
             return
         }
         textDocumentProxy.insertText(tekst)
+        if let token {
+            UserDefaults.standard.set(token, forKey: zadnjiTokenKey)
+        }
+        UserDefaults.standard.set(false, forKey: cekaDiktatKey)
+        ocistiCekanjeSesije()
+        timerAutoNalepi?.invalidate()
+        timerAutoNalepi = nil
+        timerSesijaTimeout?.invalidate()
+        timerSesijaTimeout = nil
+        cekaStartSesije = false
+        snimaSesijom = false
+        obradaSesije = false
         prikaziStatus("Nalepljeno.")
+        azurirajPrikaz()
+    }
+
+    private func pokreniIPCPolling() {
+        timerIPC?.invalidate()
+        osveziIPCStanje()
+        timerIPC = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: true) { [weak self] _ in
+            self?.osveziIPCStanje()
+        }
+    }
+
+    /// Čita status iz imenovanog pasteboard-a. Ako je sesija živa, ovde se
+    /// automatski šalje start posle prvog otvaranja aplikacije.
+    private func osveziIPCStanje() {
+        let vrednosti = DiktatorIPC.citaj(DiktatorIPC.stanje)
+        let sada = Date().timeIntervalSince1970
+        if let vremeString = vrednosti[DiktatorIPC.vreme],
+           let vreme = Double(vremeString),
+           sada - vreme <= 3 {
+            let sesija = vrednosti[DiktatorIPC.sesija] == "1"
+            let stanjeApp = vrednosti[DiktatorIPC.stanjeKljuc] ?? "mirno"
+            primeniStanje(sesija: sesija, stanje: stanjeApp, vreme: vreme)
+        } else if zadnjaNotifikacija == nil
+                    || Date().timeIntervalSince(zadnjaNotifikacija!) > 3 {
+            obradiStaleStanje()
+        }
+
+        if let (tekst, token) = tekstIzIPC() {
+            nalepiAutomatski(tekst, token: token, izvor: "IPC")
+        }
+
+        // Generalni clipboard je rezerva ako imenovani pasteboard nije
+        // dostupan u extension-u. Proveravamo ga i ovde, ne samo na
+        // UIPasteboard.changedNotification.
+        autoNalepiAkoTreba()
+        azurirajPrikaz()
+    }
+
+    private func primeniStanje(sesija: Bool, stanje: String, vreme: Double) {
+        guard vreme >= zadnjeStanjeVreme else { return }
+        zadnjeStanjeVreme = vreme
+        sesijaAktivna = sesija
+
+        let kljuc = "\(sesija)-\(stanje)"
+        if kljuc != zadnjiDnevnikStanja {
+            zadnjiDnevnikStanja = kljuc
+            Dnevnik.pisi("Stanje: sesija=\(sesija) stanje=\(stanje)")
+        }
+
+        switch stanje {
+        case "snima":
+            ocistiCekanjeSesije()
+            cekaStartSesije = false
+            snimaSesijom = true
+            obradaSesije = false
+            timerSesijaTimeout?.invalidate()
+            timerSesijaTimeout = nil
+        case "obrada":
+            ocistiCekanjeSesije()
+            cekaStartSesije = false
+            snimaSesijom = false
+            obradaSesije = true
+            timerSesijaTimeout?.invalidate()
+            timerSesijaTimeout = nil
+        case "mirno":
+            if !cekaStartSesije {
+                snimaSesijom = false
+            }
+            if !UserDefaults.standard.bool(forKey: cekaDiktatKey) {
+                obradaSesije = false
+            }
+
+            if UserDefaults.standard.bool(forKey: cekaSesijuKey) {
+                if sesija {
+                    ocistiCekanjeSesije()
+                    UserDefaults.standard.set(true, forKey: cekaDiktatKey)
+                    cekaStartSesije = true
+                    posaljiKomandu("start")
+                    snimaSesijom = true
+                    obradaSesije = false
+                    prikaziStatus("Snimam…")
+                    pokreniTimeoutSesije()
+                } else if !cekanjeSesijeTraje {
+                    ocistiCekanjeSesije()
+                    UserDefaults.standard.set(false, forKey: cekaDiktatKey)
+                    prikaziStatus("Sesija nije počela — tapni Diktiraj.")
+                }
+            }
+        case "greska":
+            ocistiCekanjeSesije()
+            cekaStartSesije = false
+            snimaSesijom = false
+            obradaSesije = false
+            if UserDefaults.standard.bool(forKey: cekaDiktatKey) {
+                UserDefaults.standard.set(false, forKey: cekaDiktatKey)
+                prikaziStatus("Greška — otvori Diktator.")
+            }
+            timerSesijaTimeout?.invalidate()
+            timerSesijaTimeout = nil
+        default:
+            break
+        }
+    }
+
+    private func obradiStaleStanje() {
+        if sesijaAktivna {
+            Dnevnik.pisi("Status je zastareo — sesija se gasi u tastaturi.")
+        }
+        sesijaAktivna = false
+        if snimaSesijom && !cekaStartSesije {
+            snimaSesijom = false
+        }
+        if obradaSesije && !UserDefaults.standard.bool(forKey: cekaDiktatKey) {
+            obradaSesije = false
+        }
+        if UserDefaults.standard.bool(forKey: cekaSesijuKey) && !cekanjeSesijeTraje {
+            ocistiCekanjeSesije()
+            UserDefaults.standard.set(false, forKey: cekaDiktatKey)
+            prikaziStatus("Sesija nije počela — tapni Diktiraj.")
+        }
+        azurirajPrikaz()
+    }
+
+    private func primljenaNotifikacija(_ ime: String) {
+        guard ime.hasPrefix(DiktatorIPC.notifStanje + ".") else { return }
+        let delovi = ime.components(separatedBy: ".")
+        guard delovi.count >= 7,
+              let ms = Double(delovi[6]),
+              Date().timeIntervalSince1970 - ms / 1000 <= 5 else {
+            return
+        }
+
+        zadnjaNotifikacija = Date()
+        let sesija = delovi[4] == "1"
+        let stanje = delovi[5]
+        Dnevnik.pisi("Darwin status: sesija=\(sesija) stanje=\(stanje)")
+        primeniStanje(sesija: sesija, stanje: stanje, vreme: ms / 1000)
+        if let (tekst, token) = tekstIzIPC() {
+            nalepiAutomatski(tekst, token: token, izvor: "IPC")
+        }
+        autoNalepiAkoTreba()
+        azurirajPrikaz()
+    }
+
+    private var cekanjeSesijeTraje: Bool {
+        let vreme = UserDefaults.standard.double(forKey: cekaSesijuVremeKey)
+        if vreme <= 0 { return true }
+        return Date().timeIntervalSince1970 - vreme < 15
+    }
+
+    private func postaviCekanjeSesije() {
+        UserDefaults.standard.set(true, forKey: cekaSesijuKey)
+        UserDefaults.standard.set(
+            Date().timeIntervalSince1970,
+            forKey: cekaSesijuVremeKey
+        )
+    }
+
+    private func ocistiCekanjeSesije() {
+        UserDefaults.standard.set(false, forKey: cekaSesijuKey)
+        UserDefaults.standard.removeObject(forKey: cekaSesijuVremeKey)
+    }
+
+    /// Ako je diktat pokrenut iz tastature, sačekaj da aplikacija završi
+    /// prepis i upiše clipboard. Ovo pokriva i slučaj kada se korisnik vrati
+    /// u drugu aplikaciju pre nego što je prepis gotov.
+    private func pokreniCekanjeAkoTreba() {
+        autoNalepiAkoTreba()
+        guard UserDefaults.standard.bool(forKey: cekaDiktatKey) else { return }
+        NSLog(
+            "Diktator tastatura: čekam automatsko lepljenje (itema=%d).",
+            UIPasteboard.general.items.count
+        )
+
+        timerAutoNalepi?.invalidate()
+        var pokusaja = 0
+        timerAutoNalepi = Timer.scheduledTimer(
+            withTimeInterval: 0.75,
+            repeats: true
+        ) { [weak self] timer in
+            guard let self else {
+                timer.invalidate()
+                return
+            }
+            pokusaja += 1
+            self.autoNalepiAkoTreba()
+            if !UserDefaults.standard.bool(forKey: self.cekaDiktatKey) || pokusaja >= 800 {
+                if pokusaja >= 800 {
+                    UserDefaults.standard.set(false, forKey: self.cekaDiktatKey)
+                    self.ocistiCekanjeSesije()
+                }
+                timer.invalidate()
+                self.timerAutoNalepi = nil
+            }
+        }
+    }
+
+    /// Automatski nalepi novi diktat. Prvo probaj imenovani pasteboard, pa
+    /// generalni clipboard (stariji put i ručno kopiran tekst).
+    private func autoNalepiAkoTreba() {
+        guard hasFullAccess, !autoNalepiUToku else { return }
+        guard UserDefaults.standard.bool(forKey: cekaDiktatKey)
+                || snimaSesijom
+                || obradaSesije else {
+            return
+        }
+
+        if let (tekst, token) = tekstIzIPC() {
+            nalepiAutomatski(tekst, token: token, izvor: "IPC")
+            return
+        }
+
+        guard let predmet = UIPasteboard.general.items.first,
+              let token = stringIz(predmet[DiktatorClipboard.token]),
+              let vremeString = stringIz(predmet[DiktatorClipboard.vreme]),
+              let vreme = Double(vremeString),
+              let tekst = stringIz(predmet[DiktatorClipboard.tekst]),
+              !tekst.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return
+        }
+
+        let starost = Date().timeIntervalSince1970 - vreme
+        guard starost >= 0, starost <= 180 else {
+            UserDefaults.standard.set(false, forKey: cekaDiktatKey)
+            timerAutoNalepi?.invalidate()
+            timerAutoNalepi = nil
+            NSLog("Diktator tastatura: preskačem star clipboard (%.0f s).", starost)
+            return
+        }
+
+        nalepiAutomatski(tekst, token: token, izvor: "clipboard")
+    }
+
+    private func nalepiAutomatski(_ tekst: String, token: String, izvor: String) {
+        let podrazumevano = UserDefaults.standard
+        guard podrazumevano.string(forKey: zadnjiTokenKey) != token else { return }
+        NSLog("Diktator tastatura: pronađen token za automatsko lepljenje (%@, %@).", izvor, token)
+
+        autoNalepiUToku = true
+        defer { autoNalepiUToku = false }
+
+        textDocumentProxy.insertText(tekst)
+        Dnevnik.pisi("Automatski nalepljeno (\(izvor)), token=\(token)")
+        podrazumevano.set(token, forKey: zadnjiTokenKey)
+        podrazumevano.set(false, forKey: cekaDiktatKey)
+        ocistiCekanjeSesije()
+        timerAutoNalepi?.invalidate()
+        timerAutoNalepi = nil
+        timerSesijaTimeout?.invalidate()
+        timerSesijaTimeout = nil
+        cekaStartSesije = false
+        snimaSesijom = false
+        obradaSesije = false
+        prikaziStatus("Nalepljeno automatski.")
+        NSLog("Diktator tastatura: automatski nalepljen tekst (%@).", token)
+    }
+
+    private func tekstIzIPC() -> (tekst: String, token: String)? {
+        let vrednosti = DiktatorIPC.citaj(DiktatorIPC.stanje)
+        guard let token = vrednosti[DiktatorIPC.token],
+              let tekst = vrednosti[DiktatorIPC.tekst],
+              !tekst.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+              let vremeString = vrednosti[DiktatorIPC.tokenVreme],
+              let vreme = Double(vremeString) else {
+            return nil
+        }
+
+        let starost = Date().timeIntervalSince1970 - vreme
+        guard starost >= 0, starost <= 180 else { return nil }
+        return (tekst, token)
+    }
+
+    private func tekstIzClipboarda() -> (tekst: String, token: String?)? {
+        if UserDefaults.standard.bool(forKey: cekaDiktatKey),
+           let ipc = tekstIzIPC() {
+            return (ipc.tekst, ipc.token)
+        }
+
+        if let predmet = UIPasteboard.general.items.first,
+           let tekst = stringIz(predmet[DiktatorClipboard.tekst]) {
+            let ociscen = tekst.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !ociscen.isEmpty {
+                return (ociscen, stringIz(predmet[DiktatorClipboard.token]))
+            }
+        }
+
+        if let tekst = UIPasteboard.general.string?
+            .trimmingCharacters(in: .whitespacesAndNewlines),
+            !tekst.isEmpty {
+            return (tekst, nil)
+        }
+
+        if let ipc = tekstIzIPC() {
+            return (ipc.tekst, ipc.token)
+        }
+        return nil
+    }
+
+    private func stringIz(_ vrednost: Any?) -> String? {
+        if let tekst = vrednost as? String { return tekst }
+        if let podaci = vrednost as? Data {
+            return String(data: podaci, encoding: .utf8)
+        }
+        return nil
     }
 
     private func prikaziStatus(_ tekst: String) {
+        privremeniStatus = tekst
+        privremeniStatusVreme = Date()
         status.text = tekst
         status.textColor = .secondaryLabel
     }
 
-    private func azurirajStatus() {
-        if hasFullAccess {
-            status.text = "Full Access ✓"
-            status.textColor = .systemGreen
+    private func azurirajPrikaz() {
+        if let vreme = privremeniStatusVreme,
+           Date().timeIntervalSince(vreme) < 1.5,
+           let tekst = privremeniStatus {
+            status.text = tekst
+            status.textColor = .secondaryLabel
         } else {
-            status.text = "Full Access ✗"
-            status.textColor = .systemOrange
+            privremeniStatus = nil
+            privremeniStatusVreme = nil
+
+            if !hasFullAccess {
+                status.text = "Full Access ✗"
+                status.textColor = .systemOrange
+            } else if UserDefaults.standard.bool(forKey: cekaSesijuKey) {
+                status.text = "Uključujem…"
+                status.textColor = .systemOrange
+            } else if obradaSesije {
+                status.text = "Obrada…"
+                status.textColor = .systemOrange
+            } else if snimaSesijom {
+                status.text = "Snimam…"
+                status.textColor = .systemRed
+            } else if sesijaAktivna {
+                status.text = "Sesija ✓"
+                status.textColor = .systemGreen
+            } else {
+                status.text = "Sesija ✗"
+                status.textColor = .systemOrange
+            }
+        }
+
+        guard let dugme = dugmeDiktiraj else { return }
+
+        if !hasFullAccess {
+            dugme.isEnabled = false
+            dugme.setTitle("Diktiraj", for: .normal)
+            dugme.backgroundColor = .systemGray
+            return
+        }
+
+        if UserDefaults.standard.bool(forKey: cekaSesijuKey) {
+            dugme.isEnabled = true
+            dugme.setTitle("Otkaži", for: .normal)
+            dugme.backgroundColor = .systemOrange
+            return
+        }
+
+        if obradaSesije {
+            dugme.isEnabled = false
+            dugme.setTitle("Obrada…", for: .normal)
+            dugme.backgroundColor = .systemGray
+            return
+        }
+
+        dugme.isEnabled = true
+        if snimaSesijom {
+            dugme.setTitle("Stop", for: .normal)
+            dugme.backgroundColor = .systemRed
+        } else {
+            dugme.setTitle("Diktiraj", for: .normal)
+            dugme.backgroundColor = .systemBlue
         }
     }
 }

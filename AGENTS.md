@@ -6,6 +6,14 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Status
 
+- **26.10.2026.** — dodata je **Statistika** u glavnu aplikaciju (verzija
+  **0.1.5 (6)**): današnje reči, niz dana, ušteđeno vreme, prosečna brzina,
+  grafikon poslednjih 7 dana, jezici i reset statistike. Statistika se čuva
+  odvojeno od istorije (`statistika.json`) i ne sadrži tekst.
+- **26.10.2026.** — pozadinska sesija je ojačana: status i komande idu preko
+  imenovanih pasteboard-a **i Darwin notifikacija**, tastatura ima timeout i
+  više ne može trajno da ostane na „Uključujem…“, a prvi `Diktiraj` odmah
+  pokreće snimanje u aplikaciji.
 - **26.10.2026.** — iPhone `nemanja` je uparen sa Mac-om preko `devicectl`
   (Xcode je prijavljivao da uređaj nije uparen), a potpisana verzija
   **0.1.1 (2)** je instalirana direktno na uređaj. Pokretanje preko

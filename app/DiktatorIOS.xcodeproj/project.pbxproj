@@ -16,8 +16,10 @@
 		58735B81EB834F2BBB3FC49D /* PonudaModela.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5C631B7C4BC7D5E1DF680F1 /* PonudaModela.swift */; };
 		589916A2679B3B7EFA8A3BFF /* Modeli.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C8F1B72EEE3D1C830799DF0 /* Modeli.swift */; };
 		796854552884166C7468B414 /* PogledPodesavanja.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EF0085283F4D8BF5410BDF9 /* PogledPodesavanja.swift */; };
+		7F899CB7C681D8EE6266283D /* Statistika.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA1E0F6EF3E4D95878C454E9 /* Statistika.swift */; };
 		8AEFD397044454A822A042B1 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D319E51BA1C441F49CF777D /* KeyboardViewController.swift */; };
 		933944E1BC2F012E332A1849 /* PogledIstorija.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6D579545458783F98DD33B /* PogledIstorija.swift */; };
+		94F8BCCE51B02101CE009BF0 /* PogledStatistika.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E2D48993A765741AFA31BE8 /* PogledStatistika.swift */; };
 		9B1AD4661F980D3502864CF7 /* PogledDiktat.swift in Sources */ = {isa = PBXBuildFile; fileRef = E98742B6EFA7462CED1983E6 /* PogledDiktat.swift */; };
 		A9741BFAC2D228E53F350A8E /* Podesavanja.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31EB7D7F59EF1CFE3D869AEF /* Podesavanja.swift */; };
 		B3E208BCDBD1BBC8B9775661 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C4FAE80C4EFAF0BF8C7C6E5 /* ContentView.swift */; };
@@ -53,12 +55,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		028BADA4F19CAFBD0194A000 /* DiktatorKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = DiktatorKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		028BADA4F19CAFBD0194A000 /* DiktatorKeyboard.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = DiktatorKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		0827D1D5A6339E92ECEE10C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		189D48705D4DAA54A219CC28 /* Snimac.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Snimac.swift; sourceTree = "<group>"; };
 		20316097F523817AD4BBA083 /* Prepisivac.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Prepisivac.swift; sourceTree = "<group>"; };
 		20D32D4B2AE29E2AFB813307 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		259106C1BF634E27DD77F3E9 /* DiktatorIOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DiktatorIOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		259106C1BF634E27DD77F3E9 /* DiktatorIOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = DiktatorIOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		275C7CD6E540C9810103E49D /* Preuzimanje.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preuzimanje.swift; sourceTree = "<group>"; };
 		2C4FAE80C4EFAF0BF8C7C6E5 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		31EB7D7F59EF1CFE3D869AEF /* Podesavanja.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Podesavanja.swift; sourceTree = "<group>"; };
@@ -66,6 +68,7 @@
 		4B6D579545458783F98DD33B /* PogledIstorija.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PogledIstorija.swift; sourceTree = "<group>"; };
 		4C8F1B72EEE3D1C830799DF0 /* Modeli.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Modeli.swift; sourceTree = "<group>"; };
 		55B72067199EB9EA9F55A949 /* DiktatorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiktatorApp.swift; sourceTree = "<group>"; };
+		5E2D48993A765741AFA31BE8 /* PogledStatistika.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PogledStatistika.swift; sourceTree = "<group>"; };
 		609B090256ACE0FC4B6BDB10 /* PogledPomoc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PogledPomoc.swift; sourceTree = "<group>"; };
 		7921CEE446B6B8121718CD08 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7D319E51BA1C441F49CF777D /* KeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; };
@@ -73,6 +76,7 @@
 		975766D460CC5AA45203E4E8 /* PogledRecnik.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PogledRecnik.swift; sourceTree = "<group>"; };
 		97891DDD9878C4AD3F561229 /* AppStanje.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStanje.swift; sourceTree = "<group>"; };
 		A5C631B7C4BC7D5E1DF680F1 /* PonudaModela.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PonudaModela.swift; sourceTree = "<group>"; };
+		CA1E0F6EF3E4D95878C454E9 /* Statistika.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Statistika.swift; sourceTree = "<group>"; };
 		DA613E2FCC4C47914E7A962B /* DiktatorIOS-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "DiktatorIOS-Bridging-Header.h"; sourceTree = "<group>"; };
 		E98742B6EFA7462CED1983E6 /* PogledDiktat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PogledDiktat.swift; sourceTree = "<group>"; };
 		F3EC31002A94081E2BD18ECA /* Putanje.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Putanje.swift; sourceTree = "<group>"; };
@@ -104,11 +108,13 @@
 				3EF0085283F4D8BF5410BDF9 /* PogledPodesavanja.swift */,
 				609B090256ACE0FC4B6BDB10 /* PogledPomoc.swift */,
 				975766D460CC5AA45203E4E8 /* PogledRecnik.swift */,
+				5E2D48993A765741AFA31BE8 /* PogledStatistika.swift */,
 				A5C631B7C4BC7D5E1DF680F1 /* PonudaModela.swift */,
 				20316097F523817AD4BBA083 /* Prepisivac.swift */,
 				275C7CD6E540C9810103E49D /* Preuzimanje.swift */,
 				F3EC31002A94081E2BD18ECA /* Putanje.swift */,
 				189D48705D4DAA54A219CC28 /* Snimac.swift */,
+				CA1E0F6EF3E4D95878C454E9 /* Statistika.swift */,
 				9311828B20AEC74CF5529CB7 /* Transliteracija.swift */,
 			);
 			path = DiktatorIOS;
@@ -179,12 +185,14 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 2710;
+				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					4B004AF766922BF2E8A93A6A = {
+						DevelopmentTeam = LHQ4Q44425;
 						ProvisioningStyle = Automatic;
 					};
 					A24689E6ECC1FF4144C3065C = {
+						DevelopmentTeam = LHQ4Q44425;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -243,11 +251,13 @@
 				796854552884166C7468B414 /* PogledPodesavanja.swift in Sources */,
 				3AB15F7EE012DA8C2DBADC62 /* PogledPomoc.swift in Sources */,
 				D15633B282DFD84931A0F53A /* PogledRecnik.swift in Sources */,
+				94F8BCCE51B02101CE009BF0 /* PogledStatistika.swift in Sources */,
 				58735B81EB834F2BBB3FC49D /* PonudaModela.swift in Sources */,
 				F07D6AF7774E528B355D0D59 /* Prepisivac.swift in Sources */,
 				BF63604AFF2519489C66144A /* Preuzimanje.swift in Sources */,
 				428FE717448B5350457A881D /* Putanje.swift in Sources */,
 				43348C2B24175D212CD296F8 /* Snimac.swift in Sources */,
+				7F899CB7C681D8EE6266283D /* Statistika.swift in Sources */,
 				C241022513AC7959AE509F2C /* Transliteracija.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -383,13 +393,12 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 6;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_LANGUAGE = sr;
 				DEVELOPMENT_TEAM = LHQ4Q44425;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -405,13 +414,12 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 0.1.1;
+				MARKETING_VERSION = 0.1.5;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -455,13 +463,12 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 6;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_LANGUAGE = sr;
 				DEVELOPMENT_TEAM = LHQ4Q44425;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -471,12 +478,11 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 0.1.1;
+				MARKETING_VERSION = 0.1.5;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;

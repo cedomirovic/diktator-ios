@@ -1,6 +1,104 @@
 import Foundation
 import UIKit
 
+/// Dijagnostika ide i u fajl, jer se NSLog iz aplikacije i tastature na
+/// iOS 26 ne pojavljuje uvek u idevicesyslog toku.
+enum Dnevnik {
+    static let putanja: URL = {
+        let folder = FileManager.default.urls(
+            for: .documentDirectory,
+            in: .userDomainMask
+        )[0]
+        return folder.appendingPathComponent("diktator-dnevnik.txt")
+    }()
+
+    static func pisi(_ tekst: String) {
+        let red = "\(Date().formatted(date: .numeric, time: .standard)) \(tekst)\n"
+        guard let podaci = red.data(using: .utf8) else { return }
+        if FileManager.default.fileExists(atPath: putanja.path) {
+            guard let rucica = try? FileHandle(forWritingTo: putanja) else { return }
+            rucica.seekToEndOfFile()
+            rucica.write(podaci)
+            try? rucica.close()
+        } else {
+            try? podaci.write(to: putanja)
+        }
+    }
+}
+
+private enum DiktatorClipboard {
+    static let tekst = "public.utf8-plain-text"
+    static let token = "com.cedomirovic.diktator.token"
+    static let vreme = "com.cedomirovic.diktator.vreme"
+}
+
+/// Imenovani pasteboard-i su dostupni aplikaciji i njenom extension-u sa
+/// istim Team ID-jem, pa ne zahtevaju App Group. Koristimo ih za komande
+/// tastature i za status sesije, da ne diramo korisnikov clipboard.
+private enum DiktatorIPC {
+    static let komande = UIPasteboard.Name(rawValue: "com.cedomirovic.diktator.komande")
+    static let stanje = UIPasteboard.Name(rawValue: "com.cedomirovic.diktator.stanje")
+    static let komanda = "komanda"
+    static let id = "id"
+    static let vreme = "vreme"
+    static let sesija = "sesija"
+    static let stanjeKljuc = "stanje"
+    static let token = "token"
+    static let tokenVreme = "tokenVreme"
+    static let tekst = "tekst"
+    static let greska = "greska"
+
+    /// Darwin notifikacije prenose samo ime, pa u njega pakujemo kratku
+    /// poruku. Tako tastatura i aplikacija rade i ako imenovani pasteboard
+    /// nije dostupan u extension-u.
+    static let notifPrefiks = "com.cedomirovic.diktator"
+    static let notifKomanda = "com.cedomirovic.diktator.cmd"
+    static let notifStanje = "com.cedomirovic.diktator.st"
+
+    static func tabla(_ ime: UIPasteboard.Name) -> UIPasteboard? {
+        UIPasteboard(name: ime, create: true)
+    }
+
+    static func pisi(_ ime: UIPasteboard.Name, _ vrednosti: [String: String]) {
+        guard let tabla = tabla(ime) else { return }
+        tabla.items = [vrednosti.mapValues { Data($0.utf8) }]
+    }
+
+    static func citaj(_ ime: UIPasteboard.Name) -> [String: String] {
+        guard let predmet = tabla(ime)?.items.first else { return [:] }
+        var rezultat: [String: String] = [:]
+        for (kljuc, vrednost) in predmet {
+            if let tekst = vrednost as? String {
+                rezultat[kljuc] = tekst
+            } else if let podaci = vrednost as? Data,
+                      let tekst = String(data: podaci, encoding: .utf8) {
+                rezultat[kljuc] = tekst
+            }
+        }
+        return rezultat
+    }
+
+    static func posaljiNotifikaciju(_ ime: String) {
+        CFNotificationCenterPostNotification(
+            CFNotificationCenterGetDarwinNotifyCenter(),
+            CFNotificationName(rawValue: ime as CFString),
+            nil,
+            nil,
+            true
+        )
+    }
+
+    static func imeKomande(_ komanda: String, id: String, vreme: Double) -> String {
+        let ms = Int(vreme * 1000)
+        return "\(notifKomanda).\(komanda).\(id).\(ms)"
+    }
+
+    static func imeStanja(sesija: Bool, stanje: String, vreme: Double) -> String {
+        let ms = Int(vreme * 1000)
+        return "\(notifStanje).\(sesija ? 1 : 0).\(stanje).\(ms)"
+    }
+}
+
 @MainActor
 final class AppStanje: ObservableObject {
     @Published var stanje: StanjeAplikacije = .mirno
@@ -10,26 +108,73 @@ final class AppStanje: ObservableObject {
     @Published var poruka: String?
     @Published var podesavanja: Podesavanja = SkladistePodesavanja.ucitaj()
     @Published var istorija: [Zapis] = IstorijaSkladiste.ucitaj()
+    @Published var statistika: Statistika = StatistikaSkladiste.ucitaj()
     @Published var recnik: String = Recnik.ucitaj()
     @Published var modelSePreuzima = false
     @Published var napredakPreuzimanja: Double?
+    @Published var sesijaAktivna = false
+    @Published var sesijaPreostalo = 0
 
     private let snimac = Snimac()
     private let prepisivac = Prepisivac()
     private var preuzimac: Preuzimac?
     private var timerOslobadjanja: Timer?
     private var timerSnimanja: Timer?
+    private var timerSesije: Timer?
+    private var timerIPC: Timer?
+    private var zadatakUPozadini: UIBackgroundTaskIdentifier = .invalid
+    private var pokrenutSaTastature = false
+    private var zadnjiIPCtoken: String?
+    private var zadnjiIPCtokenVreme: Double?
+    private var zadnjiKomandniId: String?
+    private var zadnjiDnevnikStanja = ""
 
     init() {
         Prepisivac.utisajLog()
         snimac.naNivo = { [weak self] nivo in
             self?.nivo = nivo
         }
+
+        // Prvi put posle uvođenja statistike: izvedi je iz postojeće
+        // istorije, da korisnik ne počne od nule.
+        let kljucMigracije = "diktator.statistika.migrirana.v1"
+        if !UserDefaults.standard.bool(forKey: kljucMigracije) {
+            if statistika.ukupnoSnimaka == 0, !istorija.isEmpty {
+                statistika = Statistika.iz(istorija)
+                StatistikaSkladiste.sacuvaj(statistika)
+            }
+            UserDefaults.standard.set(true, forKey: kljucMigracije)
+        }
+
+        CFNotificationCenterAddObserver(
+            CFNotificationCenterGetDarwinNotifyCenter(),
+            Unmanaged.passUnretained(self).toOpaque(),
+            { _, observer, ime, _, _ in
+                guard let observer, let ime else { return }
+                let stanje = Unmanaged<AppStanje>.fromOpaque(observer).takeUnretainedValue()
+                let tekst = ime.rawValue as String
+                Task { @MainActor in
+                    stanje.primljenaNotifikacija(tekst)
+                }
+            },
+            nil,
+            nil,
+            .deliverImmediately
+        )
     }
 
     deinit {
+        CFNotificationCenterRemoveObserver(
+            CFNotificationCenterGetDarwinNotifyCenter(),
+            Unmanaged.passUnretained(self).toOpaque(),
+            nil,
+            nil
+        )
         timerOslobadjanja?.invalidate()
         timerSnimanja?.invalidate()
+        timerSesije?.invalidate()
+        timerIPC?.invalidate()
+        snimac.zavrsiSesiju()
         prepisivac.oslobodiSada()
     }
 
@@ -37,44 +182,155 @@ final class AppStanje: ObservableObject {
 
     func obradiURL(_ url: URL) {
         guard url.scheme?.lowercased() == "diktator-ios" else { return }
-        if url.host?.lowercased() == "dictate" {
+        Dnevnik.pisi("URL \(url.absoluteString), sesija=\(sesijaAktivna)")
+
+        switch url.host?.lowercased() {
+        case "dictate":
             izabraniTab = 0
-            pocniSnimanje()
+            Task { @MainActor in
+                if !sesijaAktivna {
+                    guard await ukljuciSesijuAsync() else { return }
+                }
+                pocniSnimanje(saTastature: true)
+            }
+        case "sesija":
+            izabraniTab = 0
+            Task { @MainActor in
+                if await ukljuciSesijuAsync() {
+                    // Korisnik je već tapnuo Diktiraj, pa odmah počinjemo.
+                    // Tastatura posle povratka samo preuzima status.
+                    pocniSnimanje(saTastature: true)
+                }
+            }
+        case "stop":
+            if stanje.jeSnimanje {
+                zaustaviSnimanje()
+            }
+        default:
+            break
         }
+    }
+
+    // MARK: - Pozadinska sesija
+
+    func ukljuciSesiju() {
+        Task { @MainActor in
+            _ = await ukljuciSesijuAsync()
+        }
+    }
+
+    @discardableResult
+    private func ukljuciSesijuAsync() async -> Bool {
+        Dnevnik.pisi("ukljuciSesijuAsync početak, sesija=\(sesijaAktivna)")
+        if sesijaAktivna {
+            pisiIPCStanje()
+            return true
+        }
+        guard !stanje.jeSnimanje else {
+            Dnevnik.pisi("ukljuciSesijuAsync odbijeno: snimanje je u toku")
+            return false
+        }
+        guard await osigurajDozvolu() else {
+            Dnevnik.pisi("ukljuciSesijuAsync odbijeno: nema dozvole za mikrofon")
+            return false
+        }
+        guard let model = Modeli.nadji(podesavanja.model), model.preuzet else {
+            stanje = .greska("Model nije preuzet. Otvori Podešavanja i preuzmi model.")
+            Dnevnik.pisi("ukljuciSesijuAsync odbijeno: model nije preuzet")
+            pisiIPCStanje()
+            return false
+        }
+
+        do {
+            try snimac.pocniSesiju()
+        } catch {
+            stanje = .greska(error.localizedDescription)
+            Dnevnik.pisi("ukljuciSesijuAsync greška: \(error.localizedDescription)")
+            pisiIPCStanje()
+            return false
+        }
+
+        if case .greska = stanje {
+            stanje = .mirno
+        }
+        sesijaAktivna = true
+        sesijaPreostalo = Snimac.najduzeSesijeSekundi
+        pokreniTimerSesije()
+        pokreniIPCPolling()
+        pisiIPCStanje()
+        Dnevnik.pisi("Sesija uključena, traje do \(Snimac.najduzeSesijeSekundi) s.")
+        NSLog("Diktator: sesija uključena, traje do %d s.", Snimac.najduzeSesijeSekundi)
+        poruka = "Sesija je aktivna. Pređi u drugu aplikaciju i tapni Diktiraj na tastaturi."
+        return true
+    }
+
+    func zavrsiSesiju() {
+        guard sesijaAktivna else { return }
+        if stanje.jeSnimanje {
+            zaustaviSnimanje()
+        }
+
+        timerSesije?.invalidate()
+        timerSesije = nil
+        timerIPC?.invalidate()
+        timerIPC = nil
+        snimac.zavrsiSesiju()
+        sesijaAktivna = false
+        sesijaPreostalo = 0
+        pisiIPCStanje()
+        Dnevnik.pisi("Sesija završena.")
+        NSLog("Diktator: sesija završena.")
+        poruka = "Sesija je završena. Tastatura ponovo otvara aplikaciju za diktat."
+        oslobodiModelPosle()
+    }
+
+    func osveziIPC() {
+        pisiIPCStanje()
+    }
+
+    private func osigurajDozvolu() async -> Bool {
+        if Snimac.dozvola == .authorized {
+            return true
+        }
+        let dozvoljeno = await Snimac.traziDozvolu()
+        if !dozvoljeno {
+            stanje = .greska(
+                "Diktator nema dozvolu za mikrofon. Otvori Podešavanja → Privatnost i bezbednost → Mikrofon."
+            )
+            pisiIPCStanje()
+        }
+        return dozvoljeno
     }
 
     // MARK: - Snimanje i prepis
 
-    func pocniSnimanje() {
+    func pocniSnimanje(saTastature: Bool = false) {
         guard !stanje.jeSnimanje, !stanje.jeZauzet else { return }
+        Dnevnik.pisi("pocniSnimanje(saTastature=\(saTastature))")
+        pokrenutSaTastature = saTastature
         if case .greska = stanje {
             stanje = .mirno
         }
 
         Task { @MainActor in
-            if Snimac.dozvola != .authorized {
-                let dozvoljeno = await Snimac.traziDozvolu()
-                guard dozvoljeno else {
-                    stanje = .greska(
-                        "Diktator nema dozvolu za mikrofon. Otvori Podešavanja → Privatnost i bezbednost → Mikrofon."
-                    )
-                    return
-                }
-            }
+            guard await osigurajDozvolu() else { return }
 
             do {
                 try snimac.pocni()
                 stanje = .snima
                 poruka = nil
                 pokreniTimerSnimanja()
+                pisiIPCStanje()
             } catch {
                 stanje = .greska(error.localizedDescription)
+                pisiIPCStanje()
             }
         }
     }
 
     func zaustaviSnimanje() {
         guard stanje.jeSnimanje else { return }
+        Dnevnik.pisi("zaustaviSnimanje")
         timerSnimanja?.invalidate()
         timerSnimanja = nil
 
@@ -84,6 +340,7 @@ final class AppStanje: ObservableObject {
 
         guard trajanje >= 0.6 else {
             stanje = .greska("Snimak je prekratak — drži mikrofon dok govoriš.")
+            pisiIPCStanje()
             oslobodiModelPosle()
             return
         }
@@ -91,12 +348,14 @@ final class AppStanje: ObservableObject {
         let ocisceni = Snimac.skratiTisinu(uzorci)
         guard !ocisceni.isEmpty else {
             stanje = .greska("Nisam čuo govor. Pokušaj ponovo.")
+            pisiIPCStanje()
             oslobodiModelPosle()
             return
         }
 
         guard let model = Modeli.nadji(podesavanja.model), model.preuzet else {
             stanje = .greska("Model nije preuzet. Otvori Podešavanja i preuzmi model.")
+            pisiIPCStanje()
             return
         }
 
@@ -104,6 +363,8 @@ final class AppStanje: ObservableObject {
         let rezim = RezimPrepisa.iz(podesavanja.rezimPrepisa)
         let prompt = Recnik.kaoPrompt(recnik)
         stanje = .priprema
+        pisiIPCStanje()
+        pocniZadatakUPozadini()
 
         let prepisivac = self.prepisivac
         DispatchQueue.global(qos: .userInitiated).async {
@@ -121,7 +382,9 @@ final class AppStanje: ObservableObject {
                 }
             } catch {
                 DispatchQueue.main.async { [weak self] in
+                    self?.zavrsiZadatakUPozadini()
                     self?.stanje = .greska(error.localizedDescription)
+                    self?.pisiIPCStanje()
                     self?.oslobodiModelPosle()
                 }
             }
@@ -131,13 +394,24 @@ final class AppStanje: ObservableObject {
     private func zavrsiPrepis(_ tekst: String, trajanje: Double, jezik: String) {
         let sredjen = Tekst.sredi(tekst)
         guard !sredjen.isEmpty else {
+            zavrsiZadatakUPozadini()
             stanje = .greska("Nisam prepoznao govor. Pokušaj ponovo, malo glasnije.")
+            pisiIPCStanje()
             oslobodiModelPosle()
             return
         }
 
         poslednjiTekst = sredjen
-        UIPasteboard.general.string = sredjen
+        statistika.dodaj(
+            tekst: sredjen,
+            trajanje: trajanje,
+            jezik: jezik
+        )
+        StatistikaSkladiste.sacuvaj(statistika)
+        Dnevnik.pisi("Prepis gotov, dužina=\(sredjen.count), saTastature=\(pokrenutSaTastature)")
+        let token = postaviClipboard(sredjen, automatski: pokrenutSaTastature)
+        zadnjiIPCtoken = token
+        zadnjiIPCtokenVreme = token == nil ? nil : Date().timeIntervalSince1970
 
         if podesavanja.cuvajIstoriju {
             istorija.insert(
@@ -151,8 +425,189 @@ final class AppStanje: ObservableObject {
         }
 
         stanje = .mirno
-        poruka = "Tekst je kopiran. Vrati se u aplikaciju i tapni Nalepi."
+        pisiIPCStanje()
+
+        if pokrenutSaTastature {
+            poruka = "Tekst je spreman. Tastatura će ga automatski nalepiti."
+        } else {
+            poruka = "Tekst je kopiran. Otvori tastaturu i tapni Nalepi."
+        }
+        zavrsiZadatakUPozadini()
         oslobodiModelPosle()
+    }
+
+    /// Tekst uvek ide u clipboard za ručno lepljenje. Ako je diktat pokrenut
+    /// iz tastature, dodajemo i token koji tastatura koristi da tekst nalepi
+    /// automatski. Paralelno se status piše u imenovani pasteboard.
+    @discardableResult
+    private func postaviClipboard(_ tekst: String, automatski: Bool) -> String? {
+        guard automatski else {
+            UIPasteboard.general.string = tekst
+            return nil
+        }
+
+        let token = UUID().uuidString
+        let vreme = String(Date().timeIntervalSince1970)
+        UIPasteboard.general.items = [[
+            DiktatorClipboard.tekst: Data(tekst.utf8),
+            DiktatorClipboard.token: Data(token.utf8),
+            DiktatorClipboard.vreme: Data(vreme.utf8)
+        ]]
+        Dnevnik.pisi("Clipboard spreman za automatsko lepljenje, token=\(token)")
+        NSLog(
+            "Diktator: clipboard spreman za automatsko lepljenje (%@), string=%@",
+            token,
+            UIPasteboard.general.string ?? "nil"
+        )
+        return token
+    }
+
+    private var stanjeIPC: String {
+        switch stanje {
+        case .snima:
+            return "snima"
+        case .priprema, .prepisuje:
+            return "obrada"
+        case .greska:
+            return "greska"
+        case .mirno:
+            return "mirno"
+        }
+    }
+
+    private func pisiIPCStanje() {
+        let sada = Date().timeIntervalSince1970
+        let stanjeTekst = stanjeIPC
+        var vrednosti: [String: String] = [
+            DiktatorIPC.sesija: sesijaAktivna ? "1" : "0",
+            DiktatorIPC.stanjeKljuc: stanjeTekst,
+            DiktatorIPC.vreme: String(sada)
+        ]
+
+        if let token = zadnjiIPCtoken {
+            vrednosti[DiktatorIPC.token] = token
+        }
+        if let tokenVreme = zadnjiIPCtokenVreme {
+            vrednosti[DiktatorIPC.tokenVreme] = String(tokenVreme)
+        }
+        if zadnjiIPCtoken != nil, !poslednjiTekst.isEmpty {
+            vrednosti[DiktatorIPC.tekst] = poslednjiTekst
+        }
+        if case .greska(let poruka) = stanje {
+            vrednosti[DiktatorIPC.greska] = poruka
+        }
+
+        DiktatorIPC.pisi(DiktatorIPC.stanje, vrednosti)
+        DiktatorIPC.posaljiNotifikaciju(
+            DiktatorIPC.imeStanja(sesija: sesijaAktivna, stanje: stanjeTekst, vreme: sada)
+        )
+
+        let kljuc = "\(sesijaAktivna)-\(stanjeTekst)-\(zadnjiIPCtoken ?? "-")"
+        if kljuc != zadnjiDnevnikStanja {
+            zadnjiDnevnikStanja = kljuc
+            Dnevnik.pisi(
+                "Status: sesija=\(sesijaAktivna) stanje=\(stanjeTekst) token=\(zadnjiIPCtoken ?? "-")"
+            )
+        }
+    }
+
+    private func pokreniIPCPolling() {
+        timerIPC?.invalidate()
+        timerIPC = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                self?.obradiIPCKomandu()
+            }
+        }
+    }
+
+    private func obradiIPCKomandu() {
+        let komanda = DiktatorIPC.citaj(DiktatorIPC.komande)
+        guard let id = komanda[DiktatorIPC.id],
+              !id.isEmpty,
+              id != zadnjiKomandniId,
+              let vremeString = komanda[DiktatorIPC.vreme],
+              let vreme = Double(vremeString),
+              Date().timeIntervalSince1970 - vreme < 10 else {
+            return
+        }
+
+        zadnjiKomandniId = id
+        obradiKomandu(komanda[DiktatorIPC.komanda])
+    }
+
+    private func obradiKomandu(_ komanda: String?) {
+        Dnevnik.pisi("Obrada komande \(komanda ?? "nil"), sesija=\(sesijaAktivna), snima=\(stanje.jeSnimanje)")
+        switch komanda {
+        case "start":
+            if sesijaAktivna {
+                pocniSnimanje(saTastature: true)
+                pisiIPCStanje()
+            } else {
+                pisiIPCStanje()
+            }
+        case "stop":
+            if stanje.jeSnimanje {
+                zaustaviSnimanje()
+            } else {
+                pisiIPCStanje()
+            }
+        case "ping":
+            pisiIPCStanje()
+        default:
+            break
+        }
+    }
+
+    /// Stiže iz tastature preko Darwin notifikacije. Ime je oblika
+    /// `com.cedomirovic.diktator.cmd.<komanda>.<id>.<vreme-u-ms>`.
+    private func primljenaNotifikacija(_ ime: String) {
+        guard ime.hasPrefix(DiktatorIPC.notifKomanda + ".") else { return }
+        let delovi = ime.components(separatedBy: ".")
+        guard delovi.count >= 7 else { return }
+        let komanda = delovi[4]
+        let id = delovi[5]
+        guard id != zadnjiKomandniId,
+              let ms = Double(delovi[6]),
+              Date().timeIntervalSince1970 - ms / 1000 < 10 else {
+            return
+        }
+        zadnjiKomandniId = id
+        Dnevnik.pisi("Darwin komanda \(komanda) (\(id))")
+        NSLog("Diktator: Darwin komanda %@ (%@)", komanda, id)
+        obradiKomandu(komanda)
+    }
+
+    private func pokreniTimerSesije() {
+        timerSesije?.invalidate()
+        timerSesije = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                guard let self, self.sesijaAktivna else { return }
+                self.sesijaPreostalo = max(0, self.sesijaPreostalo - 1)
+                self.pisiIPCStanje()
+                if self.sesijaPreostalo <= 0 {
+                    self.zavrsiSesiju()
+                }
+            }
+        }
+    }
+
+    /// Prepis ume da potraje i posle povratka u drugu aplikaciju. Kratak
+    /// background task daje mu vremena da završi i upiše clipboard.
+    private func pocniZadatakUPozadini() {
+        zavrsiZadatakUPozadini()
+        zadatakUPozadini = UIApplication.shared.beginBackgroundTask(
+            withName: "Diktator prepis"
+        ) { [weak self] in
+            Task { @MainActor in
+                self?.zavrsiZadatakUPozadini()
+            }
+        }
+    }
+
+    private func zavrsiZadatakUPozadini() {
+        guard zadatakUPozadini != .invalid else { return }
+        UIApplication.shared.endBackgroundTask(zadatakUPozadini)
+        zadatakUPozadini = .invalid
     }
 
     private func pokreniTimerSnimanja() {
@@ -234,6 +689,7 @@ final class AppStanje: ObservableObject {
     private func oslobodiModelPosle() {
         timerOslobadjanja?.invalidate()
         timerOslobadjanja = nil
+        guard !sesijaAktivna else { return }
         guard let sekunde = OslobadjanjeModela.iz(podesavanja.oslobadjanjeModela).sekunde else {
             return
         }
@@ -263,6 +719,12 @@ final class AppStanje: ObservableObject {
         istorija = []
         IstorijaSkladiste.sacuvaj([])
         poruka = "Istorija je obrisana."
+    }
+
+    func obrisiStatistiku() {
+        statistika = Statistika()
+        StatistikaSkladiste.sacuvaj(statistika)
+        poruka = "Statistika je obrisana."
     }
 
     func kopiraj(_ tekst: String) {

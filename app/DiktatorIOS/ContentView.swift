@@ -29,8 +29,17 @@ struct ContentView: View {
                 .tag(4)
         }
         .onChange(of: scenePhase) { _, nova in
-            if nova == .background {
-                stanje.oslobodiModel()
+            switch nova {
+            case .background:
+                if stanje.sesijaAktivna || stanje.stanje.jeZauzet {
+                    stanje.osveziIPC()
+                } else {
+                    stanje.oslobodiModel()
+                }
+            case .active:
+                stanje.osveziIPC()
+            default:
+                break
             }
         }
     }

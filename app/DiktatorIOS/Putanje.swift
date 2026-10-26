@@ -19,6 +19,10 @@ enum Putanje {
         podrska.appendingPathComponent("istorija.json")
     }
 
+    static var statistika: URL {
+        podrska.appendingPathComponent("statistika.json")
+    }
+
     static var recnik: URL {
         podrska.appendingPathComponent("recnik.txt")
     }

@@ -30,13 +30,21 @@ final class Snimac {
     private var pretvarac: AVAudioConverter?
     private let brava = NSLock()
     private var uzorci: [Float] = []
-    private var aktivan = false
+    private var motorRadi = false
+    private var sesijaAktivna = false
+    private var snimaSada = false
     private var zadnjiNivo = CFAbsoluteTimeGetCurrent()
 
     var naNivo: ((Float) -> Void)?
 
-    /// Najduži snimak je 5 minuta — duže držanje bi trošilo RAM i usporilo prepis.
+    /// Najduži pojedinačni snimak je 5 minuta — duže držanje bi trošilo RAM
+    /// i usporilo prepis.
     static let najduzeSekundi = 300
+
+    /// Sesija drži audio motor u pripravnosti da tastatura može da počne
+    /// snimanje bez otvaranja aplikacije. Posle ovoga se gasi da ne troši
+    /// bateriju i mikrofon.
+    static let najduzeSesijeSekundi = 900
 
     static var dozvola: AVAuthorizationStatus {
         AVCaptureDevice.authorizationStatus(for: .audio)
@@ -57,10 +65,51 @@ final class Snimac {
         }
     }
 
-    var snima: Bool { aktivan }
+    var snima: Bool {
+        brava.lock()
+        defer { brava.unlock() }
+        return snimaSada
+    }
 
+    var jeSesijaAktivna: Bool {
+        brava.lock()
+        defer { brava.unlock() }
+        return sesijaAktivna
+    }
+
+    /// Obično snimanje: ako sesija već radi, samo počne da skuplja uzorke.
     func pocni() throws {
-        guard !aktivan else { return }
+        if motorRadi {
+            guard sesijaAktivna else { return }
+            brava.lock()
+            if snimaSada {
+                brava.unlock()
+                return
+            }
+            uzorci.removeAll(keepingCapacity: true)
+            snimaSada = true
+            brava.unlock()
+            return
+        }
+
+        try pokreniMotor()
+        brava.lock()
+        snimaSada = true
+        brava.unlock()
+    }
+
+    /// Uključuje pozadinsku sesiju. Mikrofon i audio motor ostaju aktivni,
+    /// ali se uzorci ne skupljaju dok tastatura ne pošalje start.
+    func pocniSesiju() throws {
+        guard !motorRadi else { return }
+        try pokreniMotor()
+        brava.lock()
+        sesijaAktivna = true
+        snimaSada = false
+        brava.unlock()
+    }
+
+    private func pokreniMotor() throws {
         guard Self.dozvola == .authorized else { throw GreskaSnimka.nemaDozvole }
 
         let sesija = AVAudioSession.sharedInstance()
@@ -87,6 +136,7 @@ final class Snimac {
         brava.lock()
         uzorci.removeAll(keepingCapacity: true)
         self.pretvarac = pretvarac
+        snimaSada = false
         brava.unlock()
 
         ulaz.installTap(onBus: 0, bufferSize: 4096, format: format) { [weak self] bafer, _ in
@@ -98,15 +148,23 @@ final class Snimac {
             try motor.start()
         } catch {
             ulaz.removeTap(onBus: 0)
+            brava.lock()
             self.pretvarac = nil
+            brava.unlock()
             try? sesija.setActive(false, options: .notifyOthersOnDeactivation)
             throw error
         }
-        aktivan = true
+        motorRadi = true
     }
 
     private func obradi(_ bafer: AVAudioPCMBuffer) {
-        guard let pretvarac else { return }
+        brava.lock()
+        let pretvarac = self.pretvarac
+        let trebaSnimati = snimaSada
+        brava.unlock()
+
+        guard trebaSnimati, let pretvarac else { return }
+
         let odnos = ciljniFormat.sampleRate / bafer.format.sampleRate
         let kapacitet = AVAudioFrameCount(Double(bafer.frameLength) * odnos) + 128
         guard let izlaz = AVAudioPCMBuffer(pcmFormat: ciljniFormat, frameCapacity: kapacitet) else {
@@ -152,22 +210,60 @@ final class Snimac {
     }
 
     func zaustavi() -> [Float] {
-        guard aktivan else { return [] }
-        aktivan = false
-        motor.stop()
-        motor.inputNode.removeTap(onBus: 0)
-        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
-
         brava.lock()
+        guard snimaSada else {
+            brava.unlock()
+            return []
+        }
+        snimaSada = false
+        let jeSesija = sesijaAktivna
         let rezultat = uzorci
-        uzorci.removeAll(keepingCapacity: false)
-        pretvarac = nil
+        uzorci.removeAll(keepingCapacity: jeSesija)
+        if !jeSesija {
+            pretvarac = nil
+        }
         brava.unlock()
+
+        if !jeSesija {
+            motor.stop()
+            motor.inputNode.removeTap(onBus: 0)
+            motorRadi = false
+            try? AVAudioSession.sharedInstance().setActive(
+                false,
+                options: .notifyOthersOnDeactivation
+            )
+        }
 
         DispatchQueue.main.async { [weak self] in
             self?.naNivo?(0)
         }
         return rezultat
+    }
+
+    /// Gasenje pozadinske sesije. Ako je snimanje u toku, uzorci se odbacuju;
+    /// aplikacija pre toga poziva `zaustavi()` da bi završila prepis.
+    func zavrsiSesiju() {
+        brava.lock()
+        let jeMotorRadi = motorRadi
+        sesijaAktivna = false
+        snimaSada = false
+        uzorci.removeAll(keepingCapacity: false)
+        pretvarac = nil
+        motorRadi = false
+        brava.unlock()
+
+        if jeMotorRadi {
+            motor.stop()
+            motor.inputNode.removeTap(onBus: 0)
+            try? AVAudioSession.sharedInstance().setActive(
+                false,
+                options: .notifyOthersOnDeactivation
+            )
+        }
+
+        DispatchQueue.main.async { [weak self] in
+            self?.naNivo?(0)
+        }
     }
 
     func otkazi() {

@@ -1,4 +1,5 @@
 import SwiftUI
+import Foundation
 
 struct PogledDiktat: View {
     @EnvironmentObject var stanje: AppStanje
@@ -47,6 +48,49 @@ struct PogledDiktat: View {
                             .tint(.red)
                             .padding(.horizontal, 44)
                     }
+
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack {
+                            Label("Sesija diktata", systemImage: "waveform")
+                                .font(.headline)
+                            Spacer()
+                            Text(stanje.sesijaAktivna ? "aktivna" : "isključena")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(stanje.sesijaAktivna ? Color.green : Color.secondary)
+                        }
+
+                        if stanje.sesijaAktivna {
+                            Text("Tastatura sada može da snima u pozadini, bez otvaranja Diktatora. Preostalo: \(stanje.sesijaPreostalo / 60):\(String(format: "%02d", stanje.sesijaPreostalo % 60))")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+
+                            Button("Završi sesiju") {
+                                stanje.zavrsiSesiju()
+                            }
+                            .buttonStyle(.bordered)
+                        } else {
+                            Text("Uključi sesiju da Diktiraj na tastaturi snima dok je otvorena bilo koja aplikacija. Prvi put će se Diktator otvoriti da uključi sesiju; posle toga tastatura ostaje u aplikaciji.")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+
+                            Button("Uključi sesiju") {
+                                stanje.ukljuciSesiju()
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .disabled(!stanje.modelJePreuzet || stanje.stanje.jeZauzet)
+                        }
+
+                        Text("Sesija traje najviše 15 minuta i drži mikrofon u pripravnosti. Zato se automatski gasi.")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(.thinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .padding(.horizontal)
+
+                    statistikaKartica
 
                     if !stanje.modelJePreuzet {
                         VStack(spacing: 8) {
@@ -147,9 +191,10 @@ struct PogledDiktat: View {
                     VStack(alignment: .leading, spacing: 6) {
                         Text("Kako radi")
                             .font(.headline)
-                        Text("1. U bilo kojoj aplikaciji otvori Diktator tastaturu.")
-                        Text("2. Tapni Diktiraj — ako iOS pita „Open in Diktator?“, tapni Open.")
-                        Text("3. Vrati se preko „Back to …“ i tapni Nalepi.")
+                        Text("1. Uključi sesiju ovde (traje do 15 minuta).")
+                        Text("2. Pređi u bilo koju aplikaciju i otvori Diktator tastaturu.")
+                        Text("3. Tapni Diktiraj — snima u pozadini. Tapni Stop — tekst se sam lepi.")
+                        Text("Ako sesija nije uključena, Diktiraj otvara Diktator i posle Stop treba tapnuti „Back to …“.")
                     }
                     .font(.footnote)
                     .foregroundStyle(.secondary)
@@ -172,5 +217,55 @@ struct PogledDiktat: View {
                 PogledPodesavanja()
             }
         }
+    }
+
+    private var statistikaKartica: some View {
+        NavigationLink {
+            PogledStatistika()
+        } label: {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Label("Statistika", systemImage: "chart.bar.fill")
+                        .font(.headline)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.tertiary)
+                }
+
+                if stanje.statistika.ukupnoSnimaka == 0 {
+                    Text("Prvi diktat pokreće statistiku.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                } else {
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        Text(stanje.statistika.danasReci.formatted())
+                            .font(.system(size: 34, weight: .bold, design: .rounded))
+                        Text("reči danas")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        if stanje.statistika.nizDana > 0 {
+                            Label("\(stanje.statistika.nizDana)", systemImage: "flame.fill")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(.orange)
+                        }
+                    }
+
+                    HStack(spacing: 14) {
+                        Text("Ukupno \(stanje.statistika.ukupnoReci.formatted())")
+                        Text("Ušteđeno \(stanje.statistika.ustedaTekst)")
+                    }
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                }
+            }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(.thinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .padding(.horizontal)
+        }
+        .buttonStyle(.plain)
     }
 }

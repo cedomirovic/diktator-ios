@@ -79,4 +79,9 @@ enum Tekst {
         t = bezUkrasa(t)
         return ocisti(t)
     }
+
+    /// Broj reči za statistiku. Znaci interpunkcije se ne računaju kao reči.
+    static func brojReci(_ tekst: String) -> Int {
+        tekst.split { $0.isWhitespace || $0.isNewline }.count
+    }
 }
