@@ -559,7 +559,7 @@ final class AppStanje: ObservableObject {
         if let tokenVreme = zadnjiIPCtokenVreme {
             vrednosti[DiktatorIPC.tokenVreme] = String(tokenVreme)
         }
-        if zadnjiIPCtoken != nil, !poslednjiTekst.isEmpty {
+        if !poslednjiTekst.isEmpty {
             vrednosti[DiktatorIPC.tekst] = poslednjiTekst
         }
         if case .greska(let poruka) = stanje {

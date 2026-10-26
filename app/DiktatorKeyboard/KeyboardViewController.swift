@@ -663,8 +663,11 @@ final class KeyboardViewController: UIInputViewController {
             return
         }
 
-        var tekst = UIPasteboard.general.string?
-            .trimmingCharacters(in: .whitespacesAndNewlines)
+        var tekst = tekstIzIPCBezTokena()
+        if tekst?.isEmpty != false {
+            tekst = UIPasteboard.general.string?
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+        }
         if tekst?.isEmpty != false,
            let predmet = UIPasteboard.general.items.first,
            let izPredmeta = stringIz(predmet[DiktatorClipboard.tekst])?
@@ -789,9 +792,10 @@ final class KeyboardViewController: UIInputViewController {
             timerSesijaTimeout?.invalidate()
             timerSesijaTimeout = nil
             if jeBilaObrada {
-                let duzina = UIPasteboard.general.string?.count ?? -1
-                Dnevnik.pisi("Mirno posle obrade: clipboard duzina=\(duzina)")
-                if let tekst = UIPasteboard.general.string,
+                let noviTekst = tekstIzIPCBezTokena() ?? UIPasteboard.general.string
+                let duzina = noviTekst?.count ?? -1
+                Dnevnik.pisi("Mirno posle obrade: tekst duzina=\(duzina)")
+                if let tekst = noviTekst,
                    !tekst.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                     tekstSpreman = true
                     prikaziStatus("Tekst spreman — tapni Nalepi.")
@@ -1011,6 +1015,19 @@ final class KeyboardViewController: UIInputViewController {
         obradaSesije = false
         prikaziStatus("Nalepljeno automatski.")
         NSLog("Diktator tastatura: automatski nalepljen tekst (%@).", token)
+    }
+
+    /// Poslednji prepis iz imenovanog status pasteboard-a. Opšti clipboard
+    /// ume da vrati zastarelu vrednost u keyboard extension-u, pa je ovo
+    /// primarni izvor za dugme Nalepi.
+    private func tekstIzIPCBezTokena() -> String? {
+        let vrednosti = DiktatorIPC.citaj(DiktatorIPC.stanje)
+        guard let tekst = vrednosti[DiktatorIPC.tekst]?
+            .trimmingCharacters(in: .whitespacesAndNewlines),
+            !tekst.isEmpty else {
+            return nil
+        }
+        return tekst
     }
 
     private func tekstIzIPC() -> (tekst: String, token: String)? {
