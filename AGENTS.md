@@ -6,6 +6,10 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Status
 
+- **26.10.2026.** — iPhone `nemanja` je uparen sa Mac-om preko `devicectl`
+  (Xcode je prijavljivao da uređaj nije uparen), a potpisana verzija
+  **0.1.1 (2)** je instalirana direktno na uređaj. Pokretanje preko
+  `devicectl` je čekalo otključavanje telefona.
 - **26.10.2026.** — srpski je prioritet: **Large v3 q5_0** je preporučeni
   model, a na srpskom sistemu je podrazumevani jezik `sr`. Tastatura pre
   otvaranja aplikacije proverava **Full Access** i ima fallback za otvaranje.
@@ -107,8 +111,9 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Sledeći korak
 
-1. Instalirati novi build, uključiti **Full Access** i proveriti da **Diktiraj**
-   otvara aplikaciju (u traci treba da piše **Full Access ✓**).
+1. Otključati iPhone, otvoriti **Diktator 0.1.1**, uključiti **Full Access** i
+   proveriti da **Diktiraj** otvara aplikaciju (u traci treba da piše
+   **Full Access ✓**).
 2. Preuzeti **Large v3** i uporediti srpski prepis sa Turbo modelom.
 3. Testirati AltStore/SideStore potpisivanje i instalaciju IPA-e, uključujući
    keyboard extension.
