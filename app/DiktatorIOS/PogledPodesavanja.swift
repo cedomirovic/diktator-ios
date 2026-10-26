@@ -89,6 +89,29 @@ struct PogledPodesavanja: View {
                 Toggle("Čuvaj istoriju", isOn: $stanje.podesavanja.cuvajIstoriju)
             }
 
+            Section("Ažuriranja") {
+                Toggle("Proveri nove verzije", isOn: $stanje.podesavanja.proveravajAzuriranja)
+
+                Button("Proveri sada") {
+                    stanje.proveriAzuriranja(prisilno: true)
+                }
+
+                Button("Testiraj obaveštenje") {
+                    stanje.testirajNotifikaciju()
+                }
+
+                if let azuriranje = stanje.dostupnoAzuriranje {
+                    Link(
+                        "Dostupna verzija \(azuriranje.verzija)",
+                        destination: azuriranje.url
+                    )
+                } else {
+                    Text("Nema nove verzije.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
             Section("O aplikaciji") {
                 LabeledContent("Verzija", value: verzija)
                 Link("GitHub projekat", destination: URL(string: "https://github.com/cedomirovic/diktator-ios")!)
@@ -100,6 +123,13 @@ struct PogledPodesavanja: View {
         .navigationTitle("Podešavanja")
         .onChange(of: stanje.podesavanja) { _, _ in
             stanje.sacuvajPodesavanja()
+        }
+        .onChange(of: stanje.podesavanja.proveravajAzuriranja) { _, novo in
+            if novo {
+                stanje.proveriAzuriranja(prisilno: true)
+            } else {
+                stanje.dostupnoAzuriranje = nil
+            }
         }
     }
 }

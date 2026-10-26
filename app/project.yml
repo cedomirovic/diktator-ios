@@ -15,8 +15,8 @@ settings:
     CODE_SIGN_STYLE: Automatic
     CODE_SIGN_IDENTITY: "Apple Development"
     DEVELOPMENT_LANGUAGE: sr
-    MARKETING_VERSION: "0.1.5"
-    CURRENT_PROJECT_VERSION: "6"
+    MARKETING_VERSION: "0.1.6"
+    CURRENT_PROJECT_VERSION: "7"
     DEVELOPMENT_TEAM: LHQ4Q44425
     CLANG_CXX_LANGUAGE_STANDARD: "c++17"
 
@@ -31,8 +31,8 @@ targets:
       properties:
         CFBundleDisplayName: Diktator
         CFBundleName: Diktator
-        CFBundleShortVersionString: "0.1.5"
-        CFBundleVersion: "6"
+        CFBundleShortVersionString: "0.1.6"
+        CFBundleVersion: "7"
         UILaunchScreen: {}
         UIBackgroundModes:
           - audio
@@ -97,8 +97,8 @@ targets:
       properties:
         CFBundleDisplayName: Diktator
         CFBundleName: Diktator
-        CFBundleShortVersionString: "0.1.5"
-        CFBundleVersion: "6"
+        CFBundleShortVersionString: "0.1.6"
+        CFBundleVersion: "7"
         NSExtension:
           NSExtensionPointIdentifier: com.apple.keyboard-service
           NSExtensionPrincipalClass: "$(PRODUCT_MODULE_NAME).KeyboardViewController"

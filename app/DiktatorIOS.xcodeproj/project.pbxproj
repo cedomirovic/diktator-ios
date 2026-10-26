@@ -26,6 +26,7 @@
 		BF63604AFF2519489C66144A /* Preuzimanje.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275C7CD6E540C9810103E49D /* Preuzimanje.swift */; };
 		C241022513AC7959AE509F2C /* Transliteracija.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9311828B20AEC74CF5529CB7 /* Transliteracija.swift */; };
 		D15633B282DFD84931A0F53A /* PogledRecnik.swift in Sources */ = {isa = PBXBuildFile; fileRef = 975766D460CC5AA45203E4E8 /* PogledRecnik.swift */; };
+		E672362093455FB44A1FECCF /* Azuriranja.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A8CC6FE4AD552B8C31452EE /* Azuriranja.swift */; };
 		EC5FC89216C4C0D8E6BFE4C9 /* DiktatorKeyboard.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 028BADA4F19CAFBD0194A000 /* DiktatorKeyboard.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		F07D6AF7774E528B355D0D59 /* Prepisivac.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20316097F523817AD4BBA083 /* Prepisivac.swift */; };
 /* End PBXBuildFile section */
@@ -71,6 +72,7 @@
 		5E2D48993A765741AFA31BE8 /* PogledStatistika.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PogledStatistika.swift; sourceTree = "<group>"; };
 		609B090256ACE0FC4B6BDB10 /* PogledPomoc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PogledPomoc.swift; sourceTree = "<group>"; };
 		7921CEE446B6B8121718CD08 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		7A8CC6FE4AD552B8C31452EE /* Azuriranja.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Azuriranja.swift; sourceTree = "<group>"; };
 		7D319E51BA1C441F49CF777D /* KeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; };
 		9311828B20AEC74CF5529CB7 /* Transliteracija.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transliteracija.swift; sourceTree = "<group>"; };
 		975766D460CC5AA45203E4E8 /* PogledRecnik.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PogledRecnik.swift; sourceTree = "<group>"; };
@@ -97,6 +99,7 @@
 			children = (
 				97891DDD9878C4AD3F561229 /* AppStanje.swift */,
 				7921CEE446B6B8121718CD08 /* Assets.xcassets */,
+				7A8CC6FE4AD552B8C31452EE /* Azuriranja.swift */,
 				2C4FAE80C4EFAF0BF8C7C6E5 /* ContentView.swift */,
 				55B72067199EB9EA9F55A949 /* DiktatorApp.swift */,
 				DA613E2FCC4C47914E7A962B /* DiktatorIOS-Bridging-Header.h */,
@@ -242,6 +245,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2867A03EAC5A8336EF9160A4 /* AppStanje.swift in Sources */,
+				E672362093455FB44A1FECCF /* Azuriranja.swift in Sources */,
 				B3E208BCDBD1BBC8B9775661 /* ContentView.swift in Sources */,
 				0981F2A397B18B476B11425F /* DiktatorApp.swift in Sources */,
 				589916A2679B3B7EFA8A3BFF /* Modeli.swift in Sources */,
@@ -393,7 +397,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_LANGUAGE = sr;
 				DEVELOPMENT_TEAM = LHQ4Q44425;
@@ -414,7 +418,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 0.1.5;
+				MARKETING_VERSION = 0.1.6;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -463,7 +467,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_LANGUAGE = sr;
 				DEVELOPMENT_TEAM = LHQ4Q44425;
@@ -478,7 +482,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 0.1.5;
+				MARKETING_VERSION = 0.1.6;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";

@@ -6,6 +6,14 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Status
 
+- **26.10.2026.** — verzija **0.1.6 (7)**: popravljena je pozadinska sesija
+  tako što status nosi **`sesijaDo`** (do kada sesija važi). Tastatura više ne
+  gasi sesiju posle 3 sekunde bez novog statusa, pa posle povratka u host
+  aplikaciju vidi **Stop** dok je snimanje u toku. Dodati su i timeout-i za
+  start/stop ako aplikacija ne odgovori.
+- **26.10.2026.** — dodata su **obaveštenja o novim verzijama**: provera
+  GitHub release-a, kartica na glavnom ekranu, lokalna notifikacija, prekidač
+  u Podešavanjima, „Proveri sada“ i „Testiraj obaveštenje“.
 - **26.10.2026.** — dodata je **Statistika** u glavnu aplikaciju (verzija
   **0.1.5 (6)**): današnje reči, niz dana, ušteđeno vreme, prosečna brzina,
   grafikon poslednjih 7 dana, jezici i reset statistike. Statistika se čuva

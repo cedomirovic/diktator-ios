@@ -92,6 +92,8 @@ struct PogledDiktat: View {
 
                     statistikaKartica
 
+                    azuriranjeKartica
+
                     if !stanje.modelJePreuzet {
                         VStack(spacing: 8) {
                             Text("Model još nije preuzet")
@@ -267,5 +269,37 @@ struct PogledDiktat: View {
             .padding(.horizontal)
         }
         .buttonStyle(.plain)
+    }
+
+    @ViewBuilder
+    private var azuriranjeKartica: some View {
+        if let azuriranje = stanje.dostupnoAzuriranje {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    Label("Dostupno ažuriranje", systemImage: "arrow.down.circle.fill")
+                        .font(.headline)
+                        .foregroundStyle(.blue)
+                    Spacer()
+                    Text("v\(azuriranje.verzija)")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                }
+
+                Text("Nova verzija je objavljena. Preuzmi je sa GitHub-a.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+
+                Link(destination: azuriranje.url) {
+                    Label("Preuzmi", systemImage: "arrow.up.right.square")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+            }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(.thinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .padding(.horizontal)
+        }
     }
 }

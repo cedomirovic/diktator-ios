@@ -132,6 +132,7 @@ struct Podesavanja: Codable, Equatable {
     var rezimPrepisa = RezimPrepisa.stedljivo.rawValue
     var oslobadjanjeModela = OslobadjanjeModela.pet.rawValue
     var cuvajIstoriju = true
+    var proveravajAzuriranja = true
 
     init() {}
 
@@ -141,6 +142,7 @@ struct Podesavanja: Codable, Equatable {
         case rezimPrepisa
         case oslobadjanjeModela
         case cuvajIstoriju
+        case proveravajAzuriranja
     }
 
     init(from decoder: Decoder) throws {
@@ -161,5 +163,6 @@ struct Podesavanja: Codable, Equatable {
             oslobadjanjeModela = OslobadjanjeModela.pet.rawValue
         }
         cuvajIstoriju = try kontejner.decodeIfPresent(Bool.self, forKey: .cuvajIstoriju) ?? true
+        proveravajAzuriranja = try kontejner.decodeIfPresent(Bool.self, forKey: .proveravajAzuriranja) ?? true
     }
 }

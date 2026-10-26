@@ -41,6 +41,7 @@ private enum DiktatorIPC {
     static let id = "id"
     static let vreme = "vreme"
     static let sesija = "sesija"
+    static let sesijaDo = "sesijaDo"
     static let stanjeKljuc = "stanje"
     static let token = "token"
     static let tokenVreme = "tokenVreme"
@@ -114,6 +115,7 @@ final class KeyboardViewController: UIInputViewController {
     private var timerIPC: Timer?
     private var timerSesijaTimeout: Timer?
     private var sesijaAktivna = false
+    private var sesijaDo: Double = 0
     private var snimaSesijom = false
     private var obradaSesije = false
     private var cekaStartSesije = false
@@ -511,6 +513,7 @@ final class KeyboardViewController: UIInputViewController {
             snimaSesijom = false
             obradaSesije = true
             prikaziStatus("Obrada…")
+            pokreniTimeoutSesije()
             azurirajPrikaz()
             return
         }
@@ -546,6 +549,9 @@ final class KeyboardViewController: UIInputViewController {
         let id = UUID().uuidString
         let vreme = Date().timeIntervalSince1970
         zadnjiKomandniId = id
+        // Lokalna akcija je novija od svakog statusa koji je stigao pre nje.
+        // Tako tastatura neće vratiti staro stanje dok aplikacija ne odgovori.
+        zadnjeStanjeVreme = max(zadnjeStanjeVreme, vreme)
         DiktatorIPC.pisi(DiktatorIPC.komande, [
             DiktatorIPC.komanda: komanda,
             DiktatorIPC.id: id,
@@ -600,22 +606,37 @@ final class KeyboardViewController: UIInputViewController {
         timerSesijaTimeout?.invalidate()
         let cekanjeSesije = UserDefaults.standard.bool(forKey: cekaSesijuKey)
         timerSesijaTimeout = Timer.scheduledTimer(
-            withTimeInterval: cekanjeSesije ? 8 : 1.8,
+            withTimeInterval: cekanjeSesije ? 8 : 3,
             repeats: false
         ) { [weak self] _ in
             guard let self else { return }
-            if self.snimaSesijom || self.obradaSesije {
-                return
-            }
 
             if UserDefaults.standard.bool(forKey: self.cekaSesijuKey) {
                 self.ocistiCekanjeSesije()
                 NSLog("Diktator tastatura: sesija nije odgovorila, otvaram app.")
                 self.prikaziStatus("Otvaram…")
                 self.otvoriAplikaciju("diktator-ios://dictate")
-            } else if !self.sesijaAktivna {
+                return
+            }
+
+            // Start je poslat, ali aplikacija nije javila „snima“. Verovatno
+            // je ugašena ili suspendovana, pa je otvaramo.
+            if self.cekaStartSesije {
+                self.cekaStartSesije = false
+                self.snimaSesijom = false
+                self.obradaSesije = false
                 NSLog("Diktator tastatura: start nije odgovorio, otvaram app.")
-                self.prikaziStatus("Otvaram…")
+                self.prikaziStatus("Nema odgovora — otvaram app.")
+                self.otvoriAplikaciju("diktator-ios://dictate")
+                return
+            }
+
+            // Stop je poslat, ali nema statusa „obrada“. Aplikacija verovatno
+            // ne radi, pa je otvaramo da se prepis ipak završi.
+            if self.obradaSesije && !UserDefaults.standard.bool(forKey: self.cekaDiktatKey) {
+                self.obradaSesije = false
+                NSLog("Diktator tastatura: stop nije odgovorio, otvaram app.")
+                self.prikaziStatus("Nema odgovora — otvaram app.")
                 self.otvoriAplikaciju("diktator-ios://dictate")
             }
         }
@@ -689,14 +710,27 @@ final class KeyboardViewController: UIInputViewController {
     private func osveziIPCStanje() {
         let vrednosti = DiktatorIPC.citaj(DiktatorIPC.stanje)
         let sada = Date().timeIntervalSince1970
+
         if let vremeString = vrednosti[DiktatorIPC.vreme],
-           let vreme = Double(vremeString),
-           sada - vreme <= 3 {
+           let vreme = Double(vremeString) {
             let sesija = vrednosti[DiktatorIPC.sesija] == "1"
             let stanjeApp = vrednosti[DiktatorIPC.stanjeKljuc] ?? "mirno"
-            primeniStanje(sesija: sesija, stanje: stanjeApp, vreme: vreme)
+            let doKada = Double(vrednosti[DiktatorIPC.sesijaDo] ?? "") ?? 0
+            primeniStanje(
+                sesija: sesija,
+                stanje: stanjeApp,
+                vreme: vreme,
+                sesijaDo: doKada
+            )
         } else if zadnjaNotifikacija == nil
-                    || Date().timeIntervalSince(zadnjaNotifikacija!) > 3 {
+                    || Date().timeIntervalSince(zadnjaNotifikacija!) > 10 {
+            obradiStaleStanje()
+        }
+
+        // Sesija traje 15 minuta. Ako aplikacija u pozadini ne stigne da
+        // pošalje novi status, tastatura i dalje zna do kada je sesija živa.
+        if sesijaAktivna, sesijaDo > 0, sada >= sesijaDo {
+            Dnevnik.pisi("Sesija je istekla (sesijaDo).")
             obradiStaleStanje()
         }
 
@@ -711,10 +745,16 @@ final class KeyboardViewController: UIInputViewController {
         azurirajPrikaz()
     }
 
-    private func primeniStanje(sesija: Bool, stanje: String, vreme: Double) {
-        guard vreme >= zadnjeStanjeVreme else { return }
+    private func primeniStanje(
+        sesija: Bool,
+        stanje: String,
+        vreme: Double,
+        sesijaDo noviSesijaDo: Double = 0
+    ) {
+        guard vreme > zadnjeStanjeVreme else { return }
         zadnjeStanjeVreme = vreme
         sesijaAktivna = sesija
+        sesijaDo = sesija ? noviSesijaDo : 0
 
         let kljuc = "\(sesija)-\(stanje)"
         if kljuc != zadnjiDnevnikStanja {
@@ -778,10 +818,15 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private func obradiStaleStanje() {
+        let sada = Date().timeIntervalSince1970
+        if sesijaAktivna, sesijaDo > 0, sada < sesijaDo {
+            return
+        }
         if sesijaAktivna {
             Dnevnik.pisi("Status je zastareo — sesija se gasi u tastaturi.")
         }
         sesijaAktivna = false
+        sesijaDo = 0
         if snimaSesijom && !cekaStartSesije {
             snimaSesijom = false
         }
@@ -798,23 +843,10 @@ final class KeyboardViewController: UIInputViewController {
 
     private func primljenaNotifikacija(_ ime: String) {
         guard ime.hasPrefix(DiktatorIPC.notifStanje + ".") else { return }
-        let delovi = ime.components(separatedBy: ".")
-        guard delovi.count >= 7,
-              let ms = Double(delovi[6]),
-              Date().timeIntervalSince1970 - ms / 1000 <= 5 else {
-            return
-        }
-
         zadnjaNotifikacija = Date()
-        let sesija = delovi[4] == "1"
-        let stanje = delovi[5]
-        Dnevnik.pisi("Darwin status: sesija=\(sesija) stanje=\(stanje)")
-        primeniStanje(sesija: sesija, stanje: stanje, vreme: ms / 1000)
-        if let (tekst, token) = tekstIzIPC() {
-            nalepiAutomatski(tekst, token: token, izvor: "IPC")
-        }
-        autoNalepiAkoTreba()
-        azurirajPrikaz()
+        // Notifikacija je samo signal; pun status (uključujući sesijaDo)
+        // čitamo iz imenovanog pasteboard-a.
+        osveziIPCStanje()
     }
 
     private var cekanjeSesijeTraje: Bool {

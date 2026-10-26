@@ -42,6 +42,7 @@ private enum DiktatorIPC {
     static let id = "id"
     static let vreme = "vreme"
     static let sesija = "sesija"
+    static let sesijaDo = "sesijaDo"
     static let stanjeKljuc = "stanje"
     static let token = "token"
     static let tokenVreme = "tokenVreme"
@@ -114,6 +115,7 @@ final class AppStanje: ObservableObject {
     @Published var napredakPreuzimanja: Double?
     @Published var sesijaAktivna = false
     @Published var sesijaPreostalo = 0
+    @Published var dostupnoAzuriranje: Azuriranje?
 
     private let snimac = Snimac()
     private let prepisivac = Prepisivac()
@@ -122,12 +124,14 @@ final class AppStanje: ObservableObject {
     private var timerSnimanja: Timer?
     private var timerSesije: Timer?
     private var timerIPC: Timer?
+    private var sesijaKraj: Date?
     private var zadatakUPozadini: UIBackgroundTaskIdentifier = .invalid
     private var pokrenutSaTastature = false
     private var zadnjiIPCtoken: String?
     private var zadnjiIPCtokenVreme: Double?
     private var zadnjiKomandniId: String?
     private var zadnjiDnevnikStanja = ""
+    private var proveraAzuriranjaUToku = false
 
     init() {
         Prepisivac.utisajLog()
@@ -145,6 +149,8 @@ final class AppStanje: ObservableObject {
             }
             UserDefaults.standard.set(true, forKey: kljucMigracije)
         }
+
+        dostupnoAzuriranje = Azuriranja.kesirano()
 
         CFNotificationCenterAddObserver(
             CFNotificationCenterGetDarwinNotifyCenter(),
@@ -255,6 +261,7 @@ final class AppStanje: ObservableObject {
         }
         sesijaAktivna = true
         sesijaPreostalo = Snimac.najduzeSesijeSekundi
+        sesijaKraj = Date().addingTimeInterval(TimeInterval(Snimac.najduzeSesijeSekundi))
         pokreniTimerSesije()
         pokreniIPCPolling()
         pisiIPCStanje()
@@ -276,6 +283,7 @@ final class AppStanje: ObservableObject {
         timerIPC = nil
         snimac.zavrsiSesiju()
         sesijaAktivna = false
+        sesijaKraj = nil
         sesijaPreostalo = 0
         pisiIPCStanje()
         Dnevnik.pisi("Sesija završena.")
@@ -286,6 +294,33 @@ final class AppStanje: ObservableObject {
 
     func osveziIPC() {
         pisiIPCStanje()
+    }
+
+    // MARK: - Ažuriranja
+
+    func proveriAzuriranja(prisilno: Bool = false) {
+        guard podesavanja.proveravajAzuriranja else { return }
+        guard !proveraAzuriranjaUToku else { return }
+        proveraAzuriranjaUToku = true
+
+        Task { @MainActor in
+            defer { proveraAzuriranjaUToku = false }
+            if let azuriranje = await Azuriranja.proveri(prisilno: prisilno) {
+                dostupnoAzuriranje = azuriranje
+                await Azuriranja.posaljiNotifikaciju(azuriranje)
+            } else {
+                dostupnoAzuriranje = nil
+            }
+        }
+    }
+
+    func testirajNotifikaciju() {
+        Task { @MainActor in
+            let uspeh = await Azuriranja.posaljiTestnuNotifikaciju()
+            poruka = uspeh
+                ? "Testno obaveštenje je poslato."
+                : "Obaveštenja su isključena u Podešavanjima iOS-a."
+        }
     }
 
     private func osigurajDozvolu() async -> Bool {
@@ -484,6 +519,10 @@ final class AppStanje: ObservableObject {
             DiktatorIPC.vreme: String(sada)
         ]
 
+        if sesijaAktivna, let kraj = sesijaKraj {
+            vrednosti[DiktatorIPC.sesijaDo] = String(kraj.timeIntervalSince1970)
+        }
+
         if let token = zadnjiIPCtoken {
             vrednosti[DiktatorIPC.token] = token
         }
@@ -582,7 +621,14 @@ final class AppStanje: ObservableObject {
         timerSesije = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             Task { @MainActor in
                 guard let self, self.sesijaAktivna else { return }
-                self.sesijaPreostalo = max(0, self.sesijaPreostalo - 1)
+                if let kraj = self.sesijaKraj {
+                    self.sesijaPreostalo = max(
+                        0,
+                        Int(kraj.timeIntervalSinceNow.rounded())
+                    )
+                } else {
+                    self.sesijaPreostalo = max(0, self.sesijaPreostalo - 1)
+                }
                 self.pisiIPCStanje()
                 if self.sesijaPreostalo <= 0 {
                     self.zavrsiSesiju()

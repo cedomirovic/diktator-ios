@@ -12,7 +12,7 @@ Projekat je nastao iz macOS aplikacije
 **snimak i tekst ostaju na uređaju**, bez slanja zvuka na server.
 
 - GitHub: <https://github.com/cedomirovic/diktator-ios>
-- Verzija: **0.1.5 (6)**
+- Verzija: **0.1.6 (7)**
 - Aplikacija: **Diktator iOS** (`com.cedomirovic.diktator.ios`)
 - Tastatura: `com.cedomirovic.diktator.ios.keyboard`
 - Preporučeni model: **Large v3 q5_0** (~1,0 GB) — tačniji za srpski.
@@ -21,7 +21,7 @@ Projekat je nastao iz macOS aplikacije
 
 ## Status
 
-Verzija **0.1.5 (6)** je potpisana i instalirana na **iPhone 15 Pro**
+Verzija **0.1.6 (7)** je potpisana i instalirana na **iPhone 15 Pro**
 (iOS 27.0.1). Debug i Release build prolaze na macOS 26.7.1 i Xcode 27.1;
 whisper.cpp za iOS (arm64, Metal + Accelerate) je izgrađen. Skripta pravi
 nepotpisan `build/DiktatorIOS.ipa` (~1.6 MB bez modela).
@@ -40,6 +40,15 @@ gotov tekst preko clipboarda.
 Na srpskom sistemu aplikacija podrazumevano bira jezik **Srpski**, a ne
 automatsku detekciju. Za srpski je preporučen **Large v3**; Turbo je brži, ali
 na srpskom ume više da pogreši.
+
+## Ažuriranja
+
+Aplikacija nije na App Store-u, pa nema sistemsku proveru ažuriranja. Zato
+proverava **GitHub release** (`cedomirovic/diktator-ios`) najviše jednom u
+6 sati. Kada postoji novija verzija, prikaže karticu na glavnom ekranu i
+pošalje lokalno obaveštenje sa linkom na release. U Podešavanjima postoji
+prekidač **Proveri nove verzije**, dugme **Proveri sada** i **Testiraj
+obaveštenje** da se odmah proveri da li iOS dozvoljava notifikacije.
 
 ## Statistika
 
