@@ -94,9 +94,15 @@ private enum DiktatorIPC {
         return "\(notifKomanda).\(komanda).\(id).\(ms)"
     }
 
-    static func imeStanja(sesija: Bool, stanje: String, vreme: Double) -> String {
+    static func imeStanja(
+        sesija: Bool,
+        stanje: String,
+        vreme: Double,
+        sesijaDo: Double
+    ) -> String {
         let ms = Int(vreme * 1000)
-        return "\(notifStanje).\(sesija ? 1 : 0).\(stanje).\(ms)"
+        let doMs = Int(sesijaDo * 1000)
+        return "\(notifStanje).\(sesija ? 1 : 0).\(stanje).\(ms).\(doMs)"
     }
 }
 
@@ -537,8 +543,14 @@ final class AppStanje: ObservableObject {
         }
 
         DiktatorIPC.pisi(DiktatorIPC.stanje, vrednosti)
+        let doKada = (sesijaAktivna ? sesijaKraj?.timeIntervalSince1970 : nil) ?? 0
         DiktatorIPC.posaljiNotifikaciju(
-            DiktatorIPC.imeStanja(sesija: sesijaAktivna, stanje: stanjeTekst, vreme: sada)
+            DiktatorIPC.imeStanja(
+                sesija: sesijaAktivna,
+                stanje: stanjeTekst,
+                vreme: sada,
+                sesijaDo: doKada
+            )
         )
 
         let kljuc = "\(sesijaAktivna)-\(stanjeTekst)-\(zadnjiIPCtoken ?? "-")"
@@ -582,7 +594,14 @@ final class AppStanje: ObservableObject {
                 pocniSnimanje(saTastature: true)
                 pisiIPCStanje()
             } else {
-                pisiIPCStanje()
+                // Aplikacija je živa, pa može sama da obnovi sesiju. Tastatura
+                // tako ne mora da otvori Diktator posle isteka sesije.
+                Task { @MainActor in
+                    if await ukljuciSesijuAsync() {
+                        pocniSnimanje(saTastature: true)
+                    }
+                    pisiIPCStanje()
+                }
             }
         case "stop":
             if stanje.jeSnimanje {
