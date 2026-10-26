@@ -923,24 +923,39 @@ final class ServerTeksta {
                 port: NWEndpoint.Port(rawValue: port)!
             )
             let novi = try NWListener(using: parametri)
-            novi.newConnectionHandler = { [weak self] veza in
-                self?.obradi(veza)
-            }
-            novi.stateUpdateHandler = { stanje in
-                if case .failed(let greska) = stanje {
-                    Dnevnik.pisi(
-                        "ServerTeksta: listener greška \(greska.localizedDescription)"
-                    )
-                }
-            }
-            novi.start(queue: queue)
-            listener = novi
-            Dnevnik.pisi("ServerTeksta: sluša na 127.0.0.1:\(port)")
+            pokreniListener(novi, opis: "127.0.0.1:\(port)")
         } catch {
             Dnevnik.pisi(
-                "ServerTeksta: ne mogu da pokrenem: \(error.localizedDescription)"
+                "ServerTeksta: loopback nije uspeo: \(error.localizedDescription)"
             )
+            do {
+                let novi = try NWListener(
+                    using: .tcp,
+                    on: NWEndpoint.Port(rawValue: port)!
+                )
+                pokreniListener(novi, opis: "port \(port)")
+            } catch {
+                Dnevnik.pisi(
+                    "ServerTeksta: ne mogu da pokrenem: \(error.localizedDescription)"
+                )
+            }
         }
+    }
+
+    private func pokreniListener(_ novi: NWListener, opis: String) {
+        novi.newConnectionHandler = { [weak self] veza in
+            self?.obradi(veza)
+        }
+        novi.stateUpdateHandler = { stanje in
+            if case .failed(let greska) = stanje {
+                Dnevnik.pisi(
+                    "ServerTeksta: listener greška \(greska.localizedDescription)"
+                )
+            }
+        }
+        novi.start(queue: queue)
+        listener = novi
+        Dnevnik.pisi("ServerTeksta: sluša na \(opis)")
     }
 
     func zaustavi() {
