@@ -566,7 +566,7 @@ final class AppStanje: ObservableObject {
               id != zadnjiKomandniId,
               let vremeString = komanda[DiktatorIPC.vreme],
               let vreme = Double(vremeString),
-              Date().timeIntervalSince1970 - vreme < 10 else {
+              Date().timeIntervalSince1970 - vreme < 60 else {
             return
         }
 
@@ -607,7 +607,7 @@ final class AppStanje: ObservableObject {
         let id = delovi[5]
         guard id != zadnjiKomandniId,
               let ms = Double(delovi[6]),
-              Date().timeIntervalSince1970 - ms / 1000 < 10 else {
+              Date().timeIntervalSince1970 - ms / 1000 < 60 else {
             return
         }
         zadnjiKomandniId = id
