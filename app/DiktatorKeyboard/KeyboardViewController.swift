@@ -213,27 +213,26 @@ final class KeyboardViewController: UIInputViewController {
             }
         }
 
-        // Tekst stiže u zasebnoj notifikaciji, sa brojem koji odgovara
-        // imenovanom pasteboard-u. Tako ne zavisimo od keša opšteg clipboard-a.
-        for broj in 0..<10 {
-            CFNotificationCenterAddObserver(
-                centar,
-                osmatrac,
-                { _, observer, ime, _, _ in
-                    guard let observer, let ime else { return }
-                    let tastatura = Unmanaged<KeyboardViewController>
-                        .fromOpaque(observer)
-                        .takeUnretainedValue()
-                    let tekst = ime.rawValue as String
-                    Task { @MainActor in
-                        tastatura.primljenaNotifikacija(tekst)
-                    }
-                },
-                "com.cedomirovic.diktator.tekst.\(broj)" as CFString,
-                nil,
-                .deliverImmediately
-            )
-        }
+        // Tekst stiže u imenu notifikacije, kao base64. Imenovani pasteboard
+        // i opšti clipboard umeju da vrate keširanu vrednost u extension-u.
+        CFNotificationCenterAddObserver(
+            centar,
+            osmatrac,
+            { _, observer, ime, _, _ in
+                guard let observer, let ime else { return }
+                let tastatura = Unmanaged<KeyboardViewController>
+                    .fromOpaque(observer)
+                    .takeUnretainedValue()
+                let tekst = ime.rawValue as String
+                guard tekst.hasPrefix("com.cedomirovic.diktator.tekst.") else { return }
+                Task { @MainActor in
+                    tastatura.primljenaNotifikacija(tekst)
+                }
+            },
+            nil,
+            nil,
+            .deliverImmediately
+        )
     }
 
     private func odjaviDarwin() {
@@ -932,34 +931,35 @@ final class KeyboardViewController: UIInputViewController {
         azurirajPrikaz()
     }
 
-    /// Stiže kao `com.cedomirovic.diktator.tekst.<broj>`. Aplikacija je pre
-    /// toga obrisala stari pasteboard sa istim imenom i upisala novi tekst,
-    /// pa čitanje ne vraća keširanu vrednost.
-    private func primljenTekst(_ ime: String, pokusaj: Int = 0) {
-        let tabla = UIPasteboard.Name(rawValue: ime)
-        let vrednosti = DiktatorIPC.citaj(tabla)
-        if let tekst = vrednosti[DiktatorIPC.tekst]?
-            .trimmingCharacters(in: .whitespacesAndNewlines),
-            !tekst.isEmpty {
-            poslednjiPrepis = tekst
-            tekstSpreman = true
-            UIPasteboard.remove(withName: tabla)
-            Dnevnik.pisi("Tekst notifikacija: duzina=\(tekst.count)")
-            prikaziStatus("Tekst spreman — tapni Nalepi.")
-            azurirajPrikaz()
+    /// Stiže kao `com.cedomirovic.diktator.tekst.<broj>.<base64>`.
+    /// Tekst je u imenu notifikacije, pa ne zavisimo od pasteboard keša.
+    private func primljenTekst(_ ime: String) {
+        let prefiks = "com.cedomirovic.diktator.tekst."
+        guard ime.hasPrefix(prefiks) else { return }
+        let ostatak = ime.dropFirst(prefiks.count)
+        guard let tacka = ostatak.firstIndex(of: ".") else { return }
+        let base64Deo = String(ostatak[ostatak.index(after: tacka)...])
+        var base64 = base64Deo
+            .replacingOccurrences(of: "-", with: "+")
+            .replacingOccurrences(of: "_", with: "/")
+        while base64.count % 4 != 0 {
+            base64 += "="
+        }
+
+        guard let podaci = Data(base64Encoded: base64),
+              let tekst = String(data: podaci, encoding: .utf8),
+              !tekst.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            Dnevnik.pisi(
+                "Tekst notifikacija: base64 nije dekodiran, duzina=\(base64Deo.count)"
+            )
             return
         }
 
-        if pokusaj < 3 {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
-                self?.primljenTekst(ime, pokusaj: pokusaj + 1)
-            }
-            return
-        }
-
-        Dnevnik.pisi(
-            "Tekst notifikacija: nema teksta posle \(pokusaj) pokusaja, kljucevi=\(vrednosti.keys.sorted().joined(separator: ","))"
-        )
+        poslednjiPrepis = tekst
+        tekstSpreman = true
+        Dnevnik.pisi("Tekst notifikacija: duzina=\(tekst.count)")
+        prikaziStatus("Tekst spreman — tapni Nalepi.")
+        azurirajPrikaz()
     }
 
     private var cekanjeSesijeTraje: Bool {

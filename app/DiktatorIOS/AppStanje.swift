@@ -537,14 +537,14 @@ final class AppStanje: ObservableObject {
     /// briše pre upisa, da keyboard extension ne bi vratio keširanu vrednost.
     private func posaljiTekstTastaturi(_ tekst: String) {
         tekstBrojac = (tekstBrojac + 1) % 10
-        let ime = UIPasteboard.Name(
-            rawValue: "com.cedomirovic.diktator.tekst.\(tekstBrojac)"
-        )
-        UIPasteboard.remove(withName: ime)
-        DiktatorIPC.pisi(ime, [DiktatorIPC.tekst: tekst])
-        DiktatorIPC.posaljiNotifikaciju(ime.rawValue)
+        let base64 = Data(tekst.utf8).base64EncodedString()
+            .replacingOccurrences(of: "+", with: "-")
+            .replacingOccurrences(of: "/", with: "_")
+            .replacingOccurrences(of: "=", with: "")
+        let ime = "com.cedomirovic.diktator.tekst.\(tekstBrojac).\(base64)"
+        DiktatorIPC.posaljiNotifikaciju(ime)
         Dnevnik.pisi(
-            "Tekst poslat tastaturi: duzina=\(tekst.count), tabla=\(ime.rawValue)"
+            "Tekst poslat notifikacijom: duzina=\(tekst.count), ime=\(ime.count) znakova"
         )
     }
 
