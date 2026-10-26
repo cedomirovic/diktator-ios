@@ -26,6 +26,7 @@ final class Prepisivac: @unchecked Sendable {
     private let red = DispatchQueue(label: "com.cedomirovic.diktator.ios.whisper")
     private let bravaStanja = NSLock()
     private var uMemoriji = false
+    private var ucitanaGPU = false
 
     private(set) var ucitanaPutanja: String?
 
@@ -39,13 +40,13 @@ final class Prepisivac: @unchecked Sendable {
         whisper_log_set({ _, _, _ in }, nil)
     }
 
-    func ucitaj(putanja: String) throws {
+    func ucitaj(putanja: String, useGPU: Bool = true) throws {
         try red.sync {
-            if kontekst != nil, ucitanaPutanja == putanja { return }
+            if kontekst != nil, ucitanaPutanja == putanja, ucitanaGPU == useGPU { return }
             oslobodiBezReda()
 
             var parametri = whisper_context_default_params()
-            parametri.use_gpu = true
+            parametri.use_gpu = useGPU
             parametri.flash_attn = true
 
             guard let novi = whisper_init_from_file_with_params(putanja, parametri) else {
@@ -53,7 +54,9 @@ final class Prepisivac: @unchecked Sendable {
             }
             kontekst = novi
             ucitanaPutanja = putanja
+            ucitanaGPU = useGPU
             postaviUcitan(true)
+            Dnevnik.pisi("Model ucitan, GPU=\(useGPU)")
         }
     }
 
@@ -99,6 +102,7 @@ final class Prepisivac: @unchecked Sendable {
             guard let kontekst else { throw GreskaPrepisa.modelNijePreuzet }
             guard !uzorci.isEmpty else { return "" }
             guard let stanje = whisper_init_state(kontekst) else {
+                Dnevnik.pisi("Whisper init_state nije uspeo")
                 throw GreskaPrepisa.dekodiranje
             }
             defer { whisper_free_state(stanje) }
@@ -149,7 +153,12 @@ final class Prepisivac: @unchecked Sendable {
                 }
             }
 
-            guard rezultat == 0 else { throw GreskaPrepisa.dekodiranje }
+            guard rezultat == 0 else {
+                Dnevnik.pisi(
+                    "Whisper full greska: kod=\(rezultat), uzorci=\(uzorci.count), GPU=\(ucitanaGPU)"
+                )
+                throw GreskaPrepisa.dekodiranje
+            }
 
             let jezID = whisper_full_lang_id_from_state(stanje)
             if jezID >= 0, let kod = whisper_lang_str(jezID) {

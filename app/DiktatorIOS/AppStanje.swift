@@ -398,6 +398,9 @@ final class AppStanje: ObservableObject {
         let uzorci = snimac.zaustavi()
         nivo = 0
         let trajanje = Snimac.trajanje(uzorci.count)
+        Dnevnik.pisi(
+            "Snimak: uzorci=\(uzorci.count), trajanje=\(String(format: "%.2f", trajanje)) s"
+        )
 
         guard trajanje >= 0.6 else {
             stanje = .greska("Snimak je prekratak — drži mikrofon dok govoriš.")
@@ -407,6 +410,16 @@ final class AppStanje: ObservableObject {
         }
 
         let ocisceni = Snimac.skratiTisinu(uzorci)
+        if let najmanji = ocisceni.min(), let najveci = ocisceni.max() {
+            let rms = sqrt(
+                ocisceni.reduce(0) { $0 + $1 * $1 } / Float(max(1, ocisceni.count))
+            )
+            let nekonacni = ocisceni.contains { !$0.isFinite }
+            Dnevnik.pisi(
+                "Uzorci: min=\(String(format: "%.4f", najmanji)), max=\(String(format: "%.4f", najveci)), rms=\(String(format: "%.4f", rms)), nekonacni=\(nekonacni)"
+            )
+        }
+        Dnevnik.pisi("Posle skracivanja tisina: uzorci=\(ocisceni.count)")
         guard !ocisceni.isEmpty else {
             stanje = .greska("Nisam čuo govor. Pokušaj ponovo.")
             pisiIPCStanje()
@@ -423,6 +436,10 @@ final class AppStanje: ObservableObject {
         let jezik = podesavanja.jezik
         let rezim = RezimPrepisa.iz(podesavanja.rezimPrepisa)
         let prompt = Recnik.kaoPrompt(recnik)
+        let useGPU = UIApplication.shared.applicationState == .active
+        Dnevnik.pisi(
+            "Prepis pocinje: model=\(model.id), fajl=\(model.putanja.lastPathComponent), jezik=\(jezik), GPU=\(useGPU), app=\(UIApplication.shared.applicationState.rawValue)"
+        )
         stanje = .priprema
         pisiIPCStanje()
         pocniZadatakUPozadini()
@@ -430,7 +447,7 @@ final class AppStanje: ObservableObject {
         let prepisivac = self.prepisivac
         DispatchQueue.global(qos: .userInitiated).async {
             do {
-                try prepisivac.ucitaj(putanja: model.putanja.path)
+                try prepisivac.ucitaj(putanja: model.putanja.path, useGPU: useGPU)
                 let tekst = try prepisivac.prepisi(
                     uzorci: ocisceni,
                     jezik: jezik,
@@ -442,6 +459,8 @@ final class AppStanje: ObservableObject {
                     self?.zavrsiPrepis(tekst, trajanje: trajanje, jezik: jezikPrepisa)
                 }
             } catch {
+                Dnevnik.pisi("Prepis greska: \(error.localizedDescription)")
+                NSLog("Diktator: prepis greška: %@", error.localizedDescription)
                 DispatchQueue.main.async { [weak self] in
                     self?.zavrsiZadatakUPozadini()
                     self?.stanje = .greska(error.localizedDescription)
@@ -454,6 +473,7 @@ final class AppStanje: ObservableObject {
 
     private func zavrsiPrepis(_ tekst: String, trajanje: Double, jezik: String) {
         let sredjen = Tekst.sredi(tekst)
+        Dnevnik.pisi("Prepis tekst: duzina=\(sredjen.count)")
         guard !sredjen.isEmpty else {
             zavrsiZadatakUPozadini()
             stanje = .greska("Nisam prepoznao govor. Pokušaj ponovo, malo glasnije.")
