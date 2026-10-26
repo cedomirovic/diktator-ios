@@ -88,6 +88,14 @@ private enum DiktatorIPC {
         let ms = Int(vreme * 1000)
         return "\(notifKomanda).\(komanda).\(id).\(ms)"
     }
+
+    static func imeKomandeFiksno(_ komanda: String) -> String {
+        "\(notifKomanda).\(komanda)"
+    }
+
+    static func imeStanjaFiksno(sesija: Bool, stanje: String) -> String {
+        "\(notifStanje).\(sesija ? 1 : 0).\(stanje)"
+    }
 }
 
 final class KeyboardViewController: UIInputViewController {
@@ -193,23 +201,29 @@ final class KeyboardViewController: UIInputViewController {
     private func registrujDarwin() {
         guard !darwinRegistrovan else { return }
         darwinRegistrovan = true
-        CFNotificationCenterAddObserver(
-            CFNotificationCenterGetDarwinNotifyCenter(),
-            Unmanaged.passUnretained(self).toOpaque(),
-            { _, observer, ime, _, _ in
-                guard let observer, let ime else { return }
-                let tastatura = Unmanaged<KeyboardViewController>
-                    .fromOpaque(observer)
-                    .takeUnretainedValue()
-                let tekst = ime.rawValue as String
-                Task { @MainActor in
-                    tastatura.primljenaNotifikacija(tekst)
-                }
-            },
-            nil,
-            nil,
-            .deliverImmediately
-        )
+        let centar = CFNotificationCenterGetDarwinNotifyCenter()
+        let osmatrac = Unmanaged.passUnretained(self).toOpaque()
+        for sesija in [false, true] {
+            for stanje in ["mirno", "snima", "obrada", "greska"] {
+                CFNotificationCenterAddObserver(
+                    centar,
+                    osmatrac,
+                    { _, observer, ime, _, _ in
+                        guard let observer, let ime else { return }
+                        let tastatura = Unmanaged<KeyboardViewController>
+                            .fromOpaque(observer)
+                            .takeUnretainedValue()
+                        let tekst = ime.rawValue as String
+                        Task { @MainActor in
+                            tastatura.primljenaNotifikacija(tekst)
+                        }
+                    },
+                    DiktatorIPC.imeStanjaFiksno(sesija: sesija, stanje: stanje) as CFString,
+                    nil,
+                    .deliverImmediately
+                )
+            }
+        }
     }
 
     private func odjaviDarwin() {
@@ -572,7 +586,7 @@ final class KeyboardViewController: UIInputViewController {
             DiktatorIPC.vreme: String(vreme)
         ])
         DiktatorIPC.posaljiNotifikaciju(
-            DiktatorIPC.imeKomande(komanda, id: id, vreme: vreme)
+            DiktatorIPC.imeKomandeFiksno(komanda)
         )
         Dnevnik.pisi("Poslata komanda \(komanda) (\(id))")
         NSLog("Diktator tastatura: poslata komanda %@ (%@).", komanda, id)
@@ -879,16 +893,43 @@ final class KeyboardViewController: UIInputViewController {
     private func primljenaNotifikacija(_ ime: String) {
         guard ime.hasPrefix(DiktatorIPC.notifStanje + ".") else { return }
         let delovi = ime.components(separatedBy: ".")
+        zadnjaNotifikacija = Date()
+
+        // Fiksno ime: com.cedomirovic.diktator.st.<sesija>.<stanje>
+        if delovi.count == 6 {
+            let sesija = delovi[4] == "1"
+            let stanje = delovi[5]
+            let vrednosti = DiktatorIPC.citaj(DiktatorIPC.stanje)
+            let sada = Date().timeIntervalSince1970
+            let doKada = Double(vrednosti[DiktatorIPC.sesijaDo] ?? "") ?? 0
+            let vazeceDo = doKada > sada ? doKada : 0
+            Dnevnik.pisi(
+                "Darwin fiksni status: sesija=\(sesija) stanje=\(stanje)"
+            )
+            // Notifikacija je svež signal; vreme uzimamo sada, da pasteboard
+            // ne može da vrati staro stanje.
+            primeniStanje(
+                sesija: sesija,
+                stanje: stanje,
+                vreme: sada,
+                sesijaDo: vazeceDo
+            )
+            if let (tekst, token) = tekstIzIPC() {
+                nalepiAutomatski(tekst, token: token, izvor: "IPC")
+            }
+            autoNalepiAkoTreba()
+            azurirajPrikaz()
+            return
+        }
+
+        // Stariji dinamički format: ...st.<sesija>.<stanje>.<ms>.<sesijaDoMs>
         guard delovi.count >= 8,
               let ms = Double(delovi[6]),
               let doMs = Double(delovi[7]) else {
-            // Stariji format notifikacije nema sesijaDo; probaj pasteboard.
-            zadnjaNotifikacija = Date()
             osveziIPCStanje()
             return
         }
 
-        zadnjaNotifikacija = Date()
         let sesija = delovi[4] == "1"
         let stanje = delovi[5]
         Dnevnik.pisi(

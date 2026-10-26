@@ -94,6 +94,16 @@ private enum DiktatorIPC {
         return "\(notifKomanda).\(komanda).\(id).\(ms)"
     }
 
+    /// Fiksna imena su pouzdana za Darwin opserver koji se registruje na
+    /// tačan naziv. Dinamički deo (ID, vreme) ide preko pasteboard-a.
+    static func imeKomandeFiksno(_ komanda: String) -> String {
+        "\(notifKomanda).\(komanda)"
+    }
+
+    static func imeStanjaFiksno(sesija: Bool, stanje: String) -> String {
+        "\(notifStanje).\(sesija ? 1 : 0).\(stanje)"
+    }
+
     static func imeStanja(
         sesija: Bool,
         stanje: String,
@@ -130,6 +140,7 @@ final class AppStanje: ObservableObject {
     private var timerSnimanja: Timer?
     private var timerSesije: Timer?
     private var timerIPC: Timer?
+    private var timerIPCHeartbeat: DispatchSourceTimer?
     private var sesijaKraj: Date?
     private var zadatakUPozadini: UIBackgroundTaskIdentifier = .invalid
     private var pokrenutSaTastature = false
@@ -158,21 +169,25 @@ final class AppStanje: ObservableObject {
 
         dostupnoAzuriranje = Azuriranja.kesirano()
 
-        CFNotificationCenterAddObserver(
-            CFNotificationCenterGetDarwinNotifyCenter(),
-            Unmanaged.passUnretained(self).toOpaque(),
-            { _, observer, ime, _, _ in
-                guard let observer, let ime else { return }
-                let stanje = Unmanaged<AppStanje>.fromOpaque(observer).takeUnretainedValue()
-                let tekst = ime.rawValue as String
-                Task { @MainActor in
-                    stanje.primljenaNotifikacija(tekst)
-                }
-            },
-            nil,
-            nil,
-            .deliverImmediately
-        )
+        let centar = CFNotificationCenterGetDarwinNotifyCenter()
+        let osmatrac = Unmanaged.passUnretained(self).toOpaque()
+        for komanda in ["start", "stop", "ping"] {
+            CFNotificationCenterAddObserver(
+                centar,
+                osmatrac,
+                { _, observer, ime, _, _ in
+                    guard let observer, let ime else { return }
+                    let stanje = Unmanaged<AppStanje>.fromOpaque(observer).takeUnretainedValue()
+                    let tekst = ime.rawValue as String
+                    Task { @MainActor in
+                        stanje.primljenaNotifikacija(tekst)
+                    }
+                },
+                DiktatorIPC.imeKomandeFiksno(komanda) as CFString,
+                nil,
+                .deliverImmediately
+            )
+        }
     }
 
     deinit {
@@ -186,6 +201,7 @@ final class AppStanje: ObservableObject {
         timerSnimanja?.invalidate()
         timerSesije?.invalidate()
         timerIPC?.invalidate()
+        timerIPCHeartbeat?.cancel()
         snimac.zavrsiSesiju()
         prepisivac.oslobodiSada()
     }
@@ -270,6 +286,7 @@ final class AppStanje: ObservableObject {
         sesijaKraj = Date().addingTimeInterval(TimeInterval(Snimac.najduzeSesijeSekundi))
         pokreniTimerSesije()
         pokreniIPCPolling()
+        pokreniIPCHeartbeat()
         pisiIPCStanje()
         Dnevnik.pisi("Sesija uključena, traje do \(Snimac.najduzeSesijeSekundi) s.")
         NSLog("Diktator: sesija uključena, traje do %d s.", Snimac.najduzeSesijeSekundi)
@@ -287,6 +304,8 @@ final class AppStanje: ObservableObject {
         timerSesije = nil
         timerIPC?.invalidate()
         timerIPC = nil
+        timerIPCHeartbeat?.cancel()
+        timerIPCHeartbeat = nil
         snimac.zavrsiSesiju()
         sesijaAktivna = false
         sesijaKraj = nil
@@ -543,14 +562,8 @@ final class AppStanje: ObservableObject {
         }
 
         DiktatorIPC.pisi(DiktatorIPC.stanje, vrednosti)
-        let doKada = (sesijaAktivna ? sesijaKraj?.timeIntervalSince1970 : nil) ?? 0
         DiktatorIPC.posaljiNotifikaciju(
-            DiktatorIPC.imeStanja(
-                sesija: sesijaAktivna,
-                stanje: stanjeTekst,
-                vreme: sada,
-                sesijaDo: doKada
-            )
+            DiktatorIPC.imeStanjaFiksno(sesija: sesijaAktivna, stanje: stanjeTekst)
         )
 
         let kljuc = "\(sesijaAktivna)-\(stanjeTekst)-\(zadnjiIPCtoken ?? "-")"
@@ -560,6 +573,24 @@ final class AppStanje: ObservableObject {
                 "Status: sesija=\(sesijaAktivna) stanje=\(stanjeTekst) token=\(zadnjiIPCtoken ?? "-")"
             )
         }
+    }
+
+    /// Timer na glavnom run loop-u ume da stane kada aplikacija ode u pozadinu.
+    /// Zato status šaljemo sa pozadinskog reda, a na main actor prelazimo tek
+    /// radi pisanja statusa.
+    private func pokreniIPCHeartbeat() {
+        timerIPCHeartbeat?.cancel()
+        let timer = DispatchSource.makeTimerSource(
+            queue: DispatchQueue(label: "com.cedomirovic.diktator.ipc.heartbeat")
+        )
+        timer.schedule(deadline: .now() + 1, repeating: 1)
+        timer.setEventHandler { [weak self] in
+            Task { @MainActor in
+                self?.pisiIPCStanje()
+            }
+        }
+        timer.resume()
+        timerIPCHeartbeat = timer
     }
 
     private func pokreniIPCPolling() {
@@ -621,6 +652,17 @@ final class AppStanje: ObservableObject {
     private func primljenaNotifikacija(_ ime: String) {
         guard ime.hasPrefix(DiktatorIPC.notifKomanda + ".") else { return }
         let delovi = ime.components(separatedBy: ".")
+
+        // Fiksno ime: com.cedomirovic.diktator.cmd.start
+        if delovi.count == 5 {
+            let komanda = delovi[4]
+            Dnevnik.pisi("Darwin fiksna komanda \(komanda)")
+            NSLog("Diktator: Darwin fiksna komanda %@", komanda)
+            obradiIPCKomandu()
+            return
+        }
+
+        // Stariji dinamički format: ...cmd.start.<id>.<ms>
         guard delovi.count >= 7 else { return }
         let komanda = delovi[4]
         let id = delovi[5]

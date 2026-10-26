@@ -46,6 +46,16 @@ struct DiktatorApp: App {
                     stanje.obradiURL(url)
                 }
                 .onChange(of: scenePhase) { _, nova in
+                    switch nova {
+                    case .active:
+                        Dnevnik.pisi("scenePhase: active")
+                    case .inactive:
+                        Dnevnik.pisi("scenePhase: inactive")
+                    case .background:
+                        Dnevnik.pisi("scenePhase: background")
+                    @unknown default:
+                        break
+                    }
                     if nova == .active || nova == .background {
                         stanje.osveziIPC()
                     }

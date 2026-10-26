@@ -37,6 +37,36 @@ final class Snimac {
 
     var naNivo: ((Float) -> Void)?
 
+    init() {
+        NotificationCenter.default.addObserver(
+            forName: AVAudioSession.interruptionNotification,
+            object: AVAudioSession.sharedInstance(),
+            queue: .main
+        ) { [weak self] obavestenje in
+            guard let self,
+                  let info = obavestenje.userInfo,
+                  let sirovi = info[AVAudioSessionInterruptionTypeKey] as? UInt,
+                  let tip = AVAudioSession.InterruptionType(rawValue: sirovi) else {
+                return
+            }
+            switch tip {
+            case .began:
+                Dnevnik.pisi("Audio prekid: počeo")
+            case .ended:
+                let siroveOpcije = info[AVAudioSessionInterruptionOptionKey] as? UInt ?? 0
+                let opcije = AVAudioSession.InterruptionOptions(rawValue: siroveOpcije)
+                Dnevnik.pisi(
+                    "Audio prekid: završen, resume=\(opcije.contains(.shouldResume))"
+                )
+                if opcije.contains(.shouldResume) {
+                    self.nastaviMotor()
+                }
+            @unknown default:
+                break
+            }
+        }
+    }
+
     /// Najduži pojedinačni snimak je 5 minuta — duže držanje bi trošilo RAM
     /// i usporilo prepis.
     static let najduzeSekundi = 300
@@ -114,7 +144,11 @@ final class Snimac {
 
         let sesija = AVAudioSession.sharedInstance()
         do {
-            try sesija.setCategory(.record, mode: .measurement, options: [])
+            try sesija.setCategory(
+                .playAndRecord,
+                mode: .measurement,
+                options: [.mixWithOthers, .allowBluetooth]
+            )
             try sesija.setActive(true, options: [])
         } catch {
             throw GreskaSnimka.nemaMikrofona
@@ -155,6 +189,20 @@ final class Snimac {
             throw error
         }
         motorRadi = true
+    }
+
+    private func nastaviMotor() {
+        guard motorRadi, sesijaAktivna else { return }
+        let sesija = AVAudioSession.sharedInstance()
+        do {
+            try sesija.setActive(true, options: [])
+            if !motor.isRunning {
+                try motor.start()
+            }
+            Dnevnik.pisi("Audio motor nastavljen posle prekida.")
+        } catch {
+            Dnevnik.pisi("Audio motor nije nastavljen: \(error.localizedDescription)")
+        }
     }
 
     private func obradi(_ bafer: AVAudioPCMBuffer) {
