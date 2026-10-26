@@ -26,9 +26,9 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 - Xcode projekat (`app/DiktatorIOS.xcodeproj`), Swift kod, puna tastatura,
   modeli, istorija i rečnik su u repou. Debug i Release build prolaze.
 - Potpisivanje besplatnim **Personal Team**-om radi: Xcode je napravio profile
-  za oba targeta, a aplikacija je instalirana i pokrenuta na iPhone 16
-  (iOS 27.0.1). Developer Mode je uključen; developer profil je trustovan na
-  uređaju.
+  za oba targeta, a aplikacija je instalirana i pokrenuta na iPhone 15 Pro
+  (iPhone16,1; iOS 27.0.1). Developer Mode je uključen; developer profil je
+  trustovan na uređaju.
 - `build/DiktatorIOS.ipa` je napravljen (nepotpisan, ~1.6 MB bez modela).
   AltStore/SideStore potpisivanje i instalacija još nisu testirani.
 - Simulator (iPhone 17, iOS 26.5): aplikacija se pokreće, UI se prikazuje, a

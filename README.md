@@ -21,7 +21,7 @@ Metal + Accelerate) je izgrađen. **Debug i Release build prolaze**, a skripta
 pravi nepotpisan `build/DiktatorIOS.ipa` (~1.6 MB bez modela).
 
 Potpisivanje besplatnim **Personal Team**-om je potvrđeno: Xcode pravi profile
-za oba targeta, a aplikacija je instalirana i pokrenuta na iPhone 16
+za oba targeta, a aplikacija je instalirana i pokrenuta na iPhone 15 Pro
 (iOS 27.0.1). Developer Mode i trust developer profila su uključeni. Simulator
 (iPhone 17, iOS 26.5) takođe potvrđuje da se aplikacija pokreće i da
 `diktator-ios://dictate` počinje snimanje.
