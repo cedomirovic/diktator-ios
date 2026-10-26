@@ -874,11 +874,11 @@ final class KeyboardViewController: UIInputViewController {
                     : poslednjiPrepis
                 let duzina = noviTekst?.count ?? -1
                 Dnevnik.pisi("Mirno posle obrade: tekst duzina=\(duzina)")
-                if let tekst = noviTekst,
-                   !tekst.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    tekstSpreman = true
-                    prikaziStatus("Tekst spreman — tapni Nalepi.")
-                }
+                // „mirno“ posle obrade znači da je prepis uspeo i da tekst
+                // postoji na lokalnom serveru, čak i ako ga tastatura nije
+                // našla u clipboard-u. Zato uvek nudimo Nalepi.
+                tekstSpreman = true
+                prikaziStatus("Spremno je, nalepi.")
             }
         case "greska":
             snimaSesijom = false
@@ -998,7 +998,7 @@ final class KeyboardViewController: UIInputViewController {
         poslednjiPrepis = tekst
         tekstSpreman = true
         Dnevnik.pisi("Tekst notifikacija: duzina=\(tekst.count)")
-        prikaziStatus("Tekst spreman — tapni Nalepi.")
+        prikaziStatus("Spremno je, nalepi.")
         azurirajPrikaz()
     }
 
@@ -1234,7 +1234,7 @@ final class KeyboardViewController: UIInputViewController {
                 status.text = "Snimam…"
                 status.textColor = .systemRed
             } else if tekstSpreman {
-                status.text = "Tekst spreman — tapni Nalepi."
+                status.text = "Spremno je, nalepi."
                 status.textColor = .systemGreen
             } else if sesijaAktivna {
                 status.text = "Sesija ✓"

@@ -195,7 +195,7 @@ struct PogledDiktat: View {
                             .font(.headline)
                         Text("1. Uključi sesiju ovde (traje do 15 minuta).")
                         Text("2. Pređi u bilo koju aplikaciju i otvori Diktator tastaturu.")
-                        Text("3. Tapni Diktiraj — snima u pozadini. Tapni Stop i sačekaj da status pređe u Sesija ✓.")
+                        Text("3. Tapni Diktiraj — snima u pozadini. Tapni Stop i sačekaj da piše Spremno je, nalepi.")
                         Text("4. Tapni Nalepi — tekst se ubacuje u polje u kome pišeš.")
                         Text("Ako sesija nije uključena, Diktiraj prikazuje poruku. Otvori Diktator i uključi sesiju.")
                     }
