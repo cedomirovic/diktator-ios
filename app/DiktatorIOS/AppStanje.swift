@@ -1,4 +1,5 @@
 import Foundation
+import Network
 import UIKit
 
 /// Dijagnostika ide i u fajl, jer se NSLog iz aplikacije i tastature na
@@ -135,6 +136,7 @@ final class AppStanje: ObservableObject {
 
     private let snimac = Snimac()
     private let prepisivac = Prepisivac()
+    private let server = ServerTeksta()
     private var preuzimac: Preuzimac?
     private var timerOslobadjanja: Timer?
     private var timerSnimanja: Timer?
@@ -206,6 +208,7 @@ final class AppStanje: ObservableObject {
         timerIPC?.invalidate()
         timerIPCHeartbeat?.cancel()
         snimac.zavrsiSesiju()
+        server.zaustavi()
         prepisivac.oslobodiSada()
     }
 
@@ -289,6 +292,8 @@ final class AppStanje: ObservableObject {
         sesijaKraj = Date().addingTimeInterval(TimeInterval(Snimac.najduzeSesijeSekundi))
         pokreniTimerSesije()
         pokreniIPCHeartbeat()
+        server.postaviTekst(poslednjiTekst)
+        server.pokreni()
         pisiIPCStanje()
         Dnevnik.pisi("Sesija uključena, traje do \(Snimac.najduzeSesijeSekundi) s.")
         NSLog("Diktator: sesija uključena, traje do %d s.", Snimac.najduzeSesijeSekundi)
@@ -309,6 +314,7 @@ final class AppStanje: ObservableObject {
         timerIPCHeartbeat?.cancel()
         timerIPCHeartbeat = nil
         snimac.zavrsiSesiju()
+        server.zaustavi()
         sesijaAktivna = false
         sesijaKraj = nil
         sesijaPreostalo = 0
@@ -484,6 +490,7 @@ final class AppStanje: ObservableObject {
         }
 
         poslednjiTekst = sredjen
+        server.postaviTekst(sredjen)
         statistika.dodaj(
             tekst: sredjen,
             trajanje: trajanje,
@@ -882,5 +889,131 @@ final class AppStanje: ObservableObject {
     func proveriModel() {
         guard !modelJePreuzet, !modelSePreuzima, poruka == nil else { return }
         poruka = "Model nije preuzet. Otvori Podešavanja i preuzmi Large v3."
+    }
+}
+
+/// Minimalni HTTP server samo na loopback adresi. Tastatura ga koristi za
+/// Nalepi, jer UIPasteboard u keyboard extension-u ume da vrati keširanu
+/// vrednost. Server ne sluša spoljašnji saobraćaj.
+final class ServerTeksta {
+    private let port: UInt16 = 8765
+    private let queue = DispatchQueue(label: "com.cedomirovic.diktator.server")
+    private let brava = NSLock()
+    private var poslednji = ""
+    private var listener: NWListener?
+
+    func postaviTekst(_ tekst: String) {
+        brava.lock()
+        poslednji = tekst
+        brava.unlock()
+    }
+
+    func pokreni() {
+        queue.async { [weak self] in
+            self?.pokreniNaQueue()
+        }
+    }
+
+    private func pokreniNaQueue() {
+        guard listener == nil else { return }
+        do {
+            let parametri = NWParameters.tcp
+            parametri.requiredLocalEndpoint = NWEndpoint.hostPort(
+                host: "127.0.0.1",
+                port: NWEndpoint.Port(rawValue: port)!
+            )
+            let novi = try NWListener(using: parametri)
+            novi.newConnectionHandler = { [weak self] veza in
+                self?.obradi(veza)
+            }
+            novi.stateUpdateHandler = { stanje in
+                if case .failed(let greska) = stanje {
+                    Dnevnik.pisi(
+                        "ServerTeksta: listener greška \(greska.localizedDescription)"
+                    )
+                }
+            }
+            novi.start(queue: queue)
+            listener = novi
+            Dnevnik.pisi("ServerTeksta: sluša na 127.0.0.1:\(port)")
+        } catch {
+            Dnevnik.pisi(
+                "ServerTeksta: ne mogu da pokrenem: \(error.localizedDescription)"
+            )
+        }
+    }
+
+    func zaustavi() {
+        queue.async { [weak self] in
+            self?.listener?.cancel()
+            self?.listener = nil
+            Dnevnik.pisi("ServerTeksta: zaustavljen")
+        }
+    }
+
+    private func obradi(_ veza: NWConnection) {
+        veza.start(queue: queue)
+        primaj(veza, podaci: Data())
+    }
+
+    private func primaj(_ veza: NWConnection, podaci: Data) {
+        veza.receive(
+            minimumIncompleteLength: 1,
+            maximumLength: 8192
+        ) { [weak self] deo, _, gotovo, greska in
+            guard let self else {
+                veza.cancel()
+                return
+            }
+            var novi = podaci
+            if let deo { novi.append(deo) }
+            if novi.count > 16384 || greska != nil {
+                veza.cancel()
+                return
+            }
+            if let kraj = novi.range(of: Data("\r\n\r\n".utf8)) {
+                let zaglavlje = String(
+                    data: novi[..<kraj.lowerBound],
+                    encoding: .utf8
+                ) ?? ""
+                let putanja = zaglavlje
+                    .components(separatedBy: "\r\n")
+                    .first?
+                    .components(separatedBy: " ")
+                    .dropFirst()
+                    .first ?? ""
+                self.odgovori(veza, putanja: putanja)
+                return
+            }
+            if gotovo {
+                veza.cancel()
+                return
+            }
+            self.primaj(veza, podaci: novi)
+        }
+    }
+
+    private func odgovori(_ veza: NWConnection, putanja: String) {
+        let traziTekst = putanja.hasPrefix("/tekst")
+        let tekst: String
+        if traziTekst {
+            brava.lock()
+            tekst = poslednji
+            brava.unlock()
+        } else {
+            tekst = ""
+        }
+
+        let kod = traziTekst ? "200 OK" : "404 Not Found"
+        let telo = Data(tekst.utf8)
+        var zaglavlje = "HTTP/1.1 \(kod)\r\n"
+        zaglavlje += "Content-Type: text/plain; charset=utf-8\r\n"
+        zaglavlje += "Content-Length: \(telo.count)\r\n"
+        zaglavlje += "Connection: close\r\n\r\n"
+        var odgovor = Data(zaglavlje.utf8)
+        odgovor.append(telo)
+        veza.send(content: odgovor, completion: .contentProcessed { _ in
+            veza.cancel()
+        })
     }
 }

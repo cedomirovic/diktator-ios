@@ -99,6 +99,8 @@ targets:
         CFBundleName: Diktator
         CFBundleShortVersionString: "0.1.6"
         CFBundleVersion: "7"
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
         NSExtension:
           NSExtensionPointIdentifier: com.apple.keyboard-service
           NSExtensionPrincipalClass: "$(PRODUCT_MODULE_NAME).KeyboardViewController"

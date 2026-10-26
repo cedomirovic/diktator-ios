@@ -680,6 +680,50 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     @objc private func nalepi() {
+        nalepiSaServera()
+    }
+
+    private func nalepiSaServera() {
+        guard hasFullAccess else {
+            prikaziStatus("Uključi Full Access.")
+            return
+        }
+        guard let url = URL(string: "http://127.0.0.1:8765/tekst") else {
+            nalepiIzRezerve()
+            return
+        }
+
+        prikaziStatus("Nalepi…")
+        var zahtev = URLRequest(url: url)
+        zahtev.timeoutInterval = 2
+        URLSession.shared.dataTask(with: zahtev) { [weak self] podaci, _, greska in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                if greska == nil,
+                   let podaci,
+                   let tekst = String(data: podaci, encoding: .utf8),
+                   !tekst.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    Dnevnik.pisi("Nalepi server: duzina=\(tekst.count)")
+                    self.umetniTekst(tekst)
+                } else {
+                    Dnevnik.pisi(
+                        "Nalepi server: nema teksta, greska=\(greska?.localizedDescription ?? "-")"
+                    )
+                    self.nalepiIzRezerve()
+                }
+            }
+        }.resume()
+    }
+
+    private func umetniTekst(_ tekst: String) {
+        textDocumentProxy.insertText(tekst)
+        poslednjiPrepis = ""
+        tekstSpreman = false
+        prikaziStatus("Nalepljeno.")
+        azurirajPrikaz()
+    }
+
+    private func nalepiIzRezerve() {
         guard hasFullAccess else {
             prikaziStatus("Uključi Full Access.")
             return
@@ -719,11 +763,7 @@ final class KeyboardViewController: UIInputViewController {
         }
 
         Dnevnik.pisi("Nalepi: duzina=\(tekst.count)")
-        textDocumentProxy.insertText(tekst)
-        poslednjiPrepis = ""
-        tekstSpreman = false
-        prikaziStatus("Nalepljeno.")
-        azurirajPrikaz()
+        umetniTekst(tekst)
     }
 
     private func pokreniIPCPolling() {
