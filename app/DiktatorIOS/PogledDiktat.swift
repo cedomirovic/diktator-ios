@@ -69,7 +69,7 @@ struct PogledDiktat: View {
                             }
                             .buttonStyle(.bordered)
                         } else {
-                            Text("Uključi sesiju da Diktiraj na tastaturi snima dok je otvorena bilo koja aplikacija. Prvi put će se Diktator otvoriti da uključi sesiju; posle toga tastatura ostaje u aplikaciji.")
+                            Text("Uključi sesiju da Diktiraj na tastaturi snima dok je otvorena bilo koja aplikacija. Kada je sesija aktivna, tastatura ne otvara Diktator. Ako sesija nije uključena, otvori Diktator ručno i uključi je.")
                                 .font(.footnote)
                                 .foregroundStyle(.secondary)
 
@@ -195,8 +195,9 @@ struct PogledDiktat: View {
                             .font(.headline)
                         Text("1. Uključi sesiju ovde (traje do 15 minuta).")
                         Text("2. Pređi u bilo koju aplikaciju i otvori Diktator tastaturu.")
-                        Text("3. Tapni Diktiraj — snima u pozadini. Tapni Stop — tekst se sam lepi.")
-                        Text("Ako sesija nije uključena, Diktiraj otvara Diktator i posle Stop treba tapnuti „Back to …“.")
+                        Text("3. Tapni Diktiraj — snima u pozadini. Tapni Stop i sačekaj da status pređe u Sesija ✓.")
+                        Text("4. Tapni Nalepi — tekst se ubacuje u polje u kome pišeš.")
+                        Text("Ako sesija nije uključena, Diktiraj prikazuje poruku. Otvori Diktator i uključi sesiju.")
                     }
                     .font(.footnote)
                     .foregroundStyle(.secondary)

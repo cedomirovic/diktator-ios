@@ -45,7 +45,7 @@ struct PogledPomoc: View {
                         .font(.title2.bold())
                     Text("Tastatura ne može direktno da snima — Apple to zabranjuje. Zato snima glavna aplikacija u pozadinskoj sesiji, a tastatura samo šalje start/stop.")
                     Text("Sesija drži mikrofon u pripravnosti najviše 15 minuta i troši bateriju. Zato se automatski gasi.")
-                    Text("Ako sesija nije uključena, Diktiraj otvara aplikaciju. iOS ne dozvoljava programski povratak, pa posle Stop tapni „Back to …“; tekst se tada lepi automatski.")
+                    Text("Kada je sesija uključena, Diktiraj ne otvara aplikaciju. Ako sesija nije uključena, otvori Diktator ručno i tapni Uključi sesiju. Posle Stop sačekaj da status pređe u Sesija ✓, pa tapni Nalepi.")
                     Text("Besplatni Apple ID profil traje 7 dana; posle toga build treba obnoviti.")
 
                     Divider()

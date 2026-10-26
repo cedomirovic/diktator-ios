@@ -314,7 +314,7 @@ final class AppStanje: ObservableObject {
         pisiIPCStanje()
         Dnevnik.pisi("Sesija završena.")
         NSLog("Diktator: sesija završena.")
-        poruka = "Sesija je završena. Tastatura ponovo otvara aplikaciju za diktat."
+        poruka = "Sesija je završena. Otvori Diktator i uključi sesiju ponovo."
         oslobodiModelPosle()
     }
 
@@ -509,7 +509,7 @@ final class AppStanje: ObservableObject {
         pisiIPCStanje()
 
         if pokrenutSaTastature {
-            poruka = "Tekst je spreman. Tastatura će ga automatski nalepiti."
+            poruka = "Tekst je spreman. Vrati se u tastaturu i tapni Nalepi."
         } else {
             poruka = "Tekst je kopiran. Otvori tastaturu i tapni Nalepi."
         }
@@ -517,30 +517,14 @@ final class AppStanje: ObservableObject {
         oslobodiModelPosle()
     }
 
-    /// Tekst uvek ide u clipboard za ručno lepljenje. Ako je diktat pokrenut
-    /// iz tastature, dodajemo i token koji tastatura koristi da tekst nalepi
-    /// automatski. Paralelno se status piše u imenovani pasteboard.
+    /// Tekst ide u opšti clipboard kao čist string. Tastatura ga čita
+    /// dugmetom Nalepi; nema automatskog lepljenja ni tokena.
     @discardableResult
     private func postaviClipboard(_ tekst: String, automatski: Bool) -> String? {
-        guard automatski else {
-            UIPasteboard.general.string = tekst
-            return nil
-        }
-
-        let token = UUID().uuidString
-        let vreme = String(Date().timeIntervalSince1970)
-        UIPasteboard.general.items = [[
-            DiktatorClipboard.tekst: Data(tekst.utf8),
-            DiktatorClipboard.token: Data(token.utf8),
-            DiktatorClipboard.vreme: Data(vreme.utf8)
-        ]]
-        Dnevnik.pisi("Clipboard spreman za automatsko lepljenje, token=\(token)")
-        NSLog(
-            "Diktator: clipboard spreman za automatsko lepljenje (%@), string=%@",
-            token,
-            UIPasteboard.general.string ?? "nil"
-        )
-        return token
+        UIPasteboard.general.string = tekst
+        Dnevnik.pisi("Clipboard spreman, duzina=\(tekst.count)")
+        NSLog("Diktator: clipboard spreman, duzina=%d", tekst.count)
+        return nil
     }
 
     private var stanjeIPC: String {
