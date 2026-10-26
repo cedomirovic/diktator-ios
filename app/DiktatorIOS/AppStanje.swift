@@ -144,6 +144,7 @@ final class AppStanje: ObservableObject {
     private var sesijaKraj: Date?
     private var zadatakUPozadini: UIBackgroundTaskIdentifier = .invalid
     private var pokrenutSaTastature = false
+    private var tekstBrojac = 0
     private var zadnjiIPCtoken: String?
     private var zadnjiIPCtokenVreme: Double?
     private var zadnjiKomandniId: String?
@@ -494,6 +495,10 @@ final class AppStanje: ObservableObject {
         zadnjiIPCtoken = token
         zadnjiIPCtokenVreme = token == nil ? nil : Date().timeIntervalSince1970
 
+        if pokrenutSaTastature {
+            posaljiTekstTastaturi(sredjen)
+        }
+
         if podesavanja.cuvajIstoriju {
             istorija.insert(
                 Zapis(tekst: sredjen, trajanje: trajanje, jezik: jezik),
@@ -525,6 +530,22 @@ final class AppStanje: ObservableObject {
         Dnevnik.pisi("Clipboard spreman, duzina=\(tekst.count)")
         NSLog("Diktator: clipboard spreman, duzina=%d", tekst.count)
         return nil
+    }
+
+    /// Tekst šaljemo tastaturi preko zasebnog imenovanog pasteboard-a i
+    /// Darwin notifikacije. Ime se menja po brojaču, a stari pasteboard se
+    /// briše pre upisa, da keyboard extension ne bi vratio keširanu vrednost.
+    private func posaljiTekstTastaturi(_ tekst: String) {
+        tekstBrojac = (tekstBrojac + 1) % 10
+        let ime = UIPasteboard.Name(
+            rawValue: "com.cedomirovic.diktator.tekst.\(tekstBrojac)"
+        )
+        UIPasteboard.remove(withName: ime)
+        DiktatorIPC.pisi(ime, [DiktatorIPC.tekst: tekst])
+        DiktatorIPC.posaljiNotifikaciju(ime.rawValue)
+        Dnevnik.pisi(
+            "Tekst poslat tastaturi: duzina=\(tekst.count), tabla=\(ime.rawValue)"
+        )
     }
 
     private var stanjeIPC: String {
@@ -575,7 +596,7 @@ final class AppStanje: ObservableObject {
         if kljuc != zadnjiDnevnikStanja {
             zadnjiDnevnikStanja = kljuc
             Dnevnik.pisi(
-                "Status: sesija=\(sesijaAktivna) stanje=\(stanjeTekst) token=\(zadnjiIPCtoken ?? "-")"
+                "Status: sesija=\(sesijaAktivna) stanje=\(stanjeTekst) token=\(zadnjiIPCtoken ?? "-") tekst=\(poslednjiTekst.count) kljucevi=\(vrednosti.keys.sorted().joined(separator: ","))"
             )
         }
     }

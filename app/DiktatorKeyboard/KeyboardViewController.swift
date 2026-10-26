@@ -111,6 +111,7 @@ final class KeyboardViewController: UIInputViewController {
     private var dugmeDiktiraj: UIButton?
     private var dugmeNalepi: UIButton?
     private var tekstSpreman = false
+    private var poslednjiPrepis = ""
 
     private var tip: TipTastature = .slova
     private var velikaSlova = false
@@ -210,6 +211,28 @@ final class KeyboardViewController: UIInputViewController {
                     .deliverImmediately
                 )
             }
+        }
+
+        // Tekst stiže u zasebnoj notifikaciji, sa brojem koji odgovara
+        // imenovanom pasteboard-u. Tako ne zavisimo od keša opšteg clipboard-a.
+        for broj in 0..<10 {
+            CFNotificationCenterAddObserver(
+                centar,
+                osmatrac,
+                { _, observer, ime, _, _ in
+                    guard let observer, let ime else { return }
+                    let tastatura = Unmanaged<KeyboardViewController>
+                        .fromOpaque(observer)
+                        .takeUnretainedValue()
+                    let tekst = ime.rawValue as String
+                    Task { @MainActor in
+                        tastatura.primljenaNotifikacija(tekst)
+                    }
+                },
+                "com.cedomirovic.diktator.tekst.\(broj)" as CFString,
+                nil,
+                .deliverImmediately
+            )
         }
     }
 
@@ -663,12 +686,22 @@ final class KeyboardViewController: UIInputViewController {
             return
         }
 
-        var tekst = tekstIzIPCBezTokena()
-        if tekst?.isEmpty != false {
-            tekst = UIPasteboard.general.string?
-                .trimmingCharacters(in: .whitespacesAndNewlines)
+        var tekst = poslednjiPrepis
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let notifikacijaDuzina = tekst.count
+
+        if tekst.isEmpty {
+            tekst = tekstIzIPCBezTokena() ?? ""
         }
-        if tekst?.isEmpty != false,
+        let ipcDuzina = tekst.count
+
+        if tekst.isEmpty {
+            tekst = UIPasteboard.general.string?
+                .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        }
+        let opstiDuzina = tekst.count
+
+        if tekst.isEmpty,
            let predmet = UIPasteboard.general.items.first,
            let izPredmeta = stringIz(predmet[DiktatorClipboard.tekst])?
             .trimmingCharacters(in: .whitespacesAndNewlines),
@@ -676,7 +709,11 @@ final class KeyboardViewController: UIInputViewController {
             tekst = izPredmeta
         }
 
-        guard let tekst, !tekst.isEmpty else {
+        Dnevnik.pisi(
+            "Nalepi izvori: notifikacija=\(notifikacijaDuzina), ipc=\(ipcDuzina), opsti=\(opstiDuzina), izabrano=\(tekst.count), changeCount=\(UIPasteboard.general.changeCount)"
+        )
+
+        guard !tekst.isEmpty else {
             Dnevnik.pisi("Nalepi: clipboard je prazan.")
             prikaziStatus("Clipboard je prazan.")
             return
@@ -684,6 +721,7 @@ final class KeyboardViewController: UIInputViewController {
 
         Dnevnik.pisi("Nalepi: duzina=\(tekst.count)")
         textDocumentProxy.insertText(tekst)
+        poslednjiPrepis = ""
         tekstSpreman = false
         prikaziStatus("Nalepljeno.")
         azurirajPrikaz()
@@ -792,7 +830,9 @@ final class KeyboardViewController: UIInputViewController {
             timerSesijaTimeout?.invalidate()
             timerSesijaTimeout = nil
             if jeBilaObrada {
-                let noviTekst = tekstIzIPCBezTokena() ?? UIPasteboard.general.string
+                let noviTekst = poslednjiPrepis.isEmpty
+                    ? (tekstIzIPCBezTokena() ?? UIPasteboard.general.string)
+                    : poslednjiPrepis
                 let duzina = noviTekst?.count ?? -1
                 Dnevnik.pisi("Mirno posle obrade: tekst duzina=\(duzina)")
                 if let tekst = noviTekst,
@@ -839,6 +879,10 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private func primljenaNotifikacija(_ ime: String) {
+        if ime.hasPrefix("com.cedomirovic.diktator.tekst.") {
+            primljenTekst(ime)
+            return
+        }
         guard ime.hasPrefix(DiktatorIPC.notifStanje + ".") else { return }
         let delovi = ime.components(separatedBy: ".")
         zadnjaNotifikacija = Date()
@@ -885,6 +929,29 @@ final class KeyboardViewController: UIInputViewController {
             vreme: ms / 1000,
             sesijaDo: doMs / 1000
         )
+        azurirajPrikaz()
+    }
+
+    /// Stiže kao `com.cedomirovic.diktator.tekst.<broj>`. Aplikacija je pre
+    /// toga obrisala stari pasteboard sa istim imenom i upisala novi tekst,
+    /// pa čitanje ne vraća keširanu vrednost.
+    private func primljenTekst(_ ime: String) {
+        let tabla = UIPasteboard.Name(rawValue: ime)
+        let vrednosti = DiktatorIPC.citaj(tabla)
+        guard let tekst = vrednosti[DiktatorIPC.tekst]?
+            .trimmingCharacters(in: .whitespacesAndNewlines),
+            !tekst.isEmpty else {
+            Dnevnik.pisi(
+                "Tekst notifikacija: nema teksta, kljucevi=\(vrednosti.keys.sorted().joined(separator: ","))"
+            )
+            return
+        }
+
+        poslednjiPrepis = tekst
+        tekstSpreman = true
+        UIPasteboard.remove(withName: tabla)
+        Dnevnik.pisi("Tekst notifikacija: duzina=\(tekst.count)")
+        prikaziStatus("Tekst spreman — tapni Nalepi.")
         azurirajPrikaz()
     }
 
@@ -1025,8 +1092,12 @@ final class KeyboardViewController: UIInputViewController {
         guard let tekst = vrednosti[DiktatorIPC.tekst]?
             .trimmingCharacters(in: .whitespacesAndNewlines),
             !tekst.isEmpty else {
+            Dnevnik.pisi(
+                "IPC bez tokena: nema teksta, kljucevi=\(vrednosti.keys.sorted().joined(separator: ","))"
+            )
             return nil
         }
+        Dnevnik.pisi("IPC bez tokena: tekst=\(tekst.count), vreme=\(vrednosti[DiktatorIPC.vreme] ?? "-")")
         return tekst
     }
 
