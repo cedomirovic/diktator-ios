@@ -96,8 +96,8 @@ private enum DiktatorIPC {
 
     /// Fiksna imena su pouzdana za Darwin opserver koji se registruje na
     /// tačan naziv. Dinamički deo (ID, vreme) ide preko pasteboard-a.
-    static func imeKomandeFiksno(_ komanda: String) -> String {
-        "\(notifKomanda).\(komanda)"
+    static func imeKomandeFiksno(_ komanda: String, broj: Int) -> String {
+        "\(notifKomanda).\(komanda).\(broj)"
     }
 
     static func imeStanjaFiksno(sesija: Bool, stanje: String) -> String {
@@ -172,21 +172,23 @@ final class AppStanje: ObservableObject {
         let centar = CFNotificationCenterGetDarwinNotifyCenter()
         let osmatrac = Unmanaged.passUnretained(self).toOpaque()
         for komanda in ["start", "stop", "ping"] {
-            CFNotificationCenterAddObserver(
-                centar,
-                osmatrac,
-                { _, observer, ime, _, _ in
-                    guard let observer, let ime else { return }
-                    let stanje = Unmanaged<AppStanje>.fromOpaque(observer).takeUnretainedValue()
-                    let tekst = ime.rawValue as String
-                    Task { @MainActor in
-                        stanje.primljenaNotifikacija(tekst)
-                    }
-                },
-                DiktatorIPC.imeKomandeFiksno(komanda) as CFString,
-                nil,
-                .deliverImmediately
-            )
+            for broj in 0...9 {
+                CFNotificationCenterAddObserver(
+                    centar,
+                    osmatrac,
+                    { _, observer, ime, _, _ in
+                        guard let observer, let ime else { return }
+                        let stanje = Unmanaged<AppStanje>.fromOpaque(observer).takeUnretainedValue()
+                        let tekst = ime.rawValue as String
+                        Task { @MainActor in
+                            stanje.primljenaNotifikacija(tekst)
+                        }
+                    },
+                    DiktatorIPC.imeKomandeFiksno(komanda, broj: broj) as CFString,
+                    nil,
+                    .deliverImmediately
+                )
+            }
         }
     }
 
@@ -285,7 +287,6 @@ final class AppStanje: ObservableObject {
         sesijaPreostalo = Snimac.najduzeSesijeSekundi
         sesijaKraj = Date().addingTimeInterval(TimeInterval(Snimac.najduzeSesijeSekundi))
         pokreniTimerSesije()
-        pokreniIPCPolling()
         pokreniIPCHeartbeat()
         pisiIPCStanje()
         Dnevnik.pisi("Sesija uključena, traje do \(Snimac.najduzeSesijeSekundi) s.")
@@ -653,7 +654,17 @@ final class AppStanje: ObservableObject {
         guard ime.hasPrefix(DiktatorIPC.notifKomanda + ".") else { return }
         let delovi = ime.components(separatedBy: ".")
 
-        // Fiksno ime: com.cedomirovic.diktator.cmd.start
+        // Fiksno ime sa rednim brojem: ...cmd.start.3
+        if delovi.count == 6, let broj = Int(delovi[5]) {
+            let komanda = delovi[4]
+            Dnevnik.pisi("Darwin fiksna komanda \(komanda) #\(broj)")
+            NSLog("Diktator: Darwin fiksna komanda %@ #%d", komanda, broj)
+            // Komanda je u imenu, pa ne zavisimo od pasteboard-a.
+            obradiKomandu(komanda)
+            return
+        }
+
+        // Stariji fiksni format bez broja: ...cmd.start
         if delovi.count == 5 {
             let komanda = delovi[4]
             Dnevnik.pisi("Darwin fiksna komanda \(komanda)")
@@ -690,7 +701,6 @@ final class AppStanje: ObservableObject {
                 } else {
                     self.sesijaPreostalo = max(0, self.sesijaPreostalo - 1)
                 }
-                self.pisiIPCStanje()
                 if self.sesijaPreostalo <= 0 {
                     self.zavrsiSesiju()
                 }

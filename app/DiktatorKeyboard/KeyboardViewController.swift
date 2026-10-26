@@ -89,8 +89,8 @@ private enum DiktatorIPC {
         return "\(notifKomanda).\(komanda).\(id).\(ms)"
     }
 
-    static func imeKomandeFiksno(_ komanda: String) -> String {
-        "\(notifKomanda).\(komanda)"
+    static func imeKomandeFiksno(_ komanda: String, broj: Int) -> String {
+        "\(notifKomanda).\(komanda).\(broj)"
     }
 
     static func imeStanjaFiksno(sesija: Bool, stanje: String) -> String {
@@ -128,6 +128,7 @@ final class KeyboardViewController: UIInputViewController {
     private var obradaSesije = false
     private var cekaStartSesije = false
     private var zadnjiKomandniId: String?
+    private var komandniBrojac = 0
     private var privremeniStatus: String?
     private var privremeniStatusVreme: Date?
     private var zadnjeStanjeVreme: Double = 0
@@ -585,8 +586,9 @@ final class KeyboardViewController: UIInputViewController {
             DiktatorIPC.id: id,
             DiktatorIPC.vreme: String(vreme)
         ])
+        komandniBrojac = (komandniBrojac + 1) % 10
         DiktatorIPC.posaljiNotifikaciju(
-            DiktatorIPC.imeKomandeFiksno(komanda)
+            DiktatorIPC.imeKomandeFiksno(komanda, broj: komandniBrojac)
         )
         Dnevnik.pisi("Poslata komanda \(komanda) (\(id))")
         NSLog("Diktator tastatura: poslata komanda %@ (%@).", komanda, id)
