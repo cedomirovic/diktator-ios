@@ -227,6 +227,13 @@ final class AppStanje: ObservableObject {
                 }
                 pocniSnimanje(saTastature: true)
             }
+        case "sesija-prikaz":
+            // Tastatura je otvorila aplikaciju jer sesija nije uključena.
+            // Ne uključujemo je sami, nego pokažemo dugme i uputstvo.
+            izabraniTab = 0
+            if !sesijaAktivna {
+                poruka = "Tapni Uključi sesiju, pa se vrati u aplikaciju i tapni Diktiraj."
+            }
         case "sesija":
             izabraniTab = 0
             Task { @MainActor in

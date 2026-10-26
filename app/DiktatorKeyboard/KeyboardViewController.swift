@@ -541,7 +541,11 @@ final class KeyboardViewController: UIInputViewController {
 
         let statusSvez = Date().timeIntervalSince1970 - zadnjiStatusVreme < 8
         if !sesijaAktivna && !statusSvez {
-            prikaziStatus("Sesija nije aktivna. Otvori Diktator jednom.")
+            // Sesija nije uključena, a aplikacija ne odgovara. Otvaramo
+            // Diktator na ekranu za diktat da korisnik uključi sesiju, pa
+            // se vraća i ponovo tapne Diktiraj.
+            prikaziStatus("Otvori Diktator i uključi sesiju.")
+            otvoriAplikaciju("diktator-ios://sesija-prikaz")
             return
         }
 
