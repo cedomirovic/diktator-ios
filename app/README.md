@@ -1,6 +1,6 @@
 # app/
 
-Swift izvori i Xcode projekat za Diktator iOS.
+Swift izvori i Xcode projekat za **Diktator iOS 0.1.1 (2)**.
 
 ```text
 app/
@@ -14,8 +14,8 @@ app/
 
 ## Prvi build
 
-Xcode 26.x je obavezan; samo Command Line Tools nije dovoljno. Proveren build:
-Xcode 26.6, iOS SDK 26.5, Debug i Release prolaze.
+Xcode 27.1 je obavezan; samo Command Line Tools nije dovoljno. Proveren build:
+macOS 26.7.1, Xcode 27.1, iOS SDK 27.1; Debug i Release prolaze.
 
 ```bash
 # 1. whisper.cpp za iOS (arm64, Metal + Accelerate)
@@ -44,6 +44,17 @@ Ako `xcodebuild` i dalje gleda u Command Line Tools:
 sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 ```
 
+Ako Xcode prijavi da uređaj nije uparen („The device must be paired before it
+can be connected“), upari ga iz Terminala:
+
+```bash
+xcrun devicectl manage pair --device <UDID>
+xcrun devicectl list devices
+```
+
+Telefon mora biti otključan. Posle uparivanja Xcode Run i `devicectl` instalacija
+rade normalno.
+
 ## IPA za AltStore/SideStore
 
 ```bash
@@ -59,3 +70,4 @@ potpisuje tvojim Apple ID-jem.
 - Tastatura ne može da snima (Apple zabranjuje mikrofon u extension-ima).
 - Modeli se ne commituju; preuzimaju se u aplikaciji.
 - `vendor-ios/` i `build/` su u `.gitignore`.
+- App Store/TestFlight detalji: [../docs/distribucija.md](../docs/distribucija.md).

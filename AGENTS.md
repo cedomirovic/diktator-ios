@@ -10,6 +10,10 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
   (Xcode je prijavljivao da uređaj nije uparen), a potpisana verzija
   **0.1.1 (2)** je instalirana direktno na uređaj. Pokretanje preko
   `devicectl` je čekalo otključavanje telefona.
+- **26.10.2026.** — dodat je stvarni screenshot sa iPhone 15 Pro
+  (`docs/slike/diktator-iphone.png`), README je ažuriran, a
+  `docs/distribucija.md` opisuje sideload, TestFlight, App Store, naloge,
+  Review Notes i checklist. Korisnik je potvrdio da sve radi na telefonu.
 - **26.10.2026.** — srpski je prioritet: **Large v3 q5_0** je preporučeni
   model, a na srpskom sistemu je podrazumevani jezik `sr`. Tastatura pre
   otvaranja aplikacije proverava **Full Access** i ima fallback za otvaranje.
@@ -111,11 +115,12 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Sledeći korak
 
-1. Otključati iPhone, otvoriti **Diktator 0.1.1**, uključiti **Full Access** i
-   proveriti da **Diktiraj** otvara aplikaciju (u traci treba da piše
-   **Full Access ✓**).
-2. Preuzeti **Large v3** i uporediti srpski prepis sa Turbo modelom.
+1. Pripremiti App Store/TestFlight: `PrivacyInfo.xcprivacy`, privacy policy,
+   support URL, metadata, screenshots za iPhone/iPad i Review Notes
+   (vidi `docs/distribucija.md`).
+2. Testirati TestFlight internal, pa external; prikupiti prve povratne
+   informacije o srpskom prepisu i preuzimanju modela.
 3. Testirati AltStore/SideStore potpisivanje i instalaciju IPA-e, uključujući
    keyboard extension.
 4. Proveriti osvežavanje profila posle 7 dana.
-5. Ažurirati dokumentaciju rezultatima i pripremiti release tag.
+5. Pripremiti release tag i objaviti App Store/TestFlight rezultate.

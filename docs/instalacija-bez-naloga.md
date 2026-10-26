@@ -1,5 +1,7 @@
 # Instalacija bez plaćenog Apple Developer naloga
 
+![Diktator iOS na iPhone 15 Pro](slike/diktator-iphone.png)
+
 Ovo uputstvo je za iPhone/iPad i Mac. **Plaćeni Apple Developer Program
 (99 $/god.) nije potreban** — dovoljan je običan Apple ID. Ali postoje
 ograničenja koja moraju da se znaju:
@@ -127,6 +129,28 @@ uključiš. Posle uključivanja treba da piše `enabled`.
    **Settings → General → VPN & Device Management → Developer App** i tapni
    **Trust**. Bez toga iOS prijavi da potpis/profil nije trustovan.
 
+Ako Xcode ili `devicectl` prijave **„The device must be paired before it can be
+connected“**, uređaj nije uparen sa ovim Mac-om. Otključaj iPhone i pokreni:
+
+```bash
+xcrun devicectl manage pair --device <UDID>
+xcrun devicectl list devices
+```
+
+Posle toga radi i direktna instalacija bez Xcode-a:
+
+```bash
+APP=$(find "$HOME/Library/Developer/Xcode/DerivedData" \
+  -path '*DiktatorIOS*/Build/Products/Debug-iphoneos/DiktatorIOS.app' \
+  -type d | head -1)
+xcrun devicectl device install app --device <UDID> "$APP"
+xcrun devicectl device process launch --device <UDID> \
+  --terminate-existing com.cedomirovic.diktator.ios
+```
+
+Telefon mora biti otključan; ako je zaključan, `devicectl` prijavi
+**„Unable to launch … because the device was not, or could not be, unlocked“**.
+
 ### 2.6. Dodaj tastaturu
 
 1. iPhone: **Settings → General → Keyboard → Keyboards → Add New Keyboard**.
@@ -188,8 +212,10 @@ zip -r DiktatorIOS.ipa Payload
 Apple ID-jem. Ako alat ne uspe da potpiše ugrađeni keyboard extension,
 instaliraj direktno iz Xcode-a (odeljak 2) ili koristi Xcode za osvežavanje.
 
-Xcode 27.1 direktno potpisivanje i instalacija na iPhone su potvrđeni. Sam
-AltStore/SideStore tok sa ugrađenim keyboard extension-om još nije testiran.
+Xcode 27.1 direktno potpisivanje i instalacija na iPhone su potvrđeni za
+verziju **0.1.1 (2)**. Ako Xcode prijavi da uređaj nije uparen, vidi
+`xcrun devicectl manage pair` u odeljku 2.5. Sam AltStore/SideStore tok sa
+ugrađenim keyboard extension-om još nije testiran.
 
 ---
 
@@ -234,6 +260,9 @@ Xcode je jedini siguran način za prvi build.
 | Aplikacija se ne otvara posle instalacije | Settings → General → VPN & Device Management → Developer App → **Trust**. |
 | iPhone se ne pojavljuje u Device Hub-u | Otključaj iPhone, tapni **Trust**, proveri passcode; ako je Developer Mode sakriven, pokreni `idevicedevmodectl reveal`. |
 | Developer Mode nema u Settings-u | Poveži iPhone i otvori Device Hub; ili `idevicedevmodectl reveal`, pa Settings → Privacy & Security → Developer Mode. |
+| **„The device must be paired before it can be connected“** | Otključaj iPhone i pokreni `xcrun devicectl manage pair --device <UDID>`; proveri `xcrun devicectl list devices`. |
+| **„Unable to launch … because the device was not, or could not be, unlocked“** | Otključaj iPhone pa ponovo pokreni `devicectl device process launch`. |
+| Xcode kaže **Build Failed**, a `xcodebuild` prolazi | Proveri da je izabran fizički iPhone, ne simulator; proveri da je uređaj uparen i otključan. Za build bez instalacije koristi `-destination 'generic/platform=iOS'`. |
 | Tastatura se ne vidi | Settings → General → Keyboard → Keyboards → Add New Keyboard → Diktator. |
 | **Diktiraj** kaže „Aplikacija nije otvorena“ | Uključi **Allow Full Access** za Diktator tastaturu; u traci treba da piše **Full Access ✓**. Na iOS 26+ bez Full Access-a tastatura ne sme da otvori aplikaciju. |
 | **Nalepi** ne radi | Uključi **Allow Full Access** za Diktator tastaturu. |
@@ -264,5 +293,7 @@ Xcode je jedini siguran način za prvi build.
   traka „Back to …“.
 - Nema App Group-a, pa tastatura i aplikacija ne dele istoriju ni podešavanja;
   istorija i rečnik su samo u glavnoj aplikaciji.
-- Nema App Store distribucije; ovo je lična instalacija.
+- Ovo uputstvo je za **sideload**. App Store i TestFlight su mogući uz
+  plaćeni Apple Developer Program — vidi
+  [distribucija.md](distribucija.md).
 - Besplatni profil traje 7 dana.

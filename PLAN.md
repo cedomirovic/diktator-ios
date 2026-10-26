@@ -125,6 +125,8 @@ bez App Group-a; tastatura ga čita samo kada korisnik uključi **Full Access**.
 9. **Instalacija** — uputstvo i nepotpisan IPA; Xcode potpisivanje,
    instalacija i pokretanje na iPhone-u rade; AltStore/SideStore test čeka.
 10. **Release** — tag, zip/IPA, uputstvo; posle AltStore/SideStore testa.
+11. **Distribucija** — App Store/TestFlight priprema: privacy manifest,
+    privacy policy, metadata, screenshots, Review Notes; čeka plaćeni nalog.
 
 ## 6. Rizici
 
@@ -142,8 +144,9 @@ bez App Group-a; tastatura ga čita samo kada korisnik uključi **Full Access**.
 - **Xcode** — Xcode 27.1 i besplatni Personal Team rade; potpisivanje,
   instalacija i pokretanje na iPhone-u su potvrđeni. AltStore/SideStore tok
   još treba testirati.
-- **App Store** — tastatura sa Full Access-om je osetljiva za review; ovo je
-  za sada sideload/lična instalacija, ne App Store distribucija.
+- **App Store** — moguć uz plaćeni Apple Developer Program; tastatura sa Full
+  Access-om i otvaranjem sopstvene aplikacije traži pažljiv Review Notes.
+  Sideload ostaje fallback; detalji u `docs/distribucija.md`.
 - **Apple Speech** — ne podržava srpski; ne koristimo ga za srpski.
 
 ## 7. Alternative (razmotrene)
