@@ -109,6 +109,7 @@ final class KeyboardViewController: UIInputViewController {
     private let tastatura = UIStackView()
     private let status = UILabel()
     private var dugmeDiktiraj: UIButton?
+    private var dugmeNalepi: UIButton?
 
     private var tip: TipTastature = .slova
     private var velikaSlova = false
@@ -261,6 +262,7 @@ final class KeyboardViewController: UIInputViewController {
         nalepi.setTitleColor(.white, for: .normal)
         nalepi.titleLabel?.font = .systemFont(ofSize: 15, weight: .semibold)
         nalepi.widthAnchor.constraint(equalToConstant: 80).isActive = true
+        dugmeNalepi = nalepi
 
         status.font = .systemFont(ofSize: 11)
         status.textColor = .secondaryLabel
@@ -1098,6 +1100,8 @@ final class KeyboardViewController: UIInputViewController {
                 status.textColor = .systemOrange
             }
         }
+
+        dugmeNalepi?.isEnabled = hasFullAccess && !obradaSesije && !snimaSesijom
 
         guard let dugme = dugmeDiktiraj else { return }
 
