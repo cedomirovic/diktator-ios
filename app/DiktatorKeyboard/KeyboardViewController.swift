@@ -110,6 +110,7 @@ final class KeyboardViewController: UIInputViewController {
     private let status = UILabel()
     private var dugmeDiktiraj: UIButton?
     private var dugmeNalepi: UIButton?
+    private var tekstSpreman = false
 
     private var tip: TipTastature = .slova
     private var velikaSlova = false
@@ -680,6 +681,7 @@ final class KeyboardViewController: UIInputViewController {
 
         Dnevnik.pisi("Nalepi: duzina=\(tekst.count)")
         textDocumentProxy.insertText(tekst)
+        tekstSpreman = false
         prikaziStatus("Nalepljeno.")
         azurirajPrikaz()
     }
@@ -769,12 +771,14 @@ final class KeyboardViewController: UIInputViewController {
         case "snima":
             snimaSesijom = true
             obradaSesije = false
+            tekstSpreman = false
             cekaStartSesije = false
             timerSesijaTimeout?.invalidate()
             timerSesijaTimeout = nil
         case "obrada":
             snimaSesijom = false
             obradaSesije = true
+            tekstSpreman = false
             cekaStartSesije = false
             timerSesijaTimeout?.invalidate()
             timerSesijaTimeout = nil
@@ -789,12 +793,14 @@ final class KeyboardViewController: UIInputViewController {
                 Dnevnik.pisi("Mirno posle obrade: clipboard duzina=\(duzina)")
                 if let tekst = UIPasteboard.general.string,
                    !tekst.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    tekstSpreman = true
                     prikaziStatus("Tekst spreman — tapni Nalepi.")
                 }
             }
         case "greska":
             snimaSesijom = false
             obradaSesije = false
+            tekstSpreman = false
             cekaStartSesije = false
             timerSesijaTimeout?.invalidate()
             timerSesijaTimeout = nil
@@ -1092,6 +1098,9 @@ final class KeyboardViewController: UIInputViewController {
             } else if snimaSesijom {
                 status.text = "Snimam…"
                 status.textColor = .systemRed
+            } else if tekstSpreman {
+                status.text = "Tekst spreman — tapni Nalepi."
+                status.textColor = .systemGreen
             } else if sesijaAktivna {
                 status.text = "Sesija ✓"
                 status.textColor = .systemGreen
