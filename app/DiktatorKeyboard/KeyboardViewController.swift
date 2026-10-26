@@ -935,24 +935,31 @@ final class KeyboardViewController: UIInputViewController {
     /// Stiže kao `com.cedomirovic.diktator.tekst.<broj>`. Aplikacija je pre
     /// toga obrisala stari pasteboard sa istim imenom i upisala novi tekst,
     /// pa čitanje ne vraća keširanu vrednost.
-    private func primljenTekst(_ ime: String) {
+    private func primljenTekst(_ ime: String, pokusaj: Int = 0) {
         let tabla = UIPasteboard.Name(rawValue: ime)
         let vrednosti = DiktatorIPC.citaj(tabla)
-        guard let tekst = vrednosti[DiktatorIPC.tekst]?
+        if let tekst = vrednosti[DiktatorIPC.tekst]?
             .trimmingCharacters(in: .whitespacesAndNewlines),
-            !tekst.isEmpty else {
-            Dnevnik.pisi(
-                "Tekst notifikacija: nema teksta, kljucevi=\(vrednosti.keys.sorted().joined(separator: ","))"
-            )
+            !tekst.isEmpty {
+            poslednjiPrepis = tekst
+            tekstSpreman = true
+            UIPasteboard.remove(withName: tabla)
+            Dnevnik.pisi("Tekst notifikacija: duzina=\(tekst.count)")
+            prikaziStatus("Tekst spreman — tapni Nalepi.")
+            azurirajPrikaz()
             return
         }
 
-        poslednjiPrepis = tekst
-        tekstSpreman = true
-        UIPasteboard.remove(withName: tabla)
-        Dnevnik.pisi("Tekst notifikacija: duzina=\(tekst.count)")
-        prikaziStatus("Tekst spreman — tapni Nalepi.")
-        azurirajPrikaz()
+        if pokusaj < 3 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+                self?.primljenTekst(ime, pokusaj: pokusaj + 1)
+            }
+            return
+        }
+
+        Dnevnik.pisi(
+            "Tekst notifikacija: nema teksta posle \(pokusaj) pokusaja, kljucevi=\(vrednosti.keys.sorted().joined(separator: ","))"
+        )
     }
 
     private var cekanjeSesijeTraje: Bool {
