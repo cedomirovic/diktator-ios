@@ -52,7 +52,7 @@ struct PogledDiktat: View {
                         VStack(spacing: 8) {
                             Text("Model još nije preuzet")
                                 .font(.headline)
-                            Text("Otvori Podešavanja i preuzmi Large v3 Turbo (~547 MB).")
+                            Text("Otvori Podešavanja i preuzmi Large v3 (~1,0 GB) — preporučeno za srpski.")
                                 .font(.footnote)
                                 .foregroundStyle(.secondary)
                                 .multilineTextAlignment(.center)
@@ -66,6 +66,54 @@ struct PogledDiktat: View {
                         .background(.thinMaterial)
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                         .padding(.horizontal)
+                    } else if stanje.podesavanja.model == "ggml-large-v3-turbo-q5_0.bin" {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Savet za srpski")
+                                .font(.headline)
+                            Text("Turbo model je brz, ali za srpski ume da pogreši. Large v3 daje tačniji tekst (~1,0 GB).")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+
+                            if let large = Modeli.nadji("ggml-large-v3-q5_0.bin") {
+                                if large.preuzet {
+                                    Button("Izaberi Large v3") {
+                                        stanje.izaberiModel(large)
+                                    }
+                                    .buttonStyle(.borderedProminent)
+                                } else {
+                                    Button("Preuzmi Large v3 (~1,0 GB)") {
+                                        stanje.preuzmiModel(large)
+                                    }
+                                    .buttonStyle(.borderedProminent)
+                                    .disabled(stanje.modelSePreuzima)
+
+                                    if stanje.modelSePreuzima {
+                                        ProgressView(value: stanje.napredakPreuzimanja ?? 0) {
+                                            Text("Preuzimanje Large v3…")
+                                                .font(.caption)
+                                        }
+                                    }
+                                }
+                            }
+
+                            Button("Otvori Podešavanja") {
+                                prikaziPodesavanja = true
+                            }
+                            .buttonStyle(.bordered)
+                        }
+                        .padding()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(.thinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .padding(.horizontal)
+                    }
+
+                    if stanje.podesavanja.jezik == "auto" {
+                        Text("Za srpski je pouzdanije izabrati **Srpski** u Podešavanjima; automatska detekcija je slabija na kratkim snimcima.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
                     }
 
                     if !stanje.poslednjiTekst.isEmpty {

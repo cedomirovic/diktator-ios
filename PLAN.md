@@ -47,15 +47,16 @@ bez App Group-a; tastatura ga čita samo kada korisnik uključi **Full Access**.
 - SwiftUI, minimum iOS 17.
 - `DiktatorApp` — ulaz, URL scheme `diktator-ios`, stanje.
 - `Snimac` — `AVAudioEngine`, 16 kHz mono, ograničenje 5 min.
-- `Prepisivac` — whisper.cpp C API; jezik `auto` (sr/en), režim kvalitet /
-  štedljiv.
+- `Prepisivac` — whisper.cpp C API; jezik `sr`/`en`/`auto` (na srpskom
+  sistemu podrazumevano `sr`), režim kvalitet / štedljiv.
 - `Tekst` / `Transliteracija` — ćirilica → latinica, čišćenje.
 - `PonudaModela` — Tiny/Base/Small/Turbo/Large; za iOS kvantizovani modeli.
 - `Preuzimanje` — URLSession download sa proverom veličine.
 - `Podesavanja` — UserDefaults; API ključevi u Keychain-u.
 - `Istorija`, `Recnik`, `PogledPomoc`, `PogledPodesavanja`.
 - `Clipboard` — upis u `UIPasteboard.general`.
-- Podrazumevani model: **Large v3 Turbo q5_0** (~547 MB).
+- Preporučeni model: **Large v3 q5_0** (~1,0 GB); Turbo q5_0 (~547 MB) je
+  brža opcija sa manje memorije.
 
 ### Tastatura `DiktatorKeyboard`
 
@@ -63,8 +64,9 @@ bez App Group-a; tastatura ga čita samo kada korisnik uključi **Full Access**.
 - QWERTY slova, srpska slova `čćžšđ`, brojevi, shift, brisanje, razmak,
   enter, globus.
 - Gornja traka: **Diktiraj** i **Nalepi**.
-- **Diktiraj**:
-  `extensionContext?.open(URL(string: "diktator-ios://dictate")!)`.
+- **Diktiraj**: proveri `hasFullAccess`, pa
+  `extensionContext?.open(URL(string: "diktator-ios://dictate")!)`; ako to
+  vrati false, probaj `UIApplication.open` preko responder lanca.
 - **Nalepi**: čita `UIPasteboard.general.string` i zove
   `textDocumentProxy.insertText`.
 - Bez mreže i bez čuvanja istorije u tastaturi.
@@ -83,8 +85,8 @@ bez App Group-a; tastatura ga čita samo kada korisnik uključi **Full Access**.
   - proizvodi `libwhisper.a`, `libggml*.a` i Metal shader.
 - Modeli se ne stavljaju u git; preuzimaju se u
   `Application Support/Diktator/models/`.
-- Podrazumevano: **Turbo q5_0** (~547 MB); opcije Small q5_1 (~181 MB),
-  Base q5_1 (~57 MB), Large v3 q5_0 (~1 GB).
+- Preporučeno: **Large v3 q5_0** (~1,0 GB); opcije Turbo q5_0 (~547 MB),
+  Small (~488 MB), Base (~148 MB) i Tiny (~78 MB).
 
 ## 4. Xcode projekat
 
@@ -127,12 +129,16 @@ bez App Group-a; tastatura ga čita samo kada korisnik uključi **Full Access**.
 ## 6. Rizici
 
 - **7 dana** — besplatni profil ističe; korisnik mora da obnovi build.
-- **Full Access** — bez njega tastatura ne može da čita clipboard; ostaje
-  ručno lepljenje.
+- **Full Access** — bez njega tastatura ne može da čita clipboard ni da
+  otvori aplikaciju na iOS 26+; ostaje ručno lepljenje i ručno otvaranje
+  aplikacije.
 - **Dva prelaska između aplikacija** — iOS ne dozvoljava automatski povratak;
   statusna traka „Back to …“ je najbrži put.
-- **Memorija** — Turbo model je ~547 MB; na starijim iPhone-ima može da bude
-  tesno. Zato Small/Base ostaju opcije.
+- **Memorija** — Large v3 je ~1,0 GB i traži više RAM-a; na starijim
+  iPhone-ima može da bude tesno. Turbo (~547 MB) i Small/Base ostaju opcije.
+- **Kvalitet srpskog** — Turbo q5_0 ume da pogreši imena i završetke; Large v3
+  je znatno bolji. Zato je Large v3 preporučen, a korisnik može da izabere
+  Turbo ako mu je brzina važnija.
 - **Xcode** — Xcode 27.1 i besplatni Personal Team rade; potpisivanje,
   instalacija i pokretanje na iPhone-u su potvrđeni. AltStore/SideStore tok
   još treba testirati.

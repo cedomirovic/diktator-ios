@@ -120,7 +120,14 @@ enum OslobadjanjeModela: String, CaseIterable, Identifiable {
 }
 
 struct Podesavanja: Codable, Equatable {
-    var jezik = "auto"
+    /// Na srpskom sistemu odmah biramo srpski, jer je automatska detekcija
+    /// na kratkim snimcima manje pouzdana. Na drugim jezicima ostaje "auto".
+    static var podrazumevaniJezik: String {
+        let prvi = Locale.preferredLanguages.first?.lowercased() ?? ""
+        return prvi.hasPrefix("sr") ? "sr" : "auto"
+    }
+
+    var jezik = Podesavanja.podrazumevaniJezik
     var model = Modeli.podrazumevani.id
     var rezimPrepisa = RezimPrepisa.stedljivo.rawValue
     var oslobadjanjeModela = OslobadjanjeModela.pet.rawValue
@@ -138,7 +145,8 @@ struct Podesavanja: Codable, Equatable {
 
     init(from decoder: Decoder) throws {
         let kontejner = try decoder.container(keyedBy: CodingKeys.self)
-        jezik = try kontejner.decodeIfPresent(String.self, forKey: .jezik) ?? "auto"
+        jezik = try kontejner.decodeIfPresent(String.self, forKey: .jezik)
+            ?? Podesavanja.podrazumevaniJezik
         model = try kontejner.decodeIfPresent(String.self, forKey: .model)
             ?? Modeli.nadjiPostojeci()?.id
             ?? Modeli.podrazumevani.id

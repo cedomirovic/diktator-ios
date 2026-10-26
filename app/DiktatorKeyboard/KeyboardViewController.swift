@@ -65,6 +65,9 @@ final class KeyboardViewController: UIInputViewController {
         status.font = .systemFont(ofSize: 11)
         status.textColor = .secondaryLabel
         status.textAlignment = .right
+        status.numberOfLines = 1
+        status.adjustsFontSizeToFitWidth = true
+        status.minimumScaleFactor = 0.75
         status.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         status.setContentHuggingPriority(.defaultLow, for: .horizontal)
 
@@ -288,12 +291,70 @@ final class KeyboardViewController: UIInputViewController {
 
     @objc private func diktiraj() {
         guard let url = URL(string: "diktator-ios://dictate") else { return }
-        prikaziStatus("Otvaram Diktator…")
-        extensionContext?.open(url) { [weak self] uspeh in
-            if !uspeh {
-                self?.prikaziStatus("Aplikacija nije otvorena.")
+
+        // iOS 26 traži Full Access i za otvaranje matične aplikacije.
+        // Bez njega `extensionContext.open` vrati false, pa odmah objasnimo
+        // korisniku šta treba uključiti umesto nejasne poruke.
+        guard hasFullAccess else {
+            prikaziStatus("Uključi Full Access.")
+            return
+        }
+
+        prikaziStatus("Otvaram…")
+        NSLog("Diktator tastatura: otvaram %@, Full Access = %@", url.absoluteString, hasFullAccess ? "da" : "ne")
+
+        guard let kontekst = extensionContext else {
+            if !otvoriPrekoResponderLanca(url) {
+                prikaziStatus("Otvori app ručno.")
+            }
+            return
+        }
+
+        kontekst.open(url) { [weak self] uspeh in
+            guard let self else { return }
+            if uspeh {
+                NSLog("Diktator tastatura: aplikacija je otvorena preko extensionContext.")
+                return
+            }
+
+            NSLog("Diktator tastatura: extensionContext.open nije uspeo, pokušavam fallback.")
+            DispatchQueue.main.async {
+                if self.otvoriPrekoResponderLanca(url) {
+                    self.prikaziStatus("Otvaram…")
+                } else {
+                    self.prikaziStatus("Otvori app ručno.")
+                }
             }
         }
+    }
+
+    /// iOS 18 je ukinuo stari `openURL:` put preko responder lanca, a iOS 26
+    /// traži Full Access. Ovo je samo rezerva ako `extensionContext.open`
+    /// iz nekog razloga vrati false dok je Full Access uključen.
+    @discardableResult
+    private func otvoriPrekoResponderLanca(_ url: URL) -> Bool {
+        // iOS 18+ put: pronađi UIApplication u responder lancu i koristi
+        // `open(_:options:completionHandler:)`.
+        var responder: UIResponder? = self
+        while let trenutni = responder {
+            if let aplikacija = trenutni as? UIApplication {
+                aplikacija.open(url, options: [:], completionHandler: nil)
+                return true
+            }
+            responder = trenutni.next
+        }
+
+        // iOS 17 rezerva: stari `openURL:` selektor.
+        let selektor = NSSelectorFromString("openURL:")
+        responder = self
+        while let trenutni = responder {
+            if trenutni.responds(to: selektor) {
+                trenutni.perform(selektor, with: url)
+                return true
+            }
+            responder = trenutni.next
+        }
+        return false
     }
 
     @objc private func nalepi() {

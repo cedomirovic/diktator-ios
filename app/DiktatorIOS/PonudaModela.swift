@@ -56,17 +56,17 @@ enum Modeli {
         PonudaModela(
             id: "ggml-large-v3-turbo-q5_0.bin",
             naziv: "Large v3 Turbo",
-            opis: "Preporučeno za iPhone. Brz, troši manje memorije i kvalitetom je blizu Large v3.",
+            opis: "Brz i troši manje memorije. Za srpski ume da pogreši više od Large v3.",
             velicina: 574_041_195,
-            preporucen: true,
+            preporucen: false,
             url: adresa("ggml-large-v3-turbo-q5_0.bin")
         ),
         PonudaModela(
             id: "ggml-large-v3-q5_0.bin",
             naziv: "Large v3",
-            opis: "Najbolji kvalitet, posebno za imena i stručne reči. Traži najviše RAM-a.",
+            opis: "Preporučeno za srpski. Najbolji kvalitet, traži više RAM-a (~1,0 GB).",
             velicina: 1_081_140_203,
-            preporucen: false,
+            preporucen: true,
             url: adresa("ggml-large-v3-q5_0.bin")
         ),
     ]

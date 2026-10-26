@@ -132,11 +132,18 @@ uključiš. Posle uključivanja treba da piše `enabled`.
 1. iPhone: **Settings → General → Keyboard → Keyboards → Add New Keyboard**.
 2. Izaberi **Diktator**.
 3. Tapni **Diktator** u listi i uključi **Allow Full Access**.
-   - Full Access je potreban da tastatura pročita clipboard i ubaci tekst.
-   - Bez njega možeš ručno da nalepiš tekst u ciljnoj aplikaciji.
+   - Full Access je potreban da tastatura pročita clipboard, ubaci tekst i
+     otvori aplikaciju dugmetom **Diktiraj** (iOS 26+).
+   - U gornjoj traci tastature treba da piše **Full Access ✓**. Ako piše
+     **Full Access ✗**, tapni **Diktiraj** i dobićeš poruku da uključiš
+     Full Access.
+   - Bez Full Access-a možeš ručno da nalepiš tekst u ciljnoj aplikaciji.
 4. U aplikaciji Diktator dozvoli **mikrofon** kada se pojavi pitanje.
-5. Otvori aplikaciju, preuzmi model (podrazumevano **Large v3 Turbo q5_0**,
-   ~547 MB) i probaj diktat.
+5. Otvori aplikaciju, preuzmi model i probaj diktat. Za srpski je
+   preporučen **Large v3 q5_0** (~1,0 GB); **Large v3 Turbo q5_0** (~547 MB)
+   je brži i štedi memoriju, ali na srpskom ume više da pogreši.
+6. U **Podešavanja → Diktat** izaberi **Jezik: Srpski** i, ako želiš tačniji
+   prepis, **Režim prepisa: Najbolji kvalitet**.
 
 ### 2.7. Kako se koristi
 
@@ -228,7 +235,9 @@ Xcode je jedini siguran način za prvi build.
 | iPhone se ne pojavljuje u Device Hub-u | Otključaj iPhone, tapni **Trust**, proveri passcode; ako je Developer Mode sakriven, pokreni `idevicedevmodectl reveal`. |
 | Developer Mode nema u Settings-u | Poveži iPhone i otvori Device Hub; ili `idevicedevmodectl reveal`, pa Settings → Privacy & Security → Developer Mode. |
 | Tastatura se ne vidi | Settings → General → Keyboard → Keyboards → Add New Keyboard → Diktator. |
+| **Diktiraj** kaže „Aplikacija nije otvorena“ | Uključi **Allow Full Access** za Diktator tastaturu; u traci treba da piše **Full Access ✓**. Na iOS 26+ bez Full Access-a tastatura ne sme da otvori aplikaciju. |
 | **Nalepi** ne radi | Uključi **Allow Full Access** za Diktator tastaturu. |
+| Srpski prepis je loš | Izaberi **Jezik: Srpski** i model **Large v3** (tačniji od Turbo modela). |
 | Nema zvuka / mikrofon ne radi | Settings → Privacy & Security → Microphone → Diktator. |
 | Posle 7 dana „Unable to Verify App“ | Obnovi build preko Xcode-a ili AltStore/SideStore. |
 | Model se ne preuzima | Proveri internet i prostor; modeli su veliki (57 MB–1 GB). |

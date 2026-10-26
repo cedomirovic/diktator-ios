@@ -10,7 +10,8 @@ Projekat je nastao iz macOS aplikacije
 - GitHub: <https://github.com/cedomirovic/diktator-ios>
 - Aplikacija: **Diktator iOS** (`com.cedomirovic.diktator.ios`)
 - Tastatura: `com.cedomirovic.diktator.ios.keyboard`
-- Podrazumevani model: **Large v3 Turbo q5_0** (~547 MB)
+- Preporučeni model: **Large v3 q5_0** (~1,0 GB) — tačniji za srpski.
+  **Large v3 Turbo q5_0** (~547 MB) je brža opcija sa manje RAM-a.
 - Minimum iOS 17; testirano na iOS 27.0.1
 
 ## Status
@@ -24,6 +25,10 @@ za oba targeta, a aplikacija je instalirana i pokrenuta na iPhone 16
 (iOS 27.0.1). Developer Mode i trust developer profila su uključeni. Simulator
 (iPhone 17, iOS 26.5) takođe potvrđuje da se aplikacija pokreće i da
 `diktator-ios://dictate` počinje snimanje.
+
+Za srpski je preporučen model **Large v3**; Turbo je brži, ali na srpskom ume
+više da pogreši. Na srpskom sistemu aplikacija podrazumevano bira jezik
+**Srpski**, a ne automatsku detekciju.
 
 Sledeće je testiranje **AltStore/SideStore** potpisivanja i instalacije IPA-e,
 uključujući keyboard extension.

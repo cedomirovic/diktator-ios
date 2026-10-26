@@ -10,7 +10,7 @@ struct PogledPomoc: View {
                     Text("1. Podešavanja → General → Keyboard → Keyboards → Add New Keyboard.")
                     Text("2. Izaberi Diktator.")
                     Text("3. Tapni Diktator i uključi Allow Full Access.")
-                    Text("Full Access je potreban da tastatura pročita clipboard i ubaci tekst.")
+                    Text("Full Access je potreban da tastatura pročita clipboard, ubaci tekst i otvori aplikaciju dugmetom Diktiraj (iOS 26+). U gornjoj traci tastature treba da piše Full Access ✓.")
 
                     Divider()
 
@@ -20,6 +20,9 @@ struct PogledPomoc: View {
                     Text("2. Tapni Diktiraj — otvara se aplikacija (ako iOS pita, tapni Open).")
                     Text("3. Snimi govor i sačekaj prepis.")
                     Text("4. Vrati se preko „Back to …“ i tapni Nalepi.")
+                    Text("Za najbolji srpski: Jezik = Srpski, Model = Large v3, Režim = Najbolji kvalitet.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
 
                     Divider()
 

@@ -22,8 +22,15 @@ struct PogledPodesavanja: View {
                 ForEach(Modeli.svi) { model in
                     HStack(alignment: .top, spacing: 10) {
                         VStack(alignment: .leading, spacing: 3) {
-                            Text(model.naziv)
-                                .font(.headline)
+                            HStack(spacing: 6) {
+                                Text(model.naziv)
+                                    .font(.headline)
+                                if model.preporucen {
+                                    Text("Preporučeno")
+                                        .font(.caption2.bold())
+                                        .foregroundStyle(.blue)
+                                }
+                            }
                             Text(model.velicinaTekst)
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
@@ -62,6 +69,10 @@ struct PogledPodesavanja: View {
                     Text("Srpski").tag("sr")
                     Text("Engleski").tag("en")
                 }
+
+                Text("Za najbolji srpski izaberi **Srpski**. Automatska detekcija je korisna kada smenjuješ srpski i engleski, ali na kratkim snimcima ume da pogreši.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
 
                 Picker("Režim prepisa", selection: $stanje.podesavanja.rezimPrepisa) {
                     ForEach(RezimPrepisa.allCases) { rezim in

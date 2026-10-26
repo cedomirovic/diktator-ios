@@ -277,6 +277,6 @@ final class AppStanje: ObservableObject {
 
     func proveriModel() {
         guard !modelJePreuzet, !modelSePreuzima, poruka == nil else { return }
-        poruka = "Model nije preuzet. Otvori Podešavanja i preuzmi Large v3 Turbo."
+        poruka = "Model nije preuzet. Otvori Podešavanja i preuzmi Large v3."
     }
 }

@@ -2,12 +2,25 @@ import Foundation
 
 final class SkladistePodesavanja {
     private static let kljuc = "diktator.ios.podesavanja.v1"
+    private static let kljucMigracijeJezika = "diktator.ios.migracija.jezika.v1"
 
     static func ucitaj() -> Podesavanja {
         guard let podaci = UserDefaults.standard.data(forKey: kljuc),
-              let p = try? JSONDecoder().decode(Podesavanja.self, from: podaci) else {
+              var p = try? JSONDecoder().decode(Podesavanja.self, from: podaci) else {
             return Podesavanja()
         }
+
+        // Prvi put posle uvođenja srpskog kao podrazumevanog jezika:
+        // na uređaju čiji je sistem srpski, "auto" zamenjujemo sa "sr".
+        // Kasnije korisnik može ponovo da izabere "auto" bez vraćanja migracije.
+        if !UserDefaults.standard.bool(forKey: kljucMigracijeJezika) {
+            if p.jezik == "auto", Podesavanja.podrazumevaniJezik == "sr" {
+                p.jezik = "sr"
+                sacuvaj(p)
+            }
+            UserDefaults.standard.set(true, forKey: kljucMigracijeJezika)
+        }
+
         return p
     }
 

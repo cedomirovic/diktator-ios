@@ -18,7 +18,7 @@ if ! xcodebuild -version >/dev/null 2>&1; then
 fi
 
 if ! xcodebuild -version >/dev/null 2>&1; then
-  echo "Nedostaje Xcode. Instaliraj Xcode 26.x i pokreni:" >&2
+  echo "Nedostaje Xcode. Instaliraj Xcode 27.1 ili noviji i pokreni:" >&2
   echo "  sudo xcode-select -s /Applications/Xcode.app/Contents/Developer" >&2
   echo "  sudo xcodebuild -license accept" >&2
   exit 1
