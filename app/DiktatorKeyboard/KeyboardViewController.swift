@@ -920,6 +920,12 @@ final class KeyboardViewController: UIInputViewController {
                 nalepiAutomatski(tekst, token: token, izvor: "IPC")
             }
             autoNalepiAkoTreba()
+            if stanje == "mirno" {
+                // Pasteboard ume da kasni koji milisekund iza notifikacije.
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+                    self?.autoNalepiAkoTreba()
+                }
+            }
             azurirajPrikaz()
             return
         }
@@ -1014,11 +1020,16 @@ final class KeyboardViewController: UIInputViewController {
         }
 
         if let (tekst, token) = tekstIzIPC() {
+            Dnevnik.pisi("AutoNalepi: IPC tekst duzina=\(tekst.count)")
             nalepiAutomatski(tekst, token: token, izvor: "IPC")
             return
         }
 
-        guard let predmet = UIPasteboard.general.items.first,
+        let predmet = UIPasteboard.general.items.first
+        Dnevnik.pisi(
+            "AutoNalepi: ceka=\(UserDefaults.standard.bool(forKey: cekaDiktatKey)), snima=\(snimaSesijom), obrada=\(obradaSesije), opsti=\(predmet?.keys.sorted().joined(separator: ",") ?? "-")"
+        )
+        guard let predmet,
               let token = stringIz(predmet[DiktatorClipboard.token]),
               let vremeString = stringIz(predmet[DiktatorClipboard.vreme]),
               let vreme = Double(vremeString),
@@ -1041,7 +1052,10 @@ final class KeyboardViewController: UIInputViewController {
 
     private func nalepiAutomatski(_ tekst: String, token: String, izvor: String) {
         let podrazumevano = UserDefaults.standard
-        guard podrazumevano.string(forKey: zadnjiTokenKey) != token else { return }
+        guard podrazumevano.string(forKey: zadnjiTokenKey) != token else {
+            Dnevnik.pisi("AutoNalepi: token je već nalepljen")
+            return
+        }
         NSLog("Diktator tastatura: pronađen token za automatsko lepljenje (%@, %@).", izvor, token)
 
         autoNalepiUToku = true
@@ -1070,11 +1084,17 @@ final class KeyboardViewController: UIInputViewController {
               !tekst.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
               let vremeString = vrednosti[DiktatorIPC.tokenVreme],
               let vreme = Double(vremeString) else {
+            if !vrednosti.isEmpty {
+                Dnevnik.pisi(
+                    "IPC tekst: nema, kljucevi=\(vrednosti.keys.sorted().joined(separator: ","))"
+                )
+            }
             return nil
         }
 
         let starost = Date().timeIntervalSince1970 - vreme
         guard starost >= 0, starost <= 180 else { return nil }
+        Dnevnik.pisi("IPC tekst: duzina=\(tekst.count), token=\(token.prefix(8))")
         return (tekst, token)
     }
 
