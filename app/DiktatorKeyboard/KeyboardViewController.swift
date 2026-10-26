@@ -754,7 +754,11 @@ final class KeyboardViewController: UIInputViewController {
         guard vreme > zadnjeStanjeVreme else { return }
         zadnjeStanjeVreme = vreme
         sesijaAktivna = sesija
+        let prethodniSesijaDo = sesijaDo
         sesijaDo = sesija ? noviSesijaDo : 0
+        if sesija, noviSesijaDo > 0, noviSesijaDo != prethodniSesijaDo {
+            Dnevnik.pisi("Sesija važi do \(Int(noviSesijaDo)).")
+        }
 
         let kljuc = "\(sesija)-\(stanje)"
         if kljuc != zadnjiDnevnikStanja {
