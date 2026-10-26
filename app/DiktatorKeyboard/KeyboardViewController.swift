@@ -129,6 +129,7 @@ final class KeyboardViewController: UIInputViewController {
     private var cekaStartSesije = false
     private var zadnjiKomandniId: String?
     private var komandniBrojac = 0
+    private var diktatPocetakVreme: TimeInterval = 0
     private var privremeniStatus: String?
     private var privremeniStatusVreme: Date?
     private var zadnjeStanjeVreme: Double = 0
@@ -515,6 +516,10 @@ final class KeyboardViewController: UIInputViewController {
             "Diktiraj: sesija=\(sesijaAktivna), snima=\(snimaSesijom), obrada=\(obradaSesije), cekaSesiju=\(UserDefaults.standard.bool(forKey: cekaSesijuKey))"
         )
         osveziIPCStanje()
+
+        if !snimaSesijom && !obradaSesije {
+            diktatPocetakVreme = Date().timeIntervalSince1970
+        }
 
         if UserDefaults.standard.bool(forKey: cekaSesijuKey) {
             ocistiCekanjeSesije()
@@ -908,6 +913,11 @@ final class KeyboardViewController: UIInputViewController {
             Dnevnik.pisi(
                 "Darwin fiksni status: sesija=\(sesija) stanje=\(stanje)"
             )
+            // Pokušaj lepljenje pre nego što „mirno“ obriše obradaSesije;
+            // inače autoNalepiAkoTreba nema nijedan uslov da uđe.
+            if stanje == "mirno" {
+                autoNalepiAkoTreba()
+            }
             // Notifikacija je svež signal; vreme uzimamo sada, da pasteboard
             // ne može da vrati staro stanje.
             primeniStanje(
@@ -1029,12 +1039,20 @@ final class KeyboardViewController: UIInputViewController {
         Dnevnik.pisi(
             "AutoNalepi: ceka=\(UserDefaults.standard.bool(forKey: cekaDiktatKey)), snima=\(snimaSesijom), obrada=\(obradaSesije), opsti=\(predmet?.keys.sorted().joined(separator: ",") ?? "-")"
         )
-        guard let predmet,
-              let token = stringIz(predmet[DiktatorClipboard.token]),
-              let vremeString = stringIz(predmet[DiktatorClipboard.vreme]),
-              let vreme = Double(vremeString),
-              let tekst = stringIz(predmet[DiktatorClipboard.tekst]),
+        guard let predmet else { return }
+        let token = stringIz(predmet[DiktatorClipboard.token])
+        let vremeString = stringIz(predmet[DiktatorClipboard.vreme])
+        let vreme = vremeString.flatMap(Double.init)
+        let tekst = stringIz(predmet[DiktatorClipboard.tekst])
+        Dnevnik.pisi(
+            "AutoNalepi opsti: token=\(token?.prefix(8) ?? "-"), vreme=\(vremeString ?? "-"), tekst=\(tekst?.count ?? -1), pocetak=\(Int(diktatPocetakVreme))"
+        )
+        guard let token, let vreme, let tekst,
               !tekst.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return
+        }
+        guard diktatPocetakVreme == 0 || vreme >= diktatPocetakVreme - 1 else {
+            Dnevnik.pisi("AutoNalepi: preskačem stari clipboard")
             return
         }
 
@@ -1094,6 +1112,10 @@ final class KeyboardViewController: UIInputViewController {
 
         let starost = Date().timeIntervalSince1970 - vreme
         guard starost >= 0, starost <= 180 else { return nil }
+        guard diktatPocetakVreme == 0 || vreme >= diktatPocetakVreme - 1 else {
+            Dnevnik.pisi("IPC tekst: preskačem stari tekst")
+            return nil
+        }
         Dnevnik.pisi("IPC tekst: duzina=\(tekst.count), token=\(token.prefix(8))")
         return (tekst, token)
     }
