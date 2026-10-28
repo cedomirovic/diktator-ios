@@ -72,15 +72,24 @@ Posle toga rade i `devicectl device install app` i
 
 1. U bilo kojoj aplikaciji otvori tekstualno polje i prebaci tastaturu na
    **Diktator**.
-2. Tapni **Diktiraj**. Prvi put se otvara Diktator, uključuje pozadinsku
-   sesiju i odmah počinje snimanje. Ako iOS prikaže **„Open in Diktator?“**,
-   tapni **Open**.
-3. Vrati se u host aplikaciju i govori. Tastatura preuzima status i prikazuje
-   **Snimam…**.
-4. Tapni **Stop** — aplikacija prepisuje lokalno, a tastatura automatski
-   ubacuje tekst. Nema potrebe za **„Back to …“**.
-5. Sledeći put tapni **Diktiraj** direktno u tastaturi; Diktator se ne otvara
-   dok je sesija aktivna (do 15 minuta).
+2. Tapni **Diktiraj**. Ako sesija nije uključena, otvoriće se Diktator;
+   tapni **Uključi sesiju**, pa se vrati u host aplikaciju i ponovo tapni
+   **Diktiraj**. Ako iOS prikaže **„Open in Diktator?“**, tapni **Open**.
+3. Govori. Tastatura prikazuje **Snimam…**.
+4. Tapni **Stop** — aplikacija prepisuje lokalno. Kada piše
+   **„Spremno je, nalepi.“**, tapni **Nalepi**.
+5. Sledeći put, dok sesija traje (do 15 minuta), tapni **Diktiraj** direktno
+   u tastaturi; Diktator se ne otvara.
+
+## Doterivanje teksta (opciono)
+
+U **Podešavanjima → Doterivanje** možeš uključiti popravku interpunkcije i
+imena preko izabranog servisa: **DeepSeek**, **OpenAI / ChatGPT**,
+**Anthropic Claude**, **Google Gemini**, **Ollama** ili bilo kog
+OpenAI-kompatibilnog servisa. Unesi API ključ (čuva se u Keychain-u), izaberi
+model i tapni **Test veze**. Kada je opcija uključena, posle lokalnog prepisa
+samo gotov tekst ide servisu; zvuk nikada ne napušta uređaj. Ako servis ne
+odgovori, zadržava se sirov prepis.
 
 ## Šta je odlučeno
 

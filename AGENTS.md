@@ -6,6 +6,12 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Status
 
+- **28.10.2026.** — dodato je **opciono doterivanje teksta** preko
+  **Gemini**, OpenAI, Claude, DeepSeek, Ollama i drugih OpenAI-kompatibilnih
+  servisa. U Podešavanjima je sekcija **Doterivanje** sa API ključem u
+  Keychain-u, izborom modela, adresom za custom servis i dugmetom **Test
+  veze**. Kada je uključeno, posle lokalnog prepisa samo gotov tekst ide
+  servisu; ako doterivanje ne uspe, zadržava se sirov prepis.
 - **26.10.2026.** — verzija **0.1.6 (7)**: popravljena je pozadinska sesija
   tako što status nosi **`sesijaDo`** (do kada sesija važi). Tastatura više ne
   gasi sesiju posle 3 sekunde bez novog statusa, pa posle povratka u host
@@ -43,7 +49,8 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
     **Large v3 Turbo q5_0** (~547 MB) ostaje opcija za brži rad i manje RAM-a.
   - Minimum iOS 17; testirano na iOS 27.0.1.
   - Instalacija: **AltStore/SideStore**; Xcode služi za build i potpis.
-  - MVP: diktat + tastatura, istorija, rečnik; **bez** LLM doterivanja.
+  - MVP: diktat + tastatura, istorija, rečnik; **LLM doterivanje je
+    opciono** (dodato 28.10.2026).
 - macOS 26.7.1 i Xcode 27.1 (27A9275) su instalirani; `xcode-select` pokazuje
   na Xcode. `app/pripremi-whisper-ios.sh` je napravio whisper.cpp biblioteke za
   iOS arm64 (Metal + Accelerate).
