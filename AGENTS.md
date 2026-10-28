@@ -6,6 +6,14 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Status
 
+- **28.10.2026.** — **bezbednosno ojačanje** (verzija **0.1.8 (9)**):
+  lokalni server za **Nalepi** sada traži tajni ključ
+  (`X-Diktator-Token`, 32 slučajna bajta po pokretanju, deli se sa
+  tastaturom preko status pasteboard-a), prihvata samo `GET /tekst` i više
+  nikada ne otvara port na svim interfejsima. Dodati su `SECURITY.md`,
+  `Cache-Control: no-store` i provera dužine zaglavlja; potvrđeno je da u
+  repou nema tajni, da ATS dozvoljava samo lokalnu mrežu i da API ključevi
+  ostaju u Keychain-u (`WhenUnlockedThisDeviceOnly`).
 - **28.10.2026.** — **brzina prepisa**: whisper sada računa audio kontekst
   samo za stvarnu dužinu snimka (umesto punih 30 s), koristi 3 niti na CPU i
   podrazumevano bira **Turbo** model. Dodat je i opcioni **Groq** prepis u
@@ -138,6 +146,9 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
   sa `/`.
 - Lokalni snimak i tekst; mreža samo za modele, ažuriranja i opciono LLM.
 - Bez tajni u git-u; API ključevi u Keychain-u.
+- Lokalni server za tastaturu sluša samo loopback i traži ključ
+  (`X-Diktator-Token`); nikada ga ne vezivati na sve interfejse. Detalji su
+  u `SECURITY.md`.
 - Posle svakog završenog koraka `git add` + `git commit`, poruka na srpskom.
 - Ne dirati macOS projekat `Pitchi` iz ovog repoa.
 

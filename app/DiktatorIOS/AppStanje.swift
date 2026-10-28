@@ -1,5 +1,6 @@
 import Foundation
 import Network
+import Security
 import UIKit
 
 /// Dijagnostika ide i u fajl, jer se NSLog iz aplikacije i tastature na
@@ -49,6 +50,9 @@ private enum DiktatorIPC {
     static let tokenVreme = "tokenVreme"
     static let tekst = "tekst"
     static let greska = "greska"
+    /// Slučajan ključ lokalnog servera. Menja se pri svakom pokretanju
+    /// aplikacije, a tastatura ga šalje u zaglavlju `X-Diktator-Token`.
+    static let serverToken = "serverToken"
 
     /// Darwin notifikacije prenose samo ime, pa u njega pakujemo kratku
     /// poruku. Tako tastatura i aplikacija rade i ako imenovani pasteboard
@@ -831,7 +835,8 @@ final class AppStanje: ObservableObject {
         var vrednosti: [String: String] = [
             DiktatorIPC.sesija: sesijaAktivna ? "1" : "0",
             DiktatorIPC.stanjeKljuc: stanjeTekst,
-            DiktatorIPC.vreme: String(sada)
+            DiktatorIPC.vreme: String(sada),
+            DiktatorIPC.serverToken: server.token
         ]
 
         if sesijaAktivna, let kraj = sesijaKraj {
@@ -1310,13 +1315,36 @@ final class AppStanje: ObservableObject {
 
 /// Minimalni HTTP server samo na loopback adresi. Tastatura ga koristi za
 /// Nalepi, jer UIPasteboard u keyboard extension-u ume da vrati keširanu
-/// vrednost. Server ne sluša spoljašnji saobraćaj.
+/// vrednost.
+///
+/// Server ne sluša spoljašnji saobraćaj i traži tajni ključ u zaglavlju
+/// `X-Diktator-Token`. Ključ se pravi pri svakom pokretanju aplikacije i
+/// deli sa tastaturom preko imenovanog pasteboard-a, pa druga aplikacija na
+/// uređaju ne može da pročita poslednji prepis samo zato što zna port.
 final class ServerTeksta {
     private let port: UInt16 = 8765
     private let queue = DispatchQueue(label: "com.cedomirovic.diktator.server")
     private let brava = NSLock()
     private var poslednji = ""
     private var listener: NWListener?
+
+    /// 32 slučajna bajta, base64url. Ne loguje se.
+    let token: String = ServerTeksta.noviToken()
+
+    private static func noviToken() -> String {
+        var bajtovi = [UInt8](repeating: 0, count: 32)
+        let status = SecRandomCopyBytes(kSecRandomDefault, bajtovi.count, &bajtovi)
+        guard status == errSecSuccess else {
+            // Rezerva: dva UUID-a spojena, i dalje dovoljno slučajno.
+            return (UUID().uuidString + UUID().uuidString)
+                .replacingOccurrences(of: "-", with: "")
+                .lowercased()
+        }
+        return Data(bajtovi).base64EncodedString()
+            .replacingOccurrences(of: "+", with: "-")
+            .replacingOccurrences(of: "/", with: "_")
+            .replacingOccurrences(of: "=", with: "")
+    }
 
     func postaviTekst(_ tekst: String) {
         brava.lock()
@@ -1334,6 +1362,7 @@ final class ServerTeksta {
         guard listener == nil else { return }
         do {
             let parametri = NWParameters.tcp
+            parametri.allowLocalEndpointReuse = true
             parametri.requiredLocalEndpoint = NWEndpoint.hostPort(
                 host: "127.0.0.1",
                 port: NWEndpoint.Port(rawValue: port)!
@@ -1344,12 +1373,17 @@ final class ServerTeksta {
             Dnevnik.pisi(
                 "ServerTeksta: loopback nije uspeo: \(error.localizedDescription)"
             )
+            // Nikada ne otvaramo port na svim interfejsima. Pokušavamo još
+            // jednom, ali striktno preko loopback interfejsa.
+            let rezerva = NWParameters.tcp
+            rezerva.requiredInterfaceType = .loopback
+            rezerva.allowLocalEndpointReuse = true
             do {
                 let novi = try NWListener(
-                    using: .tcp,
+                    using: rezerva,
                     on: NWEndpoint.Port(rawValue: port)!
                 )
-                pokreniListener(novi, opis: "port \(port)")
+                pokreniListener(novi, opis: "loopback interfejs, port \(port)")
             } catch {
                 Dnevnik.pisi(
                     "ServerTeksta: ne mogu da pokrenem: \(error.localizedDescription)"
@@ -1384,6 +1418,10 @@ final class ServerTeksta {
 
     private func obradi(_ veza: NWConnection) {
         veza.start(queue: queue)
+        // Kratak rok: lokalni klijent mora da pošalje zahtev odmah.
+        queue.asyncAfter(deadline: .now() + 8) {
+            veza.cancel()
+        }
         primaj(veza, podaci: Data())
     }
 
@@ -1407,13 +1445,32 @@ final class ServerTeksta {
                     data: novi[..<kraj.lowerBound],
                     encoding: .utf8
                 ) ?? ""
-                let putanja = zaglavlje
-                    .components(separatedBy: "\r\n")
-                    .first?
-                    .components(separatedBy: " ")
-                    .dropFirst()
-                    .first ?? ""
-                self.odgovori(veza, putanja: putanja)
+                let redovi = zaglavlje.components(separatedBy: "\r\n")
+                let prviRed = redovi.first?
+                    .components(separatedBy: " ") ?? []
+                let metod = prviRed.first ?? ""
+                let putanja = prviRed.count > 1 ? prviRed[1] : ""
+                var kljuc: String?
+                for red in redovi.dropFirst() {
+                    let delovi = red.split(
+                        separator: ":",
+                        maxSplits: 1,
+                        omittingEmptySubsequences: false
+                    )
+                    guard delovi.count == 2 else { continue }
+                    if delovi[0]
+                        .trimmingCharacters(in: .whitespaces)
+                        .lowercased() == "x-diktator-token" {
+                        kljuc = delovi[1]
+                            .trimmingCharacters(in: .whitespaces)
+                    }
+                }
+                self.odgovori(
+                    veza,
+                    metod: metod,
+                    putanja: putanja,
+                    kljuc: kljuc
+                )
                 return
             }
             if gotovo {
@@ -1424,22 +1481,47 @@ final class ServerTeksta {
         }
     }
 
-    private func odgovori(_ veza: NWConnection, putanja: String) {
-        let traziTekst = putanja.hasPrefix("/tekst")
-        let tekst: String
-        if traziTekst {
-            brava.lock()
-            tekst = poslednji
-            brava.unlock()
-        } else {
-            tekst = ""
+    /// Poređenje bez ranog prekida, da se iz vremena odgovora ne može
+    /// zaključivati koliko se ključ poklapa.
+    private func istiKljuc(_ a: String, _ b: String) -> Bool {
+        let aBajtovi = Array(a.utf8)
+        let bBajtovi = Array(b.utf8)
+        guard aBajtovi.count == bBajtovi.count else { return false }
+        var razlika: UInt8 = 0
+        for i in 0..<aBajtovi.count {
+            razlika |= aBajtovi[i] ^ bBajtovi[i]
+        }
+        return razlika == 0
+    }
+
+    private func odgovori(
+        _ veza: NWConnection,
+        metod: String,
+        putanja: String,
+        kljuc: String?
+    ) {
+        var kod = "404 Not Found"
+        var tekst = ""
+
+        if putanja == "/tekst" {
+            if metod != "GET" {
+                kod = "405 Method Not Allowed"
+            } else if let kljuc, istiKljuc(kljuc, token) {
+                brava.lock()
+                tekst = poslednji
+                brava.unlock()
+                kod = "200 OK"
+            } else {
+                kod = "401 Unauthorized"
+            }
         }
 
-        let kod = traziTekst ? "200 OK" : "404 Not Found"
         let telo = Data(tekst.utf8)
         var zaglavlje = "HTTP/1.1 \(kod)\r\n"
         zaglavlje += "Content-Type: text/plain; charset=utf-8\r\n"
         zaglavlje += "Content-Length: \(telo.count)\r\n"
+        zaglavlje += "Cache-Control: no-store\r\n"
+        zaglavlje += "X-Content-Type-Options: nosniff\r\n"
         zaglavlje += "Connection: close\r\n\r\n"
         var odgovor = Data(zaglavlje.utf8)
         odgovor.append(telo)

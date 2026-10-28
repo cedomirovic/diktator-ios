@@ -12,7 +12,7 @@ Projekat je nastao iz macOS aplikacije
 **snimak i tekst ostaju na uređaju**, bez slanja zvuka na server.
 
 - GitHub: <https://github.com/cedomirovic/diktator-ios>
-- Verzija: **0.1.7 (8)**
+- Verzija: **0.1.8 (9)**
 - Aplikacija: **Diktator iOS** (`com.cedomirovic.diktator.ios`)
 - Tastatura: `com.cedomirovic.diktator.ios.keyboard`
 - Modeli: **Large v3 Turbo q5_0** (~547 MB) za brzinu i
@@ -21,7 +21,7 @@ Projekat je nastao iz macOS aplikacije
 
 ## Status
 
-Verzija **0.1.7 (8)** je potpisana i instalirana na **iPhone 15 Pro**
+Verzija **0.1.8 (9)** je potpisana i instalirana na **iPhone 15 Pro**
 (iOS 27.0.1). Debug i Release build prolaze na macOS 26.7.1 i Xcode 27.1;
 whisper.cpp za iOS (arm64, Metal + Accelerate) je izgrađen. Skripta pravi
 nepotpisan `build/DiktatorIOS.ipa` (~1.6 MB bez modela).
@@ -155,6 +155,7 @@ docs/                arhitektura, instalacija, distribucija i slike
 
 - [Instalacija bez plaćenog naloga](docs/instalacija-bez-naloga.md)
 - [Distribucija: sideload, TestFlight i App Store](docs/distribucija.md)
+- [Bezbednost](SECURITY.md)
 - [PLAN.md](PLAN.md)
 - [AGENTS.md](AGENTS.md)
 

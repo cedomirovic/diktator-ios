@@ -48,6 +48,8 @@ private enum DiktatorIPC {
     static let tokenVreme = "tokenVreme"
     static let tekst = "tekst"
     static let greska = "greska"
+    /// Ključ lokalnog servera koji aplikacija upisuje u status.
+    static let serverToken = "serverToken"
 
     static let notifKomanda = "com.cedomirovic.diktator.cmd"
     static let notifStanje = "com.cedomirovic.diktator.st"
@@ -713,13 +715,26 @@ final class KeyboardViewController: UIInputViewController {
             return
         }
 
+        // Server traži ključ koji aplikacija upisuje u status. Bez njega
+        // odmah idemo na rezervni put preko imenovanog pasteboard-a.
+        let serverToken = DiktatorIPC.citaj(DiktatorIPC.stanje)[DiktatorIPC.serverToken]
+        guard let serverToken, !serverToken.isEmpty else {
+            Dnevnik.pisi("Nalepi server: nema ključa, prelazim na rezervu.")
+            nalepiIzRezerve()
+            return
+        }
+
         prikaziStatus("Nalepi…")
         var zahtev = URLRequest(url: url)
         zahtev.timeoutInterval = 2
-        URLSession.shared.dataTask(with: zahtev) { [weak self] podaci, _, greska in
+        zahtev.httpMethod = "GET"
+        zahtev.setValue(serverToken, forHTTPHeaderField: "X-Diktator-Token")
+        URLSession.shared.dataTask(with: zahtev) { [weak self] podaci, odgovor, greska in
             DispatchQueue.main.async {
                 guard let self else { return }
+                let kod = (odgovor as? HTTPURLResponse)?.statusCode ?? 0
                 if greska == nil,
+                   kod == 200,
                    let podaci,
                    let tekst = String(data: podaci, encoding: .utf8),
                    !tekst.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -727,7 +742,7 @@ final class KeyboardViewController: UIInputViewController {
                     self.umetniTekst(tekst)
                 } else {
                     Dnevnik.pisi(
-                        "Nalepi server: nema teksta, greska=\(greska?.localizedDescription ?? "-")"
+                        "Nalepi server: nema teksta, kod=\(kod), greska=\(greska?.localizedDescription ?? "-")"
                     )
                     self.nalepiIzRezerve()
                 }
