@@ -22,7 +22,7 @@ enum StanjeAplikacije: Equatable {
     var detalj: String {
         switch self {
         case .mirno:
-            return "Tapni mikrofon i govori. Tekst se posle prepisa kopira u clipboard."
+            return "Tapni mikrofon i govori. Tekst se posle prepisa sam ubaci u aplikaciju u kojoj kucaš."
         case .snima:
             return "Govori sada. Tapni ponovo da završiš."
         case .priprema:

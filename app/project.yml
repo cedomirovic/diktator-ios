@@ -15,8 +15,8 @@ settings:
     CODE_SIGN_STYLE: Automatic
     CODE_SIGN_IDENTITY: "Apple Development"
     DEVELOPMENT_LANGUAGE: sr
-    MARKETING_VERSION: "0.1.8"
-    CURRENT_PROJECT_VERSION: "9"
+    MARKETING_VERSION: "0.2.0"
+    CURRENT_PROJECT_VERSION: "10"
     DEVELOPMENT_TEAM: LHQ4Q44425
     CLANG_CXX_LANGUAGE_STANDARD: "c++17"
 
@@ -31,14 +31,15 @@ targets:
       properties:
         CFBundleDisplayName: Diktator
         CFBundleName: Diktator
-        CFBundleShortVersionString: "0.1.8"
-        CFBundleVersion: "9"
+        CFBundleShortVersionString: "0.2.0"
+        CFBundleVersion: "10"
         UILaunchScreen: {}
         UIBackgroundModes:
           - audio
         NSMicrophoneUsageDescription: "Diktator koristi mikrofon za diktat i, kada uključiš sesiju, drži ga u pripravnosti do 15 minuta. Snimak ostaje na uređaju."
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
+        ITSAppUsesNonExemptEncryption: false
         NSLocalNetworkUsageDescription: "Diktator koristi lokalnu mrežu samo ako izabereš Ollama ili lokalni LLM servis."
         CFBundleURLTypes:
           - CFBundleURLName: com.cedomirovic.diktator.ios
@@ -86,6 +87,28 @@ targets:
           - "-framework"
           - "UIKit"
           - "-lc++"
+        # Simulator koristi whisper build bez Metal-a (CPU + BLAS). Uređaj i
+        # dalje koristi vendor-ios/whisper sa Metal-om.
+        "LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*]":
+          - "$(SRCROOT)/vendor-ios/whisper-sim/lib"
+        "OTHER_LDFLAGS[sdk=iphonesimulator*]":
+          - "-force_load"
+          - "$(SRCROOT)/vendor-ios/whisper-sim/lib/libggml-cpu.a"
+          - "-force_load"
+          - "$(SRCROOT)/vendor-ios/whisper-sim/lib/libggml-blas.a"
+          - "-force_load"
+          - "$(SRCROOT)/vendor-ios/whisper-sim/lib/libwhisper.a"
+          - "-force_load"
+          - "$(SRCROOT)/vendor-ios/whisper-sim/lib/libggml.a"
+          - "-force_load"
+          - "$(SRCROOT)/vendor-ios/whisper-sim/lib/libggml-base.a"
+          - "-framework"
+          - "Accelerate"
+          - "-framework"
+          - "AVFoundation"
+          - "-framework"
+          - "UIKit"
+          - "-lc++"
     dependencies:
       - target: DiktatorKeyboard
         embed: true
@@ -100,10 +123,11 @@ targets:
       properties:
         CFBundleDisplayName: Diktator
         CFBundleName: Diktator
-        CFBundleShortVersionString: "0.1.8"
-        CFBundleVersion: "9"
+        CFBundleShortVersionString: "0.2.0"
+        CFBundleVersion: "10"
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
+        ITSAppUsesNonExemptEncryption: false
         NSExtension:
           NSExtensionPointIdentifier: com.apple.keyboard-service
           NSExtensionPrincipalClass: "$(PRODUCT_MODULE_NAME).KeyboardViewController"

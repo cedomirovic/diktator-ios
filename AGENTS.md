@@ -6,6 +6,17 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Status
 
+- **28.10.2026.** — **priprema za App Store** (verzija **0.2.0 (10)**):
+  dodat je `PrivacyInfo.xcprivacy` u aplikaciju i tastaturu (bez tracking-a i
+  prikupljanja; `UserDefaults` `CA92.1`, file timestamp `C617.1`),
+  `ITSAppUsesNonExemptEncryption = NO`, stranice **privatnosti** i
+  **podrške** na GitHub Pages-u, metadata i Review Notes u
+  `docs/app-store.md`, snimci ekrana za iPhone 6.9" i iPad 13" u
+  `docs/slike/app-store/`, skripte `app/objavi-testflight.sh` i
+  `app/uzmi-snimke.sh`, `app/ExportOptions.plist` i
+  `app/pripremi-whisper-simulator.sh` (whisper za simulator, da bi snimci
+  mogli da se prave bez uređaja). Aplikacija se sada može pokrenuti i u
+  simulatoru; tab se bira argumentom `-DiktatorTab`.
 - **28.10.2026.** — **sesija se sama obnavlja**: kada sesija istekne, ili
   kada je Diktator ugašen (status tastature nije svež), tap na **Diktiraj**
   otvara Diktator preko `diktator-ios://dictate`, koji uključi sesiju i odmah
@@ -166,12 +177,14 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Sledeći korak
 
-1. Pripremiti App Store/TestFlight: `PrivacyInfo.xcprivacy`, privacy policy,
-   support URL, metadata, screenshots za iPhone/iPad i Review Notes
-   (vidi `docs/distribucija.md`).
-2. Testirati TestFlight internal, pa external; prikupiti prve povratne
+1. Uplatiti **Apple Developer Program** (99 USD/god.), prihvatiti ugovore i u
+   Xcode-u napraviti **Apple Distribution** sertifikat za tim.
+2. Napraviti app record u App Store Connect-u (`com.cedomirovic.diktator.ios`)
+   i popuniti metadata iz `docs/app-store.md`.
+3. Pokrenuti `app/objavi-testflight.sh` i sačekati obradu builda.
+4. Testirati TestFlight internal, pa external; prikupiti prve povratne
    informacije o srpskom prepisu i preuzimanju modela.
-3. Testirati AltStore/SideStore potpisivanje i instalaciju IPA-e, uključujući
+5. Testirati AltStore/SideStore potpisivanje i instalaciju IPA-e, uključujući
    keyboard extension.
-4. Proveriti osvežavanje profila posle 7 dana.
-5. Pripremiti release tag i objaviti App Store/TestFlight rezultate.
+6. Proveriti osvežavanje profila posle 7 dana.
+7. Pripremiti release tag i objaviti App Store/TestFlight rezultate.

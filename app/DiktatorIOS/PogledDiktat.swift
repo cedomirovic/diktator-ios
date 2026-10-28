@@ -73,7 +73,7 @@ struct PogledDiktat: View {
                             }
                             .buttonStyle(.bordered)
                         } else {
-                            Text("Uključi sesiju da Diktiraj na tastaturi snima dok je otvorena bilo koja aplikacija. Kada je sesija aktivna, tastatura ne otvara Diktator. Ako sesija nije uključena, otvori Diktator ručno i uključi je.")
+                            Text("Uključi sesiju da Diktiraj na tastaturi snima dok je otvorena bilo koja aplikacija. Kada sesija istekne ili je aplikacija ugašena, tastatura sama otvara Diktator i uključi je.")
                                 .font(.footnote)
                                 .foregroundStyle(.secondary)
 
@@ -84,7 +84,7 @@ struct PogledDiktat: View {
                             .disabled(!stanje.modelJePreuzet || stanje.stanje.jeZauzet)
                         }
 
-                        Text("Sesija traje najviše 15 minuta i drži mikrofon u pripravnosti. Zato se automatski gasi.")
+                        Text("Sesija traje najviše 15 minuta i drži mikrofon u pripravnosti. Svaki diktat je produžava za novih 15 minuta.")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
@@ -197,11 +197,10 @@ struct PogledDiktat: View {
                     VStack(alignment: .leading, spacing: 6) {
                         Text("Kako radi")
                             .font(.headline)
-                        Text("1. Uključi sesiju ovde (traje do 15 minuta).")
-                        Text("2. Pređi u bilo koju aplikaciju i otvori Diktator tastaturu.")
-                        Text("3. Tapni Diktiraj — snima u pozadini. Tapni Stop i sačekaj da piše Spremno je, nalepi.")
-                        Text("4. Tapni Nalepi — tekst se ubacuje u polje u kome pišeš.")
-                        Text("Ako sesija nije uključena, Diktiraj otvara Diktator. Uključi sesiju i vrati se da diktiraš.")
+                        Text("1. Pređi u bilo koju aplikaciju i otvori Diktator tastaturu.")
+                        Text("2. Tapni Diktiraj i govori. Sesija se uključuje sama, a svaki diktat je produžava.")
+                        Text("3. Tapni Stop — tekst se sam ubaci u polje u kome pišeš.")
+                        Text("Ako se tekst ne ubaci, tapni Nalepi. Ako je Diktator ugašen, Diktiraj ga otvara i odmah snima.")
                     }
                     .font(.footnote)
                     .foregroundStyle(.secondary)

@@ -1,8 +1,10 @@
 # Distribucija: sideload, TestFlight i App Store
 
 Ovaj dokument objašnjava kako **Diktator iOS** može da dođe do korisnika.
-Trenutno je potvrđen **sideload** (Xcode/AltStore/SideStore); **TestFlight** i
-**App Store** su sledeći korak i traže plaćeni Apple Developer Program.
+**Sideload** (Xcode/AltStore/SideStore) je potvrđen, a **TestFlight** i
+**App Store** su pripremljeni u repou i čekaju plaćeni Apple Developer Program
+i app record. Metadata, Review Notes i checklist su u
+[app-store.md](app-store.md).
 
 ## Pregled načina
 
@@ -146,22 +148,81 @@ Ako App Review ipak odbije:
 
 ## Privacy manifest
 
-Za App Store je potreban `PrivacyInfo.xcprivacy`. Aplikacija koristi:
+`PrivacyInfo.xcprivacy` postoji u **oba** targeta
+(`app/DiktatorIOS/PrivacyInfo.xcprivacy` i
+`app/DiktatorKeyboard/PrivacyInfo.xcprivacy`). Prijavljeno je:
 
 - `UserDefaults` — reason `CA92.1` (čitanje sopstvenih podešavanja);
 - file timestamp/attribute API — reason `C617.1` (fajlovi u sopstvenom
   kontejneru).
 
 Nema tracking-a, reklama ni prikupljanja podataka. U App Store Connect-u
-prijavi **Data Not Collected**.
+prijavi **Data Not Collected**. U oba `Info.plist`-a je
+`ITSAppUsesNonExemptEncryption = NO` (koristi se samo standardni TLS i
+SHA-256 iz CryptoKit-a).
+
+Provera da su manifesti u buildu:
+
+```bash
+ls build/DiktatorIOS.xcarchive/Products/Applications/Diktator.app/PrivacyInfo.xcprivacy
+ls build/DiktatorIOS.xcarchive/Products/Applications/Diktator.app/PlugIns/DiktatorKeyboard.appex/PrivacyInfo.xcprivacy
+```
+
+## Stranice za App Store
+
+Objavljene su preko GitHub Pages-a iz foldera `docs/`:
+
+- Politika privatnosti: <https://cedomirovic.github.io/diktator-ios/privatnost.html>
+- Podrška: <https://cedomirovic.github.io/diktator-ios/podrska.html>
+
+Izvorni fajlovi su `docs/privatnost.html` i `docs/podrska.html`; ako se
+promene, dovoljan je commit i push na `main`.
+
+## Skripte
+
+```bash
+# Arhiva + upload u App Store Connect (TestFlight)
+app/objavi-testflight.sh
+
+# Isto, preko App Store Connect API ključa (pogodno za CI)
+ASC_KEY_PATH=~/kljucevi/AuthKey_ABC123.p8 \
+ASC_KEY_ID=ABC123 \
+ASC_ISSUER_ID=00000000-0000-0000-0000-000000000000 \
+app/objavi-testflight.sh
+
+# Snimci ekrana za App Store (iPhone 6.9" i iPad 13")
+app/uzmi-snimke.sh
+```
+
+`app/objavi-testflight.sh` pre arhive proverava da postoji **Apple
+Distribution** sertifikat i da su privacy manifesti u arhivi. Ako sertifikata
+nema, ispiše uputstvo i prekine.
+
+## Snimci ekrana
+
+Snimci su u `docs/slike/app-store/` i imaju tačne rezolucije koje App Store
+Connect traži:
+
+| Fajl | Rezolucija |
+|---|---|
+| `iPhone-17-Pro-Max-*.png` | 1320 × 2868 (6.9") |
+| `iPad-Pro-13-inch-M5-*.png` | 2064 × 2752 (13") |
+
+Brojevi u imenu su tabovi: `0` Diktat, `1` Istorija, `3` Podešavanja, `4`
+Pomoć. Skripta pravi snimke iz simulatora; za lepši prvi kadar pokreni
+diktat na uređaju i snimi ekran ručno.
+
+Snimak **tastature u drugoj aplikaciji** skripta ne može da napravi — custom
+tastatura se u simulatoru dodaje ručno (Settings → General → Keyboard →
+Keyboards → Add New Keyboard), pa se taj kadar snima ručno.
 
 ## Checklist pre slanja
 
 - [ ] Plaćeni Apple Developer Program i tim za oba targeta.
-- [ ] Verzija i build broj podignuti (npr. `0.1.1 (2)`).
-- [ ] `PrivacyInfo.xcprivacy` dodat i proveren.
-- [ ] Privacy policy i support URL postoje.
-- [ ] App Store opis, ključne reči i screenshots (iPhone + iPad).
+- [x] Verzija i build broj podignuti (`0.2.0 (10)`).
+- [x] `PrivacyInfo.xcprivacy` dodat i proveren.
+- [x] Privacy policy i support URL postoje (GitHub Pages).
+- [x] App Store opis, ključne reči i screenshots (iPhone + iPad).
 - [ ] Review Notes sa Full Access, lokalnom obradom i modelima.
 - [ ] TestFlight internal + external.
 - [ ] AltStore/SideStore tok testiran (opciono, za sideload).

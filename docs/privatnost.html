@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diktator — Politika privatnosti / Privacy Policy</title>
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.65;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 64px;
+  }
+  h1 { font-size: 1.8rem; margin-bottom: 0.2rem; }
+  h2 { font-size: 1.25rem; margin-top: 2rem; }
+  .datum { opacity: 0.65; font-size: 0.9rem; }
+  code { font-size: 0.9em; }
+  hr { margin: 2.5rem 0; border: none; border-top: 1px solid rgba(128,128,128,.35); }
+  li { margin-bottom: 0.35rem; }
+</style>
+</head>
+<body>
+
+<h1>Diktator — politika privatnosti</h1>
+<p class="datum">Verzija 1.0 · 28. oktobar 2026.</p>
+
+<p><strong>Diktator</strong> je aplikacija za diktiranje na iPhone-u i iPad-u.
+Diktat se obrađuje <strong>na uređaju</strong>, a tekst se ubacuje u aplikaciju u
+kojoj kucaš. Aplikacija nema nalog, analitiku ni reklame.</p>
+
+<h2>Šta se čuva na uređaju</h2>
+<ul>
+  <li><strong>Snimak</strong> se drži u memoriji samo dok traje prepis i zatim se
+    odbacuje. Zvuk se ne snima trajno.</li>
+  <li><strong>Tekst</strong> — istorija diktata, rečnik i statistika čuvaju se
+    samo u zaštićenom folderu aplikacije. Statistika ne sadrži tekst.</li>
+  <li><strong>Podešavanja</strong> — izbor modela, jezika i režima brzine.</li>
+  <li><strong>API ključevi</strong> za opcione servise čuvaju se u Apple
+    <em>Keychain</em>-u sa zaštitom <code>WhenUnlockedThisDeviceOnly</code>.</li>
+</ul>
+<p>Ovi podaci se ne napuštaju uređaj i brišu se zajedno sa aplikacijom.
+Istoriju, rečnik i statistiku možeš obrisati i u Podešavanjima.</p>
+
+<h2>Kada aplikacija koristi mrežu</h2>
+<ul>
+  <li><strong>Preuzimanje modela</strong> — sa <code>huggingface.co</code>; ako
+    preuzimanje prekineš, delimičan fajl se briše.</li>
+  <li><strong>Provera nove verzije</strong> — javni GitHub API
+    (<code>api.github.com</code>). Šalje se samo zahtev za najnovijim
+    izdanjem; ne šalje se nikakav sadržaj diktata. Možeš je isključiti u
+    Podešavanjima.</li>
+  <li><strong>Opcioni prepis u oblaku (Groq)</strong> — ako ga sam uključiš,
+    snimak se šalje na <code>api.groq.com</code> radi bržeg prepisa. Tada zvuk
+    napušta uređaj.</li>
+  <li><strong>Opciono doterivanje teksta</strong> — ako ga uključiš i uneseš
+    svoj API ključ, <em>gotov tekst</em> (bez zvuka) šalje se servisu koji
+    izabereš: Google Gemini, OpenAI, Anthropic Claude, DeepSeek, Ollama ili
+    drugi OpenAI-kompatibilni servis na adresi koju sam uneseš.</li>
+  <li><strong>Lokalna mreža</strong> — samo ako izabereš Ollama ili lokalni
+    servis na svom računaru.</li>
+</ul>
+<p>Ovi servisi su opcioni i podrazumevano isključeni. Kada ih uključiš, na
+njih se primenjuju njihove politike privatnosti. Programer Diktatora ne
+dobija kopiju snimka, teksta ni ključa.</p>
+
+<h2>Šta se ne prikuplja</h2>
+<p>Nema analitike, praćenja, reklama, profila korisnika ni telemetrije. Ne
+prikupljamo ime, mejl, lokaciju, kontakte, identifikatore uređaja za
+oglašavanje niti sadržaj diktata.</p>
+
+<h2>Tastatura</h2>
+<p>Tastatura traži <strong>Full Access</strong> da bi pročitala tekst iz
+clipboarda kada tapneš <strong>Nalepi</strong> i da bi otvorila Diktator
+dugmetom <strong>Diktiraj</strong>. Clipboard se čita samo na tvoj dodir.
+Tastatura ne šalje podatke nikome i radi i bez Full Access-a (tada samo kuca,
+bez lepljenja i bez otvaranja aplikacije).</p>
+
+<h2>Deca</h2>
+<p>Aplikacija nije namenjena deci mlađoj od 13 godina i ne prikuplja njihove
+podatke.</p>
+
+<h2>Izmene</h2>
+<p>Ako se politika promeni, novi datum i verzija biće objavljeni na ovoj
+stranici pre nego što izmena stupi na snagu.</p>
+
+<h2>Kontakt</h2>
+<p>Pitanja o privatnosti: <a href="mailto:cedomirovicnemanja@gmail.com">cedomirovicnemanja@gmail.com</a></p>
+
+<hr>
+
+<h1>Privacy Policy (English)</h1>
+<p class="datum">Version 1.0 · 28 October 2026</p>
+
+<p><strong>Diktator</strong> is a dictation app for iPhone and iPad. Speech is
+transcribed <strong>on device</strong> and the text is inserted into the app you
+are typing in. There is no account, no analytics and no advertising.</p>
+
+<h2>Data stored on your device</h2>
+<ul>
+  <li><strong>Audio</strong> is kept in memory only while transcription runs and
+    is then discarded. Recordings are not stored.</li>
+  <li><strong>Text</strong> — dictation history, vocabulary and statistics stay
+    in the app's protected container. Statistics never contain the text.</li>
+  <li><strong>Settings</strong> — selected model, language and speed mode.</li>
+  <li><strong>API keys</strong> for optional services are stored in the Apple
+    <em>Keychain</em> with <code>WhenUnlockedThisDeviceOnly</code> protection.</li>
+</ul>
+<p>This data never leaves the device and is deleted together with the app. You
+can also clear history, vocabulary and statistics in Settings.</p>
+
+<h2>When the app uses the network</h2>
+<ul>
+  <li><strong>Model download</strong> from <code>huggingface.co</code>; an
+    interrupted download is deleted.</li>
+  <li><strong>Update check</strong> against the public GitHub API
+    (<code>api.github.com</code>). Only a request for the latest release is
+    sent — never dictation content. You can turn it off in Settings.</li>
+  <li><strong>Optional cloud transcription (Groq)</strong> — if you enable it,
+    the audio is sent to <code>api.groq.com</code> for faster transcription. In
+    that mode audio leaves the device.</li>
+  <li><strong>Optional text refinement</strong> — if you enable it and enter
+    your own API key, the <em>finished text</em> (never audio) is sent to the
+    provider you choose: Google Gemini, OpenAI, Anthropic Claude, DeepSeek,
+    Ollama or another OpenAI-compatible endpoint you enter yourself.</li>
+  <li><strong>Local network</strong> — only if you choose Ollama or a local
+    service running on your own computer.</li>
+</ul>
+<p>These services are optional and off by default. When enabled, their own
+privacy policies apply. The developer of Diktator receives no copy of your
+audio, text or keys.</p>
+
+<h2>What is not collected</h2>
+<p>No analytics, tracking, advertising, user profiles or telemetry. We do not
+collect your name, email, location, contacts, advertising identifiers or
+dictation content.</p>
+
+<h2>Keyboard</h2>
+<p>The keyboard requests <strong>Full Access</strong> to read the clipboard when
+you tap <strong>Paste</strong> and to open Diktator from the
+<strong>Dictate</strong> button. The clipboard is read only on your tap. The
+keyboard sends nothing anywhere and still types without Full Access.</p>
+
+<h2>Children</h2>
+<p>The app is not directed to children under 13 and does not collect their
+data.</p>
+
+<h2>Changes</h2>
+<p>If this policy changes, a new version and date will be published on this
+page before the change takes effect.</p>
+
+<h2>Contact</h2>
+<p>Privacy questions: <a href="mailto:cedomirovicnemanja@gmail.com">cedomirovicnemanja@gmail.com</a></p>
+
+</body>
+</html>

@@ -184,6 +184,15 @@ final class AppStanje: ObservableObject {
     private var proveraObavestenjaUToku = false
 
     init() {
+        // `simctl launch ... -DiktatorTab 3` otvara tab pri pokretanju. Služi
+        // za snimke ekrana; u normalnom radu se ne koristi.
+        let argumenti = ProcessInfo.processInfo.arguments
+        if let indeks = argumenti.firstIndex(of: "-DiktatorTab"),
+           indeks + 1 < argumenti.count,
+           let broj = Int(argumenti[indeks + 1]),
+           (0...4).contains(broj) {
+            izabraniTab = broj
+        }
         Prepisivac.utisajLog()
         snimac.naNivo = { [weak self] nivo in
             self?.nivo = nivo
@@ -258,6 +267,13 @@ final class AppStanje: ObservableObject {
                     guard await ukljuciSesijuAsync() else { return }
                 }
                 pocniSnimanje(saTastature: true)
+            }
+        case "tab":
+            // diktator-ios://tab/3 — otvara konkretan tab. Koristi se za
+            // snimke za App Store i za brze prečice.
+            if let broj = Int(url.path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))),
+               (0...4).contains(broj) {
+                izabraniTab = broj
             }
         case "sesija-prikaz":
             // Tastatura je otvorila aplikaciju jer sesija nije uključena.

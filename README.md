@@ -12,7 +12,7 @@ Projekat je nastao iz macOS aplikacije
 **snimak i tekst ostaju na uređaju**, bez slanja zvuka na server.
 
 - GitHub: <https://github.com/cedomirovic/diktator-ios>
-- Verzija: **0.1.8 (9)**
+- Verzija: **0.2.0 (10)**
 - Aplikacija: **Diktator iOS** (`com.cedomirovic.diktator.ios`)
 - Tastatura: `com.cedomirovic.diktator.ios.keyboard`
 - Modeli: **Large v3 Turbo q5_0** (~547 MB) za brzinu i
@@ -21,7 +21,7 @@ Projekat je nastao iz macOS aplikacije
 
 ## Status
 
-Verzija **0.1.8 (9)** je potpisana i instalirana na **iPhone 15 Pro**
+Verzija **0.2.0 (10)** je potpisana i instalirana na **iPhone 15 Pro**
 (iOS 27.0.1). Debug i Release build prolaze na macOS 26.7.1 i Xcode 27.1;
 whisper.cpp za iOS (arm64, Metal + Accelerate) je izgrađen. Skripta pravi
 nepotpisan `build/DiktatorIOS.ipa` (~1.6 MB bez modela).
@@ -130,15 +130,28 @@ odgovori, zadržava se sirov prepis.
 
 ## Distribucija
 
-- **Sideload (trenutno):** besplatni Apple ID + Xcode/AltStore/SideStore;
-  profil traje 7 dana.
+- **Sideload:** besplatni Apple ID + Xcode/AltStore/SideStore; profil traje
+  7 dana.
 - **TestFlight / App Store:** potreban je plaćeni **Apple Developer Program**
   (99 USD/god.). App Store nema 7-dnevni istek; TestFlight build traje 90 dana.
 - **Tuđi nalog:** tehnički moguć preko App Store Connect tima, ali app pripada
   tom timu. Za ozbiljan projekat je bolji sopstveni Individual ili Organization
   nalog.
 
-Detalji, koraci za App Store, Review Notes i checklist su u
+### Priprema za App Store (urađeno)
+
+- `PrivacyInfo.xcprivacy` u aplikaciji i u tastaturi: nema tracking-a ni
+  prikupljanja; prijavljeni `UserDefaults` (`CA92.1`) i file timestamp
+  (`C617.1`).
+- `ITSAppUsesNonExemptEncryption = NO` u oba `Info.plist`-a.
+- **Politika privatnosti:** <https://cedomirovic.github.io/diktator-ios/privatnost.html>
+- **Podrška:** <https://cedomirovic.github.io/diktator-ios/podrska.html>
+- Metadata, Review Notes i checklist: [docs/app-store.md](docs/app-store.md).
+- Snimci ekrana (iPhone 6.9" i iPad 13"): `docs/slike/app-store/`.
+- Slanje builda: `app/objavi-testflight.sh` (arhiva + upload u App Store
+  Connect, opciono preko API ključa).
+
+Detalji, koraci za App Store i checklist su u
 [docs/distribucija.md](docs/distribucija.md).
 
 ## Struktura
@@ -150,6 +163,10 @@ app/
   DiktatorIOS.xcodeproj
   project.yml        XcodeGen specifikacija
   pripremi-whisper-ios.sh
+  pripremi-whisper-simulator.sh  whisper za iOS simulator (snimci, UI provera)
+  objavi-testflight.sh           arhiva + upload u App Store Connect
+  uzmi-snimke.sh                 snimci ekrana za App Store
+  ExportOptions.plist
 scripts/             pravljenje IPA za AltStore/SideStore
 docs/                arhitektura, instalacija, distribucija i slike
 ```
@@ -158,6 +175,7 @@ docs/                arhitektura, instalacija, distribucija i slike
 
 - [Instalacija bez plaćenog naloga](docs/instalacija-bez-naloga.md)
 - [Distribucija: sideload, TestFlight i App Store](docs/distribucija.md)
+- [App Store metadata i Review Notes](docs/app-store.md)
 - [Bezbednost](SECURITY.md)
 - [PLAN.md](PLAN.md)
 - [AGENTS.md](AGENTS.md)
