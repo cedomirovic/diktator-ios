@@ -317,23 +317,50 @@ struct PogledPodesavanja: View {
             Section("Ažuriranja") {
                 Toggle("Proveri nove verzije", isOn: $stanje.podesavanja.proveravajAzuriranja)
 
-                Button("Proveri sada") {
+                Button {
                     stanje.proveriAzuriranja(prisilno: true)
+                } label: {
+                    HStack {
+                        Label("Proveri sada", systemImage: "arrow.clockwise")
+                        Spacer()
+                        if stanje.proveravaAzuriranja {
+                            ProgressView()
+                        }
+                    }
                 }
-
-                Button("Testiraj obaveštenje") {
-                    stanje.testirajNotifikaciju()
-                }
+                .disabled(stanje.proveravaAzuriranja)
 
                 if let azuriranje = stanje.dostupnoAzuriranje {
-                    Link(
-                        "Dostupna verzija \(azuriranje.verzija)",
-                        destination: azuriranje.url
-                    )
-                } else {
-                    Text("Nema nove verzije.")
+                    Link(destination: azuriranje.url) {
+                        Label(
+                            "Preuzmi verziju \(azuriranje.verzija)",
+                            systemImage: "arrow.up.right.square"
+                        )
+                    }
+                }
+
+                if let poruka = stanje.porukaAzuriranja {
+                    Text(poruka)
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                }
+
+                Button {
+                    stanje.testirajNotifikaciju()
+                } label: {
+                    Label("Testiraj obaveštenje", systemImage: "bell.badge")
+                }
+
+                if let poruka = stanje.porukaObavestenja {
+                    Text(poruka)
+                        .font(.caption)
+                        .foregroundStyle(stanje.obavestenjaOdbijena ? .orange : .secondary)
+                }
+
+                if stanje.obavestenjaOdbijena {
+                    Button("Otvori podešavanja iOS-a") {
+                        stanje.otvoriPodesavanjaIOS()
+                    }
                 }
             }
 
@@ -351,9 +378,10 @@ struct PogledPodesavanja: View {
         }
         .onChange(of: stanje.podesavanja.proveravajAzuriranja) { _, novo in
             if novo {
+                stanje.zatraziDozvoluZaObavestenja()
                 stanje.proveriAzuriranja(prisilno: true)
             } else {
-                stanje.dostupnoAzuriranje = nil
+                stanje.porukaAzuriranja = nil
             }
         }
     }

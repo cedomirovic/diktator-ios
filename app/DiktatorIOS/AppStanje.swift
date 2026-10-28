@@ -133,6 +133,10 @@ final class AppStanje: ObservableObject {
     @Published var sesijaAktivna = false
     @Published var sesijaPreostalo = 0
     @Published var dostupnoAzuriranje: Azuriranje?
+    @Published var proveravaAzuriranja = false
+    @Published var porukaAzuriranja: String?
+    @Published var porukaObavestenja: String?
+    @Published var obavestenjaOdbijena = false
     @Published var kljucDoterivanja = ""
     @Published var testiraDoterivanje = false
     @Published var porukaDoterivanja: String?
@@ -158,6 +162,7 @@ final class AppStanje: ObservableObject {
     private var zadnjiKomandniId: String?
     private var zadnjiDnevnikStanja = ""
     private var proveraAzuriranjaUToku = false
+    private var proveraObavestenjaUToku = false
 
     init() {
         Prepisivac.utisajLog()
@@ -358,28 +363,71 @@ final class AppStanje: ObservableObject {
     // MARK: - Ažuriranja
 
     func proveriAzuriranja(prisilno: Bool = false) {
-        guard podesavanja.proveravajAzuriranja else { return }
+        // „Proveri sada“ radi i kada je automatska provera isključena.
+        guard prisilno || podesavanja.proveravajAzuriranja else { return }
         guard !proveraAzuriranjaUToku else { return }
         proveraAzuriranjaUToku = true
+        proveravaAzuriranja = true
+        if prisilno {
+            porukaAzuriranja = nil
+        }
 
         Task { @MainActor in
-            defer { proveraAzuriranjaUToku = false }
-            if let azuriranje = await Azuriranja.proveri(prisilno: prisilno) {
+            defer {
+                proveraAzuriranjaUToku = false
+                proveravaAzuriranja = false
+            }
+            switch await Azuriranja.proveri(prisilno: prisilno) {
+            case .dostupno(let azuriranje):
                 dostupnoAzuriranje = azuriranje
+                porukaAzuriranja = "Dostupna je verzija \(azuriranje.verzija)."
                 await Azuriranja.posaljiNotifikaciju(azuriranje)
-            } else {
+            case .nema:
                 dostupnoAzuriranje = nil
+                porukaAzuriranja = "Nema nove verzije. Trenutna je \(Azuriranja.trenutnaVerzija)."
+            case .greska:
+                porukaAzuriranja = "Provera nije uspela. Proveri internet vezu i pokušaj ponovo."
             }
         }
     }
 
     func testirajNotifikaciju() {
+        guard !proveraObavestenjaUToku else { return }
+        proveraObavestenjaUToku = true
         Task { @MainActor in
+            defer { proveraObavestenjaUToku = false }
+            let status = await Azuriranja.statusDozvole()
+            obavestenjaOdbijena = (status == .denied)
+            guard status != .denied else {
+                porukaObavestenja = "Obaveštenja su isključena za Diktator u iOS Podešavanjima."
+                return
+            }
+            guard Azuriranja.jeDozvoljeno(status) else {
+                porukaObavestenja = "iOS nije dozvolio obaveštenja. Pokušaj ponovo u Podešavanjima iOS-a."
+                obavestenjaOdbijena = true
+                return
+            }
             let uspeh = await Azuriranja.posaljiTestnuNotifikaciju()
-            poruka = uspeh
-                ? "Testno obaveštenje je poslato."
-                : "Obaveštenja su isključena u Podešavanjima iOS-a."
+            porukaObavestenja = uspeh
+                ? "Testno obaveštenje je poslato — treba da se pojavi odmah."
+                : "Obaveštenje nije poslato. Proveri dozvolu u iOS Podešavanjima."
+            obavestenjaOdbijena = !uspeh
         }
+    }
+
+    func zatraziDozvoluZaObavestenja() {
+        Task { @MainActor in
+            let status = await Azuriranja.statusDozvole()
+            obavestenjaOdbijena = (status == .denied)
+            if status == .denied {
+                porukaObavestenja = "Obaveštenja su isključena za Diktator u iOS Podešavanjima."
+            }
+        }
+    }
+
+    func otvoriPodesavanjaIOS() {
+        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+        UIApplication.shared.open(url)
     }
 
     private func osigurajDozvolu() async -> Bool {

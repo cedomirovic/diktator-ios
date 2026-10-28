@@ -9,6 +9,12 @@ struct Azuriranje: Identifiable, Equatable, Codable {
     var id: String { verzija }
 }
 
+enum RezultatProvere {
+    case dostupno(Azuriranje)
+    case nema
+    case greska
+}
+
 /// Provera novih verzija preko GitHub release-a. Aplikacija nije na App
 /// Store-u, pa nema sistemsku proveru ažuriranja; ovo je zamena za nju.
 enum Azuriranja {
@@ -28,14 +34,12 @@ enum Azuriranja {
             ?? "0"
     }
 
-    static func proveri(prisilno: Bool = false) async -> Azuriranje? {
+    static func proveri(prisilno: Bool = false) async -> RezultatProvere {
         let sada = Date().timeIntervalSince1970
         let zadnja = UserDefaults.standard.double(forKey: kljucZadnjaProvera)
         if !prisilno, zadnja > 0, sada - zadnja < intervalProvere {
-            return kesirano()
+            return kesirano().map { .dostupno($0) } ?? .nema
         }
-
-        UserDefaults.standard.set(sada, forKey: kljucZadnjaProvera)
 
         var zahtev = URLRequest(url: apiURL)
         zahtev.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
@@ -44,18 +48,32 @@ enum Azuriranja {
 
         do {
             let (podaci, odgovor) = try await URLSession.shared.data(for: zahtev)
-            guard let http = odgovor as? HTTPURLResponse, http.statusCode == 200 else {
-                return kesirano()
+            guard let http = odgovor as? HTTPURLResponse else {
+                return kesirano().map { .dostupno($0) } ?? .greska
+            }
+            // 404 znači da repozitorijum još nema objavljen release — to nije
+            // greška u mreži, nego jednostavno nema nove verzije.
+            if http.statusCode == 404 {
+                UserDefaults.standard.set(sada, forKey: kljucZadnjaProvera)
+                UserDefaults.standard.removeObject(forKey: kljucKesirano)
+                return .nema
+            }
+            guard http.statusCode == 200 else {
+                return kesirano().map { .dostupno($0) } ?? .greska
             }
             guard let json = try JSONSerialization.jsonObject(with: podaci) as? [String: Any],
                   let tag = json["tag_name"] as? String else {
-                return kesirano()
+                return kesirano().map { .dostupno($0) } ?? .greska
             }
+
+            // Uspešnu proveru pamtimo tek sada; neuspeh ne sme da blokira
+            // sledeću proveru šest sati.
+            UserDefaults.standard.set(sada, forKey: kljucZadnjaProvera)
 
             let verzija = normalizuj(tag)
             guard jeNovija(verzija, od: trenutnaVerzija) else {
                 UserDefaults.standard.removeObject(forKey: kljucKesirano)
-                return nil
+                return .nema
             }
 
             let url = (json["html_url"] as? String).flatMap(URL.init(string:))
@@ -65,9 +83,9 @@ enum Azuriranja {
             if let podaci = try? JSONEncoder().encode(azuriranje) {
                 UserDefaults.standard.set(podaci, forKey: kljucKesirano)
             }
-            return azuriranje
+            return .dostupno(azuriranje)
         } catch {
-            return kesirano()
+            return kesirano().map { .dostupno($0) } ?? .greska
         }
     }
 
@@ -81,11 +99,9 @@ enum Azuriranja {
 
     static func posaljiNotifikaciju(_ azuriranje: Azuriranje) async {
         let centar = UNUserNotificationCenter.current()
-        var postavke = await centar.notificationSettings()
-        if postavke.authorizationStatus == .notDetermined {
-            _ = try? await centar.requestAuthorization(options: [.alert, .sound])
-            postavke = await centar.notificationSettings()
-        }
+        // Ne pitamo za dozvolu u sred provere — dijalog se pojavljuje kada
+        // korisnik to sam zatraži (uključi prekidač ili tapne test).
+        let postavke = await centar.notificationSettings()
         guard jeDozvoljeno(postavke.authorizationStatus) else { return }
         guard UserDefaults.standard.string(forKey: kljucObavesteno) != azuriranje.verzija else {
             return
@@ -95,6 +111,7 @@ enum Azuriranja {
         sadrzaj.title = "Dostupno je ažuriranje Diktatora"
         sadrzaj.body = "Verzija \(azuriranje.verzija) je objavljena. Otvori GitHub i preuzmi novu verziju."
         sadrzaj.sound = .default
+        sadrzaj.categoryIdentifier = "diktator.azuriranje"
         sadrzaj.userInfo = ["url": azuriranje.url.absoluteString]
 
         let zahtev = UNNotificationRequest(
@@ -135,7 +152,20 @@ enum Azuriranja {
         }
     }
 
-    private static func jeDozvoljeno(_ status: UNAuthorizationStatus) -> Bool {
+    /// Vraća trenutni status, a prvi put pita korisnika za dozvolu. Tako
+    /// dugme „Testiraj obaveštenje“ odmah pokaže sistemski dijalog umesto da
+    /// tiho ne uradi ništa.
+    static func statusDozvole() async -> UNAuthorizationStatus {
+        let centar = UNUserNotificationCenter.current()
+        var postavke = await centar.notificationSettings()
+        if postavke.authorizationStatus == .notDetermined {
+            _ = try? await centar.requestAuthorization(options: [.alert, .sound])
+            postavke = await centar.notificationSettings()
+        }
+        return postavke.authorizationStatus
+    }
+
+    static func jeDozvoljeno(_ status: UNAuthorizationStatus) -> Bool {
         status == .authorized || status == .provisional || status == .ephemeral
     }
 

@@ -7,7 +7,22 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
-        UNUserNotificationCenter.current().delegate = self
+        let centar = UNUserNotificationCenter.current()
+        centar.delegate = self
+
+        // Dugme „Preuzmi“ direktno na obaveštenju o novoj verziji.
+        let preuzmi = UNNotificationAction(
+            identifier: "diktator.preuzmi",
+            title: "Preuzmi",
+            options: [.foreground]
+        )
+        let kategorija = UNNotificationCategory(
+            identifier: "diktator.azuriranje",
+            actions: [preuzmi],
+            intentIdentifiers: [],
+            options: []
+        )
+        centar.setNotificationCategories([kategorija])
         return true
     }
 
