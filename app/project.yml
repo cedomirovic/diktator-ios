@@ -39,6 +39,7 @@ targets:
         NSMicrophoneUsageDescription: "Diktator koristi mikrofon za diktat i, kada uključiš sesiju, drži ga u pripravnosti do 15 minuta. Snimak ostaje na uređaju."
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
+        NSLocalNetworkUsageDescription: "Diktator koristi lokalnu mrežu samo ako izabereš Ollama ili lokalni LLM servis."
         CFBundleURLTypes:
           - CFBundleURLName: com.cedomirovic.diktator.ios
             CFBundleURLSchemes:

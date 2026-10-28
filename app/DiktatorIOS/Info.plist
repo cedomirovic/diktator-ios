@@ -36,6 +36,8 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Diktator koristi lokalnu mrežu samo ako izabereš Ollama ili lokalni LLM servis.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Diktator koristi mikrofon za diktat i, kada uključiš sesiju, drži ga u pripravnosti do 15 minuta. Snimak ostaje na uređaju.</string>
 	<key>UIBackgroundModes</key>

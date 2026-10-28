@@ -168,11 +168,27 @@ struct Doterivac {
         let ociscenHost = host
             .trimmingCharacters(in: CharacterSet(charactersIn: "[]"))
             .trimmingCharacters(in: CharacterSet(charactersIn: "."))
-        let lokalna = ociscenHost == "localhost" || ociscenHost == "127.0.0.1" || ociscenHost == "::1"
+        let lokalna = ociscenHost == "localhost"
+            || ociscenHost == "127.0.0.1"
+            || ociscenHost == "::1"
+            || jePrivatnaIPv4(ociscenHost)
         guard sema == "https" || lokalna else {
             throw GreskaDoterivanja.nebezbednaAdresa
         }
         return url
+    }
+
+    /// Ollama i slični servisi u kućnoj mreži koriste običan HTTP. Dozvoljavamo
+    /// ga samo za privatne IPv4 adrese, nikada za javni internet.
+    private static func jePrivatnaIPv4(_ host: String) -> Bool {
+        let delovi = host.split(separator: ".").compactMap { Int($0) }
+        guard delovi.count == 4, delovi.allSatisfy({ (0...255).contains($0) }) else {
+            return false
+        }
+        if delovi[0] == 10 { return true }
+        if delovi[0] == 172, (16...31).contains(delovi[1]) { return true }
+        if delovi[0] == 192, delovi[1] == 168 { return true }
+        return false
     }
 
     private static func ocitaj(_ podaci: Data, vrsta: VrstaDoterivaca) throws -> String? {

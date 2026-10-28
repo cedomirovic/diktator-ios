@@ -96,8 +96,8 @@ enum ProvajderiDoterivanja {
         adresa: "http://localhost:11434/api/chat",
         traziKljuc: false,
         prikazujeKljuc: false,
-        prikazujeAdresu: false,
-        uputstvo: "Instaliraj Ollama na računar, pa pokreni `ollama pull llama3.2`. Adresa: localhost:11434.",
+        prikazujeAdresu: true,
+        uputstvo: "Instaliraj Ollama na računar, pokreni `ollama pull llama3.2` i unesi adresu tog računara, npr. http://192.168.1.10:11434/api/chat. localhost na iPhone-u je sam telefon.",
         linkNaslov: "Preuzmi Ollama",
         link: URL(string: "https://ollama.com/download")
     )
