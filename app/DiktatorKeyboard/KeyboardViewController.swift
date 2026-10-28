@@ -563,6 +563,11 @@ final class KeyboardViewController: UIInputViewController {
             // korisnik uključi sesiju. Kad je sesija aktivna, Diktiraj
             // snima odmah i ne dira drugu aplikaciju.
             prikaziStatus("Otvori Diktator i uključi sesiju.")
+            // I ovaj prvi diktat treba da se nalepi sam po povratku, ako
+            // aplikacija uspe da ga završi dok je tastatura na ekranu.
+            diktatPocetakVreme = Date().timeIntervalSince1970
+            UserDefaults.standard.set(diktatPocetakVreme, forKey: diktatPocetakKey)
+            UserDefaults.standard.set(true, forKey: cekaDiktatKey)
             otvoriAplikaciju("diktator-ios://sesija-prikaz")
             return
         }
