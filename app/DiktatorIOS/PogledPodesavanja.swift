@@ -177,7 +177,14 @@ struct PogledPodesavanja: View {
                     if let poruka = stanje.porukaOblaka {
                         Text(poruka)
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(
+                                poruka.hasPrefix("Veza radi") ? Color.green : Color.orange
+                            )
+                        if poruka.contains("401") || poruka.contains("403") {
+                            Text("Napravi novi ključ na console.groq.com → API Keys, pa ga nalepi ovde i tapni Sačuvaj ključ. Stari je možda obrisan ili je pogrešno iskopiran.")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
                     }
 
                     Text("Ključ praviš na console.groq.com → API Keys. Model: whisper-large-v3-turbo (može i whisper-large-v3). Ako Groq ne odgovori, prepis se radi na uređaju.")

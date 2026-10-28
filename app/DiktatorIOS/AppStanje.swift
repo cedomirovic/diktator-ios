@@ -1330,6 +1330,11 @@ final class AppStanje: ObservableObject {
     func testirajOblak() {
         guard !testiraOblak else { return }
         let kljuc = kljucOblaka.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let savet = PrepisOblak.savetZaKljuc(kljuc) {
+            porukaOblaka = savet
+            Dnevnik.pisi("Oblak test: oblik kljuca ne valja — \(savet)")
+            return
+        }
         testiraOblak = true
         porukaOblaka = nil
         Dnevnik.pisi("Oblak test: pocinje, duzina kljuca=\(kljuc.count)")

@@ -107,6 +107,26 @@ struct PrepisOblak {
         return tekst
     }
 
+    /// Gruba provera oblika ključa pre odlaska na mrežu. Groq ključevi
+    /// počinju sa `gsk_` i imaju 56 znakova; ako to ne važi, bolje je reći
+    /// odmah nego čekati 401.
+    static func savetZaKljuc(_ kljuc: String) -> String? {
+        let ociscen = kljuc.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !ociscen.isEmpty else {
+            return "Groq API ključ nije unet."
+        }
+        if !ociscen.hasPrefix("gsk_") {
+            return "Groq ključ počinje sa gsk_ — izgleda da je iskopiran pogrešan ključ."
+        }
+        if ociscen.count != 56 {
+            return "Groq ključ ima 56 znakova, a ovaj ima \(ociscen.count). Proveri da nije skraćen."
+        }
+        if ociscen.unicodeScalars.contains(where: { !$0.isASCII }) {
+            return "Ključ sadrži ne-ASCII znak — iskopiraj ga ponovo iz console.groq.com."
+        }
+        return nil
+    }
+
     /// Provera ključa bez slanja zvuka — dovoljan je spisak modela.
     static func proveriKljuc(_ kljuc: String) async throws {
         let ociscen = kljuc.trimmingCharacters(in: .whitespacesAndNewlines)
