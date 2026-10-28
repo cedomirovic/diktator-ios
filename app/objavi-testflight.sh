@@ -69,7 +69,11 @@ xcodebuild \
   -allowProvisioningUpdates \
   archive
 
-APP="$ARHIVA/Products/Applications/Diktator.app"
+APP="$(find "$ARHIVA/Products/Applications" -maxdepth 1 -name '*.app' | head -1)"
+if [[ -z "$APP" ]]; then
+  echo "Greška: u arhivi nema .app bundle-a." >&2
+  exit 1
+fi
 for PUTANJA in \
   "$APP/PrivacyInfo.xcprivacy" \
   "$APP/PlugIns/DiktatorKeyboard.appex/PrivacyInfo.xcprivacy"; do
