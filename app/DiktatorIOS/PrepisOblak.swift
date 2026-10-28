@@ -6,7 +6,7 @@ import Foundation
 enum GreskaOblaka: LocalizedError {
     case nemaKljuca
     case neispravanOdgovor
-    case status(Int)
+    case status(Int, String?)
     case prazan
 
     var errorDescription: String? {
@@ -15,17 +15,24 @@ enum GreskaOblaka: LocalizedError {
             return "Groq API ključ nije unet."
         case .neispravanOdgovor:
             return "Groq je vratio neočekivan odgovor."
-        case .status(let kod):
+        case .status(let kod, let detalj):
+            let osnova: String
             switch kod {
+            case 400:
+                osnova = "Groq ne prihvata zahtev (HTTP 400)."
             case 401, 403:
-                return "Groq je odbio ključ (HTTP \(kod))."
+                osnova = "Groq je odbio ključ (HTTP \(kod))."
+            case 404:
+                osnova = "Groq ne poznaje model ili putanju (HTTP 404)."
             case 413:
-                return "Snimak je predugačak za Groq (HTTP 413)."
+                osnova = "Snimak je predugačak za Groq (HTTP 413)."
             case 429:
-                return "Groq traži pauzu — previše zahteva (HTTP 429)."
+                osnova = "Groq traži pauzu — previše zahteva (HTTP 429)."
             default:
-                return "Groq je vratio HTTP \(kod)."
+                osnova = "Groq je vratio HTTP \(kod)."
             }
+            guard let detalj, !detalj.isEmpty else { return osnova }
+            return "\(osnova) \(detalj)"
         case .prazan:
             return "Groq nije prepoznao govor."
         }
@@ -86,7 +93,7 @@ struct PrepisOblak {
             throw GreskaOblaka.neispravanOdgovor
         }
         guard http.statusCode == 200 else {
-            throw GreskaOblaka.status(http.statusCode)
+            throw GreskaOblaka.status(http.statusCode, detaljGreske(podaci))
         }
 
         struct Odgovor: Decodable {
@@ -110,13 +117,35 @@ struct PrepisOblak {
         zahtev.timeoutInterval = 20
         zahtev.setValue("Bearer \(ociscen)", forHTTPHeaderField: "Authorization")
 
-        let (_, odgovor) = try await URLSession.shared.data(for: zahtev)
+        let (podaci, odgovor) = try await URLSession.shared.data(for: zahtev)
         guard let http = odgovor as? HTTPURLResponse else {
             throw GreskaOblaka.neispravanOdgovor
         }
         guard http.statusCode == 200 else {
-            throw GreskaOblaka.status(http.statusCode)
+            throw GreskaOblaka.status(http.statusCode, detaljGreske(podaci))
         }
+    }
+
+    /// Groq u telu odgovora vraća razlog (npr. „Invalid API Key“). Prikazujemo
+    /// ga ukratko, da se iz poruke vidi šta tačno ne valja.
+    private static func detaljGreske(_ podaci: Data) -> String? {
+        struct Odgovor: Decodable {
+            struct Detalj: Decodable {
+                let message: String?
+                let code: String?
+            }
+            let error: Detalj?
+            let message: String?
+        }
+        guard let dekodirano = try? JSONDecoder().decode(Odgovor.self, from: podaci) else {
+            return nil
+        }
+        let poruka = dekodirano.error?.message ?? dekodirano.message
+        guard let poruka, !poruka.isEmpty else { return nil }
+        let ocisceno = poruka
+            .replacingOccurrences(of: "\n", with: " ")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return ocisceno.count > 120 ? String(ocisceno.prefix(120)) + "…" : ocisceno
     }
 
     /// WAV koji Groq očekuje: mono, 16 kHz, 16 bita.

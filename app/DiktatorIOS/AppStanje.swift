@@ -593,7 +593,7 @@ final class AppStanje: ObservableObject {
                 Dnevnik.pisi("Oblak prepis gotov, duzina=\(tekst.count)")
                 self.zavrsiPrepis(tekst, trajanje: trajanje, jezik: jezik)
             } catch {
-                Dnevnik.pisi("Oblak greska: \(error.localizedDescription)")
+                Dnevnik.pisi("Oblak greska: \(self.opisGreske(error))")
                 guard let lokalni = self.modelZaPrepis, lokalni.preuzet else {
                     self.zavrsiZadatakUPozadini()
                     self.stanje = .greska(
@@ -1331,16 +1331,27 @@ final class AppStanje: ObservableObject {
         guard !testiraOblak else { return }
         let kljuc = kljucOblaka.trimmingCharacters(in: .whitespacesAndNewlines)
         testiraOblak = true
+        porukaOblaka = nil
+        Dnevnik.pisi("Oblak test: pocinje, duzina kljuca=\(kljuc.count)")
         Task { @MainActor in
             do {
                 try await PrepisOblak.proveriKljuc(kljuc)
                 testiraOblak = false
                 porukaOblaka = "Veza radi. Model: \(modelOblaka)."
+                Dnevnik.pisi("Oblak test: OK")
             } catch {
                 testiraOblak = false
                 porukaOblaka = "Test nije uspeo: \(error.localizedDescription)"
+                Dnevnik.pisi("Oblak test: greska \(opisGreske(error))")
             }
         }
+    }
+
+    /// Kratak opis greške za dnevnik: domen i kod pomažu da se razlikuje
+    /// mreža (`NSURLErrorDomain`) od HTTP greške koju je vratio Groq.
+    private func opisGreske(_ greska: Error) -> String {
+        let ns = greska as NSError
+        return "\(ns.domain) \(ns.code) — \(ns.localizedDescription)"
     }
 
     func sacuvajPodesavanja() {
