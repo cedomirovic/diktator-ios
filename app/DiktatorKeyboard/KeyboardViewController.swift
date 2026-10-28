@@ -122,6 +122,7 @@ final class KeyboardViewController: UIInputViewController {
     private var dugmeShift: UIButton?
     private let zadnjiTokenKey = "diktator.zadnjiToken"
     private let cekaDiktatKey = "diktator.cekaDiktat"
+    private let diktatPocetakKey = "diktator.diktatPocetak"
     private let cekaSesijuKey = "diktator.cekaSesiju"
     private let cekaSesijuVremeKey = "diktator.cekaSesijuVreme"
     private var autoNalepiUToku = false
@@ -136,6 +137,13 @@ final class KeyboardViewController: UIInputViewController {
     private var zadnjiKomandniId: String?
     private var komandniBrojac = 0
     private var diktatPocetakVreme: TimeInterval = 0
+
+    /// Vreme kada je diktat pokrenut. Čuva se i u `UserDefaults`, jer iOS
+    /// ume da ugasi keyboard extension dok je aplikacija u pozadini.
+    private var pocetakDiktata: TimeInterval {
+        let upisano = UserDefaults.standard.double(forKey: diktatPocetakKey)
+        return upisano > 0 ? upisano : diktatPocetakVreme
+    }
     private var privremeniStatus: String?
     private var privremeniStatusVreme: Date?
     private var zadnjeStanjeVreme: Double = 0
@@ -168,6 +176,9 @@ final class KeyboardViewController: UIInputViewController {
         // Tastatura se posle povratka iz aplikacije ponekad pojavi pre nego
         // što je textDocumentProxy spreman; kratak delay rešava taj slučaj.
         osveziIPCStanje()
+        // Ako je tekst stigao dok tastatura nije bila na ekranu, nalepi ga
+        // odmah po povratku.
+        autoNalepiAkoTreba()
         // Traži svež status od aplikacije. Bez ovoga tastatura može da
         // nasledi zastareo status iz prethodne sesije.
         posaljiKomandu("ping")
@@ -559,6 +570,10 @@ final class KeyboardViewController: UIInputViewController {
         posaljiKomandu("start")
         snimaSesijom = true
         obradaSesije = false
+        cekaStartSesije = false
+        diktatPocetakVreme = Date().timeIntervalSince1970
+        UserDefaults.standard.set(diktatPocetakVreme, forKey: diktatPocetakKey)
+        UserDefaults.standard.set(true, forKey: cekaDiktatKey)
         prikaziStatus("Snimam…")
         pustiZvukDiktata()
         azurirajPrikaz()
@@ -753,6 +768,11 @@ final class KeyboardViewController: UIInputViewController {
         textDocumentProxy.insertText(tekst)
         poslednjiPrepis = ""
         tekstSpreman = false
+        // Ručni Nalepi završava čekanje, da ga automatsko lepljenje ne bi
+        // ponovilo isti tekst.
+        UserDefaults.standard.set(false, forKey: cekaDiktatKey)
+        timerAutoNalepi?.invalidate()
+        timerAutoNalepi = nil
         prikaziStatus("Nalepljeno.")
         azurirajPrikaz()
     }
@@ -853,6 +873,12 @@ final class KeyboardViewController: UIInputViewController {
             obradiStaleStanje()
         }
 
+        // Dok čekamo tekst iz aplikacije, svaki prolaz pokušava i automatsko
+        // lepljenje. Tako se tekst ubaci čim stigne, bez dodatnog dodira.
+        if UserDefaults.standard.bool(forKey: cekaDiktatKey) {
+            autoNalepiAkoTreba()
+        }
+
         azurirajPrikaz()
     }
 
@@ -910,15 +936,22 @@ final class KeyboardViewController: UIInputViewController {
                 Dnevnik.pisi("Mirno posle obrade: tekst duzina=\(duzina)")
                 // „mirno“ posle obrade znači da je prepis uspeo i da tekst
                 // postoji na lokalnom serveru, čak i ako ga tastatura nije
-                // našla u clipboard-u. Zato uvek nudimo Nalepi.
+                // našla u clipboard-u. Prvo probamo da nalepimo sami, a
+                // Nalepi ostaje ako to ne uspe.
                 tekstSpreman = true
-                prikaziStatus("Spremno je, nalepi.")
+                autoNalepiAkoTreba()
+                if UserDefaults.standard.bool(forKey: cekaDiktatKey) {
+                    prikaziStatus("Spremno je, nalepi.")
+                }
             }
         case "greska":
             snimaSesijom = false
             obradaSesije = false
             tekstSpreman = false
             cekaStartSesije = false
+            UserDefaults.standard.set(false, forKey: cekaDiktatKey)
+            timerAutoNalepi?.invalidate()
+            timerAutoNalepi = nil
             timerSesijaTimeout?.invalidate()
             timerSesijaTimeout = nil
             prikaziStatus("Greška — otvori Diktator.")
@@ -1032,7 +1065,10 @@ final class KeyboardViewController: UIInputViewController {
         poslednjiPrepis = tekst
         tekstSpreman = true
         Dnevnik.pisi("Tekst notifikacija: duzina=\(tekst.count)")
-        prikaziStatus("Spremno je, nalepi.")
+        autoNalepiAkoTreba()
+        if UserDefaults.standard.bool(forKey: cekaDiktatKey) {
+            prikaziStatus("Spremno je, nalepi.")
+        }
         azurirajPrikaz()
     }
 
@@ -1099,6 +1135,15 @@ final class KeyboardViewController: UIInputViewController {
             return
         }
 
+        // Ako se tekst ne pojavi (aplikacija ugašena, snimak odbijen),
+        // ne čekamo zauvek.
+        let pocetak = pocetakDiktata
+        if pocetak > 0, Date().timeIntervalSince1970 - pocetak > 600 {
+            UserDefaults.standard.set(false, forKey: cekaDiktatKey)
+            Dnevnik.pisi("AutoNalepi: isteklo čekanje posle 10 minuta.")
+            return
+        }
+
         if let (tekst, token) = tekstIzIPC() {
             Dnevnik.pisi("AutoNalepi: IPC tekst duzina=\(tekst.count)")
             nalepiAutomatski(tekst, token: token, izvor: "IPC")
@@ -1115,13 +1160,13 @@ final class KeyboardViewController: UIInputViewController {
         let vreme = vremeString.flatMap(Double.init)
         let tekst = stringIz(predmet[DiktatorClipboard.tekst])
         Dnevnik.pisi(
-            "AutoNalepi opsti: token=\(token?.prefix(8) ?? "-"), vreme=\(vremeString ?? "-"), tekst=\(tekst?.count ?? -1), pocetak=\(Int(diktatPocetakVreme))"
+            "AutoNalepi opsti: token=\(token?.prefix(8) ?? "-"), vreme=\(vremeString ?? "-"), tekst=\(tekst?.count ?? -1), pocetak=\(Int(pocetakDiktata))"
         )
         guard let token, let vreme, let tekst,
               !tekst.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             return
         }
-        guard diktatPocetakVreme == 0 || vreme >= diktatPocetakVreme - 1 else {
+        guard pocetak == 0 || vreme >= pocetak - 1 else {
             Dnevnik.pisi("AutoNalepi: preskačem stari clipboard")
             return
         }
@@ -1199,7 +1244,8 @@ final class KeyboardViewController: UIInputViewController {
 
         let starost = Date().timeIntervalSince1970 - vreme
         guard starost >= 0, starost <= 180 else { return nil }
-        guard diktatPocetakVreme == 0 || vreme >= diktatPocetakVreme - 1 else {
+        let pocetak = pocetakDiktata
+        guard pocetak == 0 || vreme >= pocetak - 1 else {
             Dnevnik.pisi("IPC tekst: preskačem stari tekst")
             return nil
         }

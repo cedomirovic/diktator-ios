@@ -801,14 +801,23 @@ final class AppStanje: ObservableObject {
         oslobodiModelPosle()
     }
 
-    /// Tekst ide u opšti clipboard kao čist string. Tastatura ga čita
-    /// dugmetom Nalepi; nema automatskog lepljenja ni tokena.
+    /// Tekst ide u opšti clipboard zajedno sa tokenom i vremenom. Token
+    /// služi tastaturi da prepozna novi prepis i da ga sama nalepi, a da
+    /// pritom ne nalepi isti tekst dva puta ili nešto staro.
     @discardableResult
     private func postaviClipboard(_ tekst: String, automatski: Bool) -> String? {
-        UIPasteboard.general.string = tekst
-        Dnevnik.pisi("Clipboard spreman, duzina=\(tekst.count)")
+        let token = UUID().uuidString
+        let vreme = String(Date().timeIntervalSince1970)
+        UIPasteboard.general.items = [[
+            DiktatorClipboard.tekst: tekst,
+            DiktatorClipboard.token: token,
+            DiktatorClipboard.vreme: vreme,
+        ]]
+        Dnevnik.pisi(
+            "Clipboard spreman, duzina=\(tekst.count), token=\(token.prefix(8)), zaTastaturu=\(automatski)"
+        )
         NSLog("Diktator: clipboard spreman, duzina=%d", tekst.count)
-        return nil
+        return token
     }
 
     /// Tekst šaljemo tastaturi preko zasebnog imenovanog pasteboard-a i
