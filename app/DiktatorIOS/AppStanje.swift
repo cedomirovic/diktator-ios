@@ -467,6 +467,12 @@ final class AppStanje: ObservableObject {
             guard await osigurajDozvolu() else { return }
 
             do {
+                // Znak ide pre uzorkovanja, da se ne bi snimio u diktat.
+                if !snimac.jeSesijaAktivna {
+                    try snimac.pripremiSesiju()
+                }
+                Zvuk.pustiPocetak()
+                try? await Task.sleep(nanoseconds: 200_000_000)
                 try snimac.pocni()
                 stanje = .snima
                 poruka = nil

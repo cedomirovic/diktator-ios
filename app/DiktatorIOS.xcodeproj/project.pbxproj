@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0981F2A397B18B476B11425F /* DiktatorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55B72067199EB9EA9F55A949 /* DiktatorApp.swift */; };
+		17B279E2BFA8DA3611FCFE4A /* Zvuk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41CE7A956AB11BC950B20EB3 /* Zvuk.swift */; };
 		2867A03EAC5A8336EF9160A4 /* AppStanje.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97891DDD9878C4AD3F561229 /* AppStanje.swift */; };
 		3AB15F7EE012DA8C2DBADC62 /* PogledPomoc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 609B090256ACE0FC4B6BDB10 /* PogledPomoc.swift */; };
 		428FE717448B5350457A881D /* Putanje.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3EC31002A94081E2BD18ECA /* Putanje.swift */; };
@@ -70,6 +71,7 @@
 		2C4FAE80C4EFAF0BF8C7C6E5 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		31EB7D7F59EF1CFE3D869AEF /* Podesavanja.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Podesavanja.swift; sourceTree = "<group>"; };
 		3EF0085283F4D8BF5410BDF9 /* PogledPodesavanja.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PogledPodesavanja.swift; sourceTree = "<group>"; };
+		41CE7A956AB11BC950B20EB3 /* Zvuk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zvuk.swift; sourceTree = "<group>"; };
 		4B6D579545458783F98DD33B /* PogledIstorija.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PogledIstorija.swift; sourceTree = "<group>"; };
 		4C8F1B72EEE3D1C830799DF0 /* Modeli.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Modeli.swift; sourceTree = "<group>"; };
 		55B72067199EB9EA9F55A949 /* DiktatorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiktatorApp.swift; sourceTree = "<group>"; };
@@ -128,6 +130,7 @@
 				189D48705D4DAA54A219CC28 /* Snimac.swift */,
 				CA1E0F6EF3E4D95878C454E9 /* Statistika.swift */,
 				9311828B20AEC74CF5529CB7 /* Transliteracija.swift */,
+				41CE7A956AB11BC950B20EB3 /* Zvuk.swift */,
 			);
 			path = DiktatorIOS;
 			sourceTree = "<group>";
@@ -275,6 +278,7 @@
 				43348C2B24175D212CD296F8 /* Snimac.swift in Sources */,
 				7F899CB7C681D8EE6266283D /* Statistika.swift in Sources */,
 				C241022513AC7959AE509F2C /* Transliteracija.swift in Sources */,
+				17B279E2BFA8DA3611FCFE4A /* Zvuk.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

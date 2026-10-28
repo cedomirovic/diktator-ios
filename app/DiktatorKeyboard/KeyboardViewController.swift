@@ -1,4 +1,3 @@
-import AudioToolbox
 import UIKit
 
 /// Dijagnostika tastature ide u njen sopstveni container; posle testa se
@@ -565,10 +564,10 @@ final class KeyboardViewController: UIInputViewController {
         azurirajPrikaz()
     }
 
-    /// Kratak sistemski zvuk i blagi haptički odziv kada počne diktat.
-    /// Ne diramo AVAudioSession, da ne prekinemo snimanje u aplikaciji.
+    /// Blagi haptički odziv odmah na dodir. Zvuk pušta aplikacija kada
+    /// stvarno počne snimanje — tastatura ne sme da dira AVAudioSession, a
+    /// sistemski zvuk se ne čuje kada je telefon na tihom.
     private func pustiZvukDiktata() {
-        AudioServicesPlaySystemSound(1104)
         let generator = UIImpactFeedbackGenerator(style: .light)
         generator.prepare()
         generator.impactOccurred()

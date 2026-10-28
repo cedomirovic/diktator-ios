@@ -139,20 +139,26 @@ final class Snimac {
         brava.unlock()
     }
 
-    private func pokreniMotor() throws {
+    /// Postavlja audio sesiju za snimanje, ali ne dira mikrofon. Koristi se
+    /// da zvučni znak krene pre uzorkovanja, da se ne bi snimio u diktat.
+    func pripremiSesiju() throws {
         guard Self.dozvola == .authorized else { throw GreskaSnimka.nemaDozvole }
-
         let sesija = AVAudioSession.sharedInstance()
         do {
             try sesija.setCategory(
                 .playAndRecord,
                 mode: .measurement,
-                options: [.mixWithOthers, .allowBluetooth]
+                options: [.mixWithOthers, .allowBluetooth, .defaultToSpeaker]
             )
             try sesija.setActive(true, options: [])
         } catch {
             throw GreskaSnimka.nemaMikrofona
         }
+    }
+
+    private func pokreniMotor() throws {
+        let sesija = AVAudioSession.sharedInstance()
+        try pripremiSesiju()
 
         let ulaz = motor.inputNode
         let format = ulaz.outputFormat(forBus: 0)
