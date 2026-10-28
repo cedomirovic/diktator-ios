@@ -37,6 +37,8 @@ targets:
         UIBackgroundModes:
           - audio
         NSMicrophoneUsageDescription: "Diktator koristi mikrofon za diktat i, kada uključiš sesiju, drži ga u pripravnosti do 15 minuta. Snimak ostaje na uređaju."
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
         CFBundleURLTypes:
           - CFBundleURLName: com.cedomirovic.diktator.ios
             CFBundleURLSchemes:

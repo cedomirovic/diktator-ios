@@ -2,6 +2,7 @@ import SwiftUI
 
 struct PogledPodesavanja: View {
     @EnvironmentObject var stanje: AppStanje
+    @State private var kljucVidljiv = false
 
     private var verzija: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
@@ -87,6 +88,131 @@ struct PogledPodesavanja: View {
                 }
 
                 Toggle("Čuvaj istoriju", isOn: $stanje.podesavanja.cuvajIstoriju)
+            }
+
+            Section("Doterivanje") {
+                Toggle("Popravi interpunkciju i imena", isOn: $stanje.podesavanja.doterivanje)
+
+                Text("Šalje samo gotov tekst izabranom servisu. Isključeno znači da ništa ne napušta uređaj.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                if stanje.podesavanja.doterivanje {
+                    Picker(
+                        "Servis",
+                        selection: Binding(
+                            get: { stanje.podesavanja.provajderDoterivanja },
+                            set: { stanje.izaberiProvajdera($0) }
+                        )
+                    ) {
+                        ForEach(ProvajderiDoterivanja.svi) { provajder in
+                            Text(provajder.naziv).tag(provajder.id)
+                        }
+                    }
+
+                    Text(stanje.provajderDoterivanja.opis)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    if stanje.provajderDoterivanja.prikazujeKljuc {
+                        HStack {
+                            if kljucVidljiv {
+                                TextField("API ključ", text: $stanje.kljucDoterivanja)
+                                    .textInputAutocapitalization(.never)
+                                    .autocorrectionDisabled()
+                            } else {
+                                SecureField("API ključ", text: $stanje.kljucDoterivanja)
+                            }
+                            Button {
+                                kljucVidljiv.toggle()
+                            } label: {
+                                Image(systemName: kljucVidljiv ? "eye.slash" : "eye")
+                            }
+                            .buttonStyle(.borderless)
+                            .accessibilityLabel(kljucVidljiv ? "Sakrij ključ" : "Prikaži ključ")
+                        }
+
+                        Button("Sačuvaj ključ") {
+                            stanje.sacuvajKljuc()
+                        }
+
+                        Text(stanje.provajderDoterivanja.traziKljuc
+                            ? "Ključ se čuva u Keychain-u. Ako polje ostane prazno, doterivanje se preskače."
+                            : "Ključ nije obavezan; čuva se u Keychain-u ako ga uneseš.")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Text(stanje.provajderDoterivanja.uputstvo)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    if let link = stanje.provajderDoterivanja.link {
+                        Link(stanje.provajderDoterivanja.linkNaslov ?? "Otvori", destination: link)
+                            .font(.caption)
+                    }
+
+                    HStack {
+                        Text("Model")
+                            .font(.caption.weight(.medium))
+                            .frame(width: 58, alignment: .leading)
+                        TextField(
+                            stanje.provajderDoterivanja.model,
+                            text: Binding(
+                                get: { stanje.modelDoterivanja },
+                                set: { stanje.postaviModelDoterivanja($0) }
+                            )
+                        )
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                    }
+
+                    if stanje.provajderDoterivanja.prikazujeAdresu {
+                        HStack {
+                            Text("Adresa")
+                                .font(.caption.weight(.medium))
+                                .frame(width: 58, alignment: .leading)
+                            TextField(
+                                stanje.provajderDoterivanja.adresa,
+                                text: $stanje.podesavanja.adresaCustomDoterivanja
+                            )
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                            .keyboardType(.URL)
+                        }
+                    }
+
+                    Button {
+                        stanje.testirajDoterivanje()
+                    } label: {
+                        if stanje.testiraDoterivanje {
+                            HStack(spacing: 6) {
+                                ProgressView()
+                                Text("Testiram…")
+                            }
+                        } else {
+                            Label("Test veze", systemImage: "bolt.horizontal")
+                        }
+                    }
+                    .disabled(
+                        stanje.testiraDoterivanje ||
+                        (stanje.provajderDoterivanja.traziKljuc &&
+                         stanje.kljucDoterivanja.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    )
+
+                    if let poruka = stanje.porukaDoterivanja {
+                        Text(poruka)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Text("Ako doterivanje ne uspe, zadržava se sirov prepis.")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .onChange(of: stanje.podesavanja.provajderDoterivanja) { _, _ in
+                kljucVidljiv = false
             }
 
             Section("Ažuriranja") {

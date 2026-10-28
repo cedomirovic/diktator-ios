@@ -12,6 +12,7 @@
 		3AB15F7EE012DA8C2DBADC62 /* PogledPomoc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 609B090256ACE0FC4B6BDB10 /* PogledPomoc.swift */; };
 		428FE717448B5350457A881D /* Putanje.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3EC31002A94081E2BD18ECA /* Putanje.swift */; };
 		43348C2B24175D212CD296F8 /* Snimac.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189D48705D4DAA54A219CC28 /* Snimac.swift */; };
+		486BC131FDB3E93A4976D069 /* Doterivanje.swift in Sources */ = {isa = PBXBuildFile; fileRef = F04EB5CE75811FF1188C1A13 /* Doterivanje.swift */; };
 		4EC9B10BAAC1DED16857C4EC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7921CEE446B6B8121718CD08 /* Assets.xcassets */; };
 		58735B81EB834F2BBB3FC49D /* PonudaModela.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5C631B7C4BC7D5E1DF680F1 /* PonudaModela.swift */; };
 		589916A2679B3B7EFA8A3BFF /* Modeli.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C8F1B72EEE3D1C830799DF0 /* Modeli.swift */; };
@@ -29,6 +30,7 @@
 		E672362093455FB44A1FECCF /* Azuriranja.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A8CC6FE4AD552B8C31452EE /* Azuriranja.swift */; };
 		EC5FC89216C4C0D8E6BFE4C9 /* DiktatorKeyboard.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 028BADA4F19CAFBD0194A000 /* DiktatorKeyboard.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		F07D6AF7774E528B355D0D59 /* Prepisivac.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20316097F523817AD4BBA083 /* Prepisivac.swift */; };
+		F1C47B9141B8A01B4E7F6FFF /* ProvajderiDoterivanja.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D151EFE97E9DBD96818BDCA /* ProvajderiDoterivanja.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,6 +60,7 @@
 /* Begin PBXFileReference section */
 		028BADA4F19CAFBD0194A000 /* DiktatorKeyboard.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = DiktatorKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		0827D1D5A6339E92ECEE10C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		0D151EFE97E9DBD96818BDCA /* ProvajderiDoterivanja.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProvajderiDoterivanja.swift; sourceTree = "<group>"; };
 		189D48705D4DAA54A219CC28 /* Snimac.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Snimac.swift; sourceTree = "<group>"; };
 		20316097F523817AD4BBA083 /* Prepisivac.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Prepisivac.swift; sourceTree = "<group>"; };
 		20D32D4B2AE29E2AFB813307 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -81,6 +84,7 @@
 		CA1E0F6EF3E4D95878C454E9 /* Statistika.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Statistika.swift; sourceTree = "<group>"; };
 		DA613E2FCC4C47914E7A962B /* DiktatorIOS-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "DiktatorIOS-Bridging-Header.h"; sourceTree = "<group>"; };
 		E98742B6EFA7462CED1983E6 /* PogledDiktat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PogledDiktat.swift; sourceTree = "<group>"; };
+		F04EB5CE75811FF1188C1A13 /* Doterivanje.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Doterivanje.swift; sourceTree = "<group>"; };
 		F3EC31002A94081E2BD18ECA /* Putanje.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Putanje.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -103,6 +107,7 @@
 				2C4FAE80C4EFAF0BF8C7C6E5 /* ContentView.swift */,
 				55B72067199EB9EA9F55A949 /* DiktatorApp.swift */,
 				DA613E2FCC4C47914E7A962B /* DiktatorIOS-Bridging-Header.h */,
+				F04EB5CE75811FF1188C1A13 /* Doterivanje.swift */,
 				0827D1D5A6339E92ECEE10C6 /* Info.plist */,
 				4C8F1B72EEE3D1C830799DF0 /* Modeli.swift */,
 				31EB7D7F59EF1CFE3D869AEF /* Podesavanja.swift */,
@@ -115,6 +120,7 @@
 				A5C631B7C4BC7D5E1DF680F1 /* PonudaModela.swift */,
 				20316097F523817AD4BBA083 /* Prepisivac.swift */,
 				275C7CD6E540C9810103E49D /* Preuzimanje.swift */,
+				0D151EFE97E9DBD96818BDCA /* ProvajderiDoterivanja.swift */,
 				F3EC31002A94081E2BD18ECA /* Putanje.swift */,
 				189D48705D4DAA54A219CC28 /* Snimac.swift */,
 				CA1E0F6EF3E4D95878C454E9 /* Statistika.swift */,
@@ -248,6 +254,7 @@
 				E672362093455FB44A1FECCF /* Azuriranja.swift in Sources */,
 				B3E208BCDBD1BBC8B9775661 /* ContentView.swift in Sources */,
 				0981F2A397B18B476B11425F /* DiktatorApp.swift in Sources */,
+				486BC131FDB3E93A4976D069 /* Doterivanje.swift in Sources */,
 				589916A2679B3B7EFA8A3BFF /* Modeli.swift in Sources */,
 				A9741BFAC2D228E53F350A8E /* Podesavanja.swift in Sources */,
 				9B1AD4661F980D3502864CF7 /* PogledDiktat.swift in Sources */,
@@ -259,6 +266,7 @@
 				58735B81EB834F2BBB3FC49D /* PonudaModela.swift in Sources */,
 				F07D6AF7774E528B355D0D59 /* Prepisivac.swift in Sources */,
 				BF63604AFF2519489C66144A /* Preuzimanje.swift in Sources */,
+				F1C47B9141B8A01B4E7F6FFF /* ProvajderiDoterivanja.swift in Sources */,
 				428FE717448B5350457A881D /* Putanje.swift in Sources */,
 				43348C2B24175D212CD296F8 /* Snimac.swift in Sources */,
 				7F899CB7C681D8EE6266283D /* Statistika.swift in Sources */,

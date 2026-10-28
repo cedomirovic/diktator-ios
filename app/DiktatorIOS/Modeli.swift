@@ -5,6 +5,7 @@ enum StanjeAplikacije: Equatable {
     case snima
     case priprema
     case prepisuje
+    case doteruje
     case greska(String)
 
     var naslov: String {
@@ -13,6 +14,7 @@ enum StanjeAplikacije: Equatable {
         case .snima: return "Snimam…"
         case .priprema: return "Pripremam model…"
         case .prepisuje: return "Prepisujem…"
+        case .doteruje: return "Doterujem…"
         case .greska: return "Greška"
         }
     }
@@ -27,6 +29,8 @@ enum StanjeAplikacije: Equatable {
             return "Model se učitava u memoriju, sačekaj trenutak."
         case .prepisuje:
             return "Pretvaram govor u tekst."
+        case .doteruje:
+            return "Popravljam interpunkciju i imena preko izabranog servisa."
         case .greska(let poruka):
             return poruka
         }
@@ -39,7 +43,7 @@ enum StanjeAplikacije: Equatable {
 
     var jeZauzet: Bool {
         switch self {
-        case .priprema, .prepisuje: return true
+        case .priprema, .prepisuje, .doteruje: return true
         default: return false
         }
     }
@@ -133,6 +137,10 @@ struct Podesavanja: Codable, Equatable {
     var oslobadjanjeModela = OslobadjanjeModela.pet.rawValue
     var cuvajIstoriju = true
     var proveravajAzuriranja = true
+    var doterivanje = false
+    var provajderDoterivanja = ProvajderiDoterivanja.podrazumevani.id
+    var modeliDoterivanja: [String: String] = [:]
+    var adresaCustomDoterivanja = ProvajderiDoterivanja.custom.adresa
 
     init() {}
 
@@ -143,6 +151,10 @@ struct Podesavanja: Codable, Equatable {
         case oslobadjanjeModela
         case cuvajIstoriju
         case proveravajAzuriranja
+        case doterivanje
+        case provajderDoterivanja
+        case modeliDoterivanja
+        case adresaCustomDoterivanja
     }
 
     init(from decoder: Decoder) throws {
@@ -164,5 +176,15 @@ struct Podesavanja: Codable, Equatable {
         }
         cuvajIstoriju = try kontejner.decodeIfPresent(Bool.self, forKey: .cuvajIstoriju) ?? true
         proveravajAzuriranja = try kontejner.decodeIfPresent(Bool.self, forKey: .proveravajAzuriranja) ?? true
+        doterivanje = try kontejner.decodeIfPresent(Bool.self, forKey: .doterivanje) ?? false
+        provajderDoterivanja = try kontejner.decodeIfPresent(String.self, forKey: .provajderDoterivanja)
+            ?? ProvajderiDoterivanja.podrazumevani.id
+        if ProvajderiDoterivanja.nadji(provajderDoterivanja) == nil {
+            provajderDoterivanja = ProvajderiDoterivanja.podrazumevani.id
+        }
+        modeliDoterivanja = try kontejner.decodeIfPresent([String: String].self, forKey: .modeliDoterivanja)
+            ?? [:]
+        adresaCustomDoterivanja = try kontejner.decodeIfPresent(String.self, forKey: .adresaCustomDoterivanja)
+            ?? ProvajderiDoterivanja.custom.adresa
     }
 }
