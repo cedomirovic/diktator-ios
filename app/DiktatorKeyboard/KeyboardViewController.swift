@@ -1,3 +1,4 @@
+import AudioToolbox
 import UIKit
 
 /// Dijagnostika tastature ide u njen sopstveni container; posle testa se
@@ -108,6 +109,7 @@ final class KeyboardViewController: UIInputViewController {
     private let gornjaTraka = UIStackView()
     private let tastatura = UIStackView()
     private let status = UILabel()
+    private let spinnerObrade = UIActivityIndicatorView(style: .medium)
     private var dugmeDiktiraj: UIButton?
     private var dugmeNalepi: UIButton?
     private var tekstSpreman = false
@@ -296,8 +298,13 @@ final class KeyboardViewController: UIInputViewController {
         status.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         status.setContentHuggingPriority(.defaultLow, for: .horizontal)
 
+        spinnerObrade.hidesWhenStopped = true
+        spinnerObrade.color = .systemOrange
+        spinnerObrade.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
+
         gornjaTraka.addArrangedSubview(diktiraj)
         gornjaTraka.addArrangedSubview(nalepi)
+        gornjaTraka.addArrangedSubview(spinnerObrade)
         gornjaTraka.addArrangedSubview(status)
         gornjaTraka.heightAnchor.constraint(equalToConstant: 36).isActive = true
 
@@ -552,7 +559,17 @@ final class KeyboardViewController: UIInputViewController {
         snimaSesijom = true
         obradaSesije = false
         prikaziStatus("Snimam…")
+        pustiZvukDiktata()
         azurirajPrikaz()
+    }
+
+    /// Kratak sistemski zvuk i blagi haptički odziv kada počne diktat.
+    /// Ne diramo AVAudioSession, da ne prekinemo snimanje u aplikaciji.
+    private func pustiZvukDiktata() {
+        AudioServicesPlaySystemSound(1104)
+        let generator = UIImpactFeedbackGenerator(style: .light)
+        generator.prepare()
+        generator.impactOccurred()
     }
 
     private func posaljiKomandu(_ komanda: String) {
@@ -1218,6 +1235,12 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private func azurirajPrikaz() {
+        if obradaSesije {
+            spinnerObrade.startAnimating()
+        } else {
+            spinnerObrade.stopAnimating()
+        }
+
         if let vreme = privremeniStatusVreme,
            Date().timeIntervalSince(vreme) < 1.5,
            let tekst = privremeniStatus {

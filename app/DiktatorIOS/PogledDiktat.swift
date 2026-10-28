@@ -47,6 +47,10 @@ struct PogledDiktat: View {
                         ProgressView(value: Double(stanje.nivo))
                             .tint(.red)
                             .padding(.horizontal, 44)
+                    } else if stanje.stanje.jeZauzet {
+                        ProgressView()
+                            .tint(.accentColor)
+                            .padding(.top, 4)
                     }
 
                     VStack(alignment: .leading, spacing: 10) {
