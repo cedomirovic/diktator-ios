@@ -144,9 +144,14 @@ final class AppStanje: ObservableObject {
     @Published var kljucDoterivanja = ""
     @Published var testiraDoterivanje = false
     @Published var porukaDoterivanja: String?
+    /// Kratka potvrda ispod dugmeta „Sačuvaj ključ“.
+    @Published var potvrdaKljucaDoterivanja: String?
+    @Published var potvrdaKljucaDoterivanjaGreska = false
     @Published var kljucOblaka = ""
     @Published var testiraOblak = false
     @Published var porukaOblaka: String?
+    @Published var potvrdaKljucaOblaka: String?
+    @Published var potvrdaKljucaOblakaGreska = false
 
     private let snimac = Snimac()
     private let prepisivac = Prepisivac()
@@ -1193,17 +1198,58 @@ final class AppStanje: ObservableObject {
               let provajder = ProvajderiDoterivanja.nadji(id) else { return }
         podesavanja.provajderDoterivanja = provajder.id
         kljucDoterivanja = Kljuc.citaj(za: provajder.id) ?? ""
+        potvrdaKljucaDoterivanja = nil
+        porukaDoterivanja = nil
     }
 
     @discardableResult
     func sacuvajKljuc() -> Bool {
         let ociscen = kljucDoterivanja.trimmingCharacters(in: .whitespacesAndNewlines)
         kljucDoterivanja = ociscen
-        let uspeh = Kljuc.upisi(ociscen, za: provajderDoterivanja.id)
-        porukaDoterivanja = uspeh
-            ? "\(provajderDoterivanja.naziv) ključ je sačuvan u Keychain-u."
-            : "\(provajderDoterivanja.naziv) ključ nije mogao da se sačuva u Keychain-u."
+        let provajder = provajderDoterivanja
+        let postojao = !(Kljuc.citaj(za: provajder.id) ?? "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .isEmpty
+
+        if ociscen.isEmpty, !postojao {
+            potvrdaKljucaDoterivanja = "Polje je prazno — unesi ključ pa tapni Sačuvaj."
+            potvrdaKljucaDoterivanjaGreska = true
+            UINotificationFeedbackGenerator().notificationOccurred(.warning)
+            return false
+        }
+
+        let uspeh = Kljuc.upisi(ociscen, za: provajder.id)
+        if uspeh {
+            potvrdaKljucaDoterivanja = ociscen.isEmpty
+                ? "Ključ je obrisan iz Keychain-a."
+                : "Sačuvano — \(provajder.naziv) ključ je u Keychain-u."
+            potvrdaKljucaDoterivanjaGreska = false
+        } else {
+            potvrdaKljucaDoterivanja = "Nije sačuvano: Keychain je odbio upis. Pokušaj ponovo."
+            potvrdaKljucaDoterivanjaGreska = true
+        }
+        UINotificationFeedbackGenerator().notificationOccurred(uspeh ? .success : .error)
+        porukaDoterivanja = nil
+        nestaniPosle(potvrdaKljucaDoterivanja) { [weak self] potvrda in
+            if self?.potvrdaKljucaDoterivanja == potvrda {
+                self?.potvrdaKljucaDoterivanja = nil
+            }
+        }
         return uspeh
+    }
+
+    /// Potvrda stoji nekoliko sekundi pa se sama skloni, da ne ostane zauvek
+    /// na ekranu i da sledeći dodir na dugme opet ima vidljiv odgovor.
+    private func nestaniPosle(
+        _ potvrda: String?,
+        posle sekundi: UInt64 = 4,
+        _ akcija: @escaping @MainActor (String) -> Void
+    ) {
+        guard let potvrda else { return }
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: sekundi * 1_000_000_000)
+            akcija(potvrda)
+        }
     }
 
     func testirajDoterivanje() {
@@ -1250,10 +1296,34 @@ final class AppStanje: ObservableObject {
     func sacuvajKljucOblaka() -> Bool {
         let ociscen = kljucOblaka.trimmingCharacters(in: .whitespacesAndNewlines)
         kljucOblaka = ociscen
+        let postojao = !(Kljuc.citaj(za: "groq") ?? "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .isEmpty
+
+        if ociscen.isEmpty, !postojao {
+            potvrdaKljucaOblaka = "Polje je prazno — unesi Groq ključ pa tapni Sačuvaj."
+            potvrdaKljucaOblakaGreska = true
+            UINotificationFeedbackGenerator().notificationOccurred(.warning)
+            return false
+        }
+
         let uspeh = Kljuc.upisi(ociscen, za: "groq")
-        porukaOblaka = uspeh
-            ? "Groq ključ je sačuvan u Keychain-u."
-            : "Groq ključ nije mogao da se sačuva u Keychain-u."
+        if uspeh {
+            potvrdaKljucaOblaka = ociscen.isEmpty
+                ? "Groq ključ je obrisan iz Keychain-a."
+                : "Sačuvano — Groq ključ je u Keychain-u."
+            potvrdaKljucaOblakaGreska = false
+        } else {
+            potvrdaKljucaOblaka = "Nije sačuvano: Keychain je odbio upis. Pokušaj ponovo."
+            potvrdaKljucaOblakaGreska = true
+        }
+        UINotificationFeedbackGenerator().notificationOccurred(uspeh ? .success : .error)
+        porukaOblaka = nil
+        nestaniPosle(potvrdaKljucaOblaka) { [weak self] potvrda in
+            if self?.potvrdaKljucaOblaka == potvrda {
+                self?.potvrdaKljucaOblaka = nil
+            }
+        }
         return uspeh
     }
 

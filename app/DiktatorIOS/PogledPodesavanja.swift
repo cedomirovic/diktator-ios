@@ -126,7 +126,23 @@ struct PogledPodesavanja: View {
                     }
 
                     Button("Sačuvaj ključ") {
-                        stanje.sacuvajKljucOblaka()
+                        withAnimation(.easeInOut(duration: 0.15)) {
+                            _ = stanje.sacuvajKljucOblaka()
+                        }
+                    }
+
+                    if let potvrda = stanje.potvrdaKljucaOblaka {
+                        Label(
+                            potvrda,
+                            systemImage: stanje.potvrdaKljucaOblakaGreska
+                                ? "exclamationmark.triangle.fill"
+                                : "checkmark.circle.fill"
+                        )
+                        .font(.caption)
+                        .foregroundStyle(
+                            stanje.potvrdaKljucaOblakaGreska ? Color.orange : Color.green
+                        )
+                        .transition(.opacity)
                     }
 
                     HStack {
@@ -232,7 +248,25 @@ struct PogledPodesavanja: View {
                         }
 
                         Button("Sačuvaj ključ") {
-                            stanje.sacuvajKljuc()
+                            withAnimation(.easeInOut(duration: 0.15)) {
+                                _ = stanje.sacuvajKljuc()
+                            }
+                        }
+
+                        if let potvrda = stanje.potvrdaKljucaDoterivanja {
+                            Label(
+                                potvrda,
+                                systemImage: stanje.potvrdaKljucaDoterivanjaGreska
+                                    ? "exclamationmark.triangle.fill"
+                                    : "checkmark.circle.fill"
+                            )
+                            .font(.caption)
+                            .foregroundStyle(
+                                stanje.potvrdaKljucaDoterivanjaGreska
+                                    ? Color.orange
+                                    : Color.green
+                            )
+                            .transition(.opacity)
                         }
 
                         Text(stanje.provajderDoterivanja.traziKljuc
