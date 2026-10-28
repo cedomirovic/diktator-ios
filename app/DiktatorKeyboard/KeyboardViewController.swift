@@ -1,4 +1,17 @@
+import CryptoKit
 import UIKit
+
+/// Isti izračun kao u aplikaciji (`TajnaServera`). Obe strane dobijaju isti
+/// ključ iz `identifierForVendor`, pa nema oslanjanja na pasteboard.
+private enum TajnaServera {
+    static var token: String {
+        let identitet = UIDevice.current.identifierForVendor?.uuidString ?? "bez-identiteta"
+        let podaci = Data("com.cedomirovic.diktator.server.\(identitet)".utf8)
+        return SHA256.hash(data: podaci)
+            .map { String(format: "%02x", $0) }
+            .joined()
+    }
+}
 
 /// Dijagnostika tastature ide u njen sopstveni container; posle testa se
 /// fajl izvuče preko devicectl-a.
@@ -47,8 +60,6 @@ private enum DiktatorIPC {
     static let tokenVreme = "tokenVreme"
     static let tekst = "tekst"
     static let greska = "greska"
-    /// Ključ lokalnog servera koji aplikacija upisuje u status.
-    static let serverToken = "serverToken"
 
     static let notifKomanda = "com.cedomirovic.diktator.cmd"
     static let notifStanje = "com.cedomirovic.diktator.st"
@@ -126,6 +137,9 @@ final class KeyboardViewController: UIInputViewController {
     private let cekaSesijuKey = "diktator.cekaSesiju"
     private let cekaSesijuVremeKey = "diktator.cekaSesijuVreme"
     private var autoNalepiUToku = false
+    private var serverUpitUToku = false
+    private var serverGreske = 0
+    private var zadnjiServerUpit = Date.distantPast
     private var timerAutoNalepi: Timer?
     private var timerIPC: Timer?
     private var timerSesijaTimeout: Timer?
@@ -734,14 +748,8 @@ final class KeyboardViewController: UIInputViewController {
             return
         }
 
-        // Server traži ključ koji aplikacija upisuje u status. Bez njega
-        // odmah idemo na rezervni put preko imenovanog pasteboard-a.
-        let serverToken = DiktatorIPC.citaj(DiktatorIPC.stanje)[DiktatorIPC.serverToken]
-        guard let serverToken, !serverToken.isEmpty else {
-            Dnevnik.pisi("Nalepi server: nema ključa, prelazim na rezervu.")
-            nalepiIzRezerve()
-            return
-        }
+        // Isti ključ koji računa i aplikacija.
+        let serverToken = TajnaServera.token
 
         prikaziStatus("Nalepi…")
         var zahtev = URLRequest(url: url)
@@ -1156,36 +1164,98 @@ final class KeyboardViewController: UIInputViewController {
         }
 
         let predmet = UIPasteboard.general.items.first
-        Dnevnik.pisi(
-            "AutoNalepi: ceka=\(UserDefaults.standard.bool(forKey: cekaDiktatKey)), snima=\(snimaSesijom), obrada=\(obradaSesije), opsti=\(predmet?.keys.sorted().joined(separator: ",") ?? "-")"
-        )
-        guard let predmet else { return }
-        let token = stringIz(predmet[DiktatorClipboard.token])
-        let vremeString = stringIz(predmet[DiktatorClipboard.vreme])
-        let vreme = vremeString.flatMap(Double.init)
-        let tekst = stringIz(predmet[DiktatorClipboard.tekst])
-        Dnevnik.pisi(
-            "AutoNalepi opsti: token=\(token?.prefix(8) ?? "-"), vreme=\(vremeString ?? "-"), tekst=\(tekst?.count ?? -1), pocetak=\(Int(pocetakDiktata))"
-        )
-        guard let token, let vreme, let tekst,
-              !tekst.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            return
+        let token = stringIz(predmet?[DiktatorClipboard.token])
+        let vreme = stringIz(predmet?[DiktatorClipboard.vreme]).flatMap(Double.init)
+        let tekst = stringIz(predmet?[DiktatorClipboard.tekst])
+        if let token, let vreme, let tekst,
+           !tekst.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+           pocetak == 0 || vreme >= pocetak - 1 {
+            let starost = Date().timeIntervalSince1970 - vreme
+            if starost >= 0, starost <= 180 {
+                Dnevnik.pisi("AutoNalepi: clipboard duzina=\(tekst.count)")
+                nalepiAutomatski(tekst, token: token, izvor: "clipboard")
+                return
+            }
         }
-        guard pocetak == 0 || vreme >= pocetak - 1 else {
-            Dnevnik.pisi("AutoNalepi: preskačem stari clipboard")
+
+        // Imenovani pasteboard i opšti clipboard umeju da vrate keširanu
+        // vrednost u keyboard extension-u. Zato je lokalni server glavni
+        // izvor: on uvek vraća stvarni tekst, token i vreme.
+        pokusajServer()
+    }
+
+    /// Pita lokalni server aplikacije za poslednji prepis. Odgovor nosi i
+    /// token i vreme, pa znamo da je tekst nov i da nije već nalepljen.
+    private func pokusajServer() {
+        guard !serverUpitUToku else { return }
+        let sada = Date()
+        // Kada server ne odgovara (aplikacija ugašena), razmak raste do 3 s,
+        // da ne bismo stalno tukli na zatvoren port.
+        let razmak = min(0.4 * pow(2.0, Double(min(serverGreske, 4))), 3.0)
+        guard sada.timeIntervalSince(zadnjiServerUpit) > razmak else { return }
+        let kljuc = TajnaServera.token
+        guard let url = URL(string: "http://127.0.0.1:8765/tekst") else {
             return
         }
 
-        let starost = Date().timeIntervalSince1970 - vreme
-        guard starost >= 0, starost <= 180 else {
-            UserDefaults.standard.set(false, forKey: cekaDiktatKey)
-            timerAutoNalepi?.invalidate()
-            timerAutoNalepi = nil
-            NSLog("Diktator tastatura: preskačem star clipboard (%.0f s).", starost)
-            return
-        }
+        zadnjiServerUpit = sada
+        serverUpitUToku = true
+        var zahtev = URLRequest(url: url)
+        zahtev.timeoutInterval = 1.5
+        zahtev.httpMethod = "GET"
+        zahtev.setValue(kljuc, forHTTPHeaderField: "X-Diktator-Token")
 
-        nalepiAutomatski(tekst, token: token, izvor: "clipboard")
+        URLSession.shared.dataTask(with: zahtev) { [weak self] podaci, odgovor, greska in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.serverUpitUToku = false
+                if let greska {
+                    self.serverGreske += 1
+                    // Prvi promašaj i svaki deseti — ostalo bi samo punilo
+                    // dnevnik dok aplikacija nije pokrenuta.
+                    if self.serverGreske == 1 || self.serverGreske % 10 == 0 {
+                        Dnevnik.pisi(
+                            "AutoNalepi server: greska \(greska.localizedDescription) (uzastopno \(self.serverGreske))"
+                        )
+                    }
+                    return
+                }
+                self.serverGreske = 0
+                guard let http = odgovor as? HTTPURLResponse else { return }
+                guard http.statusCode == 200 else {
+                    Dnevnik.pisi("AutoNalepi server: kod=\(http.statusCode)")
+                    return
+                }
+                guard
+                      let podaci,
+                      let tekst = String(data: podaci, encoding: .utf8),
+                      !tekst.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+                      let token = http.value(
+                        forHTTPHeaderField: "X-Diktator-Tekst-Token"
+                      ),
+                      !token.isEmpty,
+                      let vremeString = http.value(
+                        forHTTPHeaderField: "X-Diktator-Tekst-Vreme"
+                      ),
+                      let vreme = Double(vremeString) else {
+                    return
+                }
+
+                let pocetak = self.pocetakDiktata
+                guard pocetak == 0 || vreme >= pocetak - 1 else {
+                    Dnevnik.pisi("AutoNalepi server: tekst je stariji od diktata")
+                    return
+                }
+                let starost = Date().timeIntervalSince1970 - vreme
+                guard starost >= 0, starost <= 180 else {
+                    Dnevnik.pisi("AutoNalepi server: preskačem star tekst")
+                    return
+                }
+
+                Dnevnik.pisi("AutoNalepi server: duzina=\(tekst.count)")
+                self.nalepiAutomatski(tekst, token: token, izvor: "server")
+            }
+        }.resume()
     }
 
     private func nalepiAutomatski(_ tekst: String, token: String, izvor: String) {

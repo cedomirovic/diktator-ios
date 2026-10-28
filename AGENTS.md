@@ -6,14 +6,21 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Status
 
+- **28.10.2026.** — **automatsko lepljenje**: posle diktata iz tastature
+  tekst se sam ubacuje u polje, bez klika na **Nalepi**. Aplikacija uz tekst
+  upisuje token i vreme, a tastatura preko lokalnog servera prepoznaje novi
+  prepis i ubacuje ga preko `textDocumentProxy`; ako to ne uspe, ostaje
+  ručni **Nalepi**. Isti tekst se ne lepi dvaput, stari se preskače, a
+  čekanje odustaje posle 10 minuta.
 - **28.10.2026.** — **bezbednosno ojačanje** (verzija **0.1.8 (9)**):
   lokalni server za **Nalepi** sada traži tajni ključ
-  (`X-Diktator-Token`, 32 slučajna bajta po pokretanju, deli se sa
-  tastaturom preko status pasteboard-a), prihvata samo `GET /tekst` i više
-  nikada ne otvara port na svim interfejsima. Dodati su `SECURITY.md`,
-  `Cache-Control: no-store` i provera dužine zaglavlja; potvrđeno je da u
-  repou nema tajni, da ATS dozvoljava samo lokalnu mrežu i da API ključevi
-  ostaju u Keychain-u (`WhenUnlockedThisDeviceOnly`).
+  (`X-Diktator-Token`, izveden kao
+  `SHA-256("com.cedomirovic.diktator.server." + identifierForVendor)`, pa ga
+  aplikacija i tastatura računaju same bez pasteboard-a), prihvata samo
+  `GET /tekst` i više nikada ne otvara port na svim interfejsima. Dodati su
+  `SECURITY.md`, `Cache-Control: no-store` i provera dužine zaglavlja;
+  potvrđeno je da u repou nema tajni, da ATS dozvoljava samo lokalnu mrežu i
+  da API ključevi ostaju u Keychain-u (`WhenUnlockedThisDeviceOnly`).
 - **28.10.2026.** — **brzina prepisa**: whisper sada računa audio kontekst
   samo za stvarnu dužinu snimka (umesto punih 30 s), koristi 3 niti na CPU i
   podrazumevano bira **Turbo** model. Dodat je i opcioni **Groq** prepis u

@@ -1,7 +1,20 @@
+import CryptoKit
 import Foundation
 import Network
-import Security
 import UIKit
+
+/// Ključ lokalnog servera. I aplikacija i tastatura ga računaju iz istog
+/// `identifierForVendor`, pa se poklapaju bez deljenja preko pasteboard-a —
+/// koji u keyboard extension-u ume da vrati zastarelu vrednost.
+enum TajnaServera {
+    static var token: String {
+        let identitet = UIDevice.current.identifierForVendor?.uuidString ?? "bez-identiteta"
+        let podaci = Data("com.cedomirovic.diktator.server.\(identitet)".utf8)
+        return SHA256.hash(data: podaci)
+            .map { String(format: "%02x", $0) }
+            .joined()
+    }
+}
 
 /// Dijagnostika ide i u fajl, jer se NSLog iz aplikacije i tastature na
 /// iOS 26 ne pojavljuje uvek u idevicesyslog toku.
@@ -50,9 +63,6 @@ private enum DiktatorIPC {
     static let tokenVreme = "tokenVreme"
     static let tekst = "tekst"
     static let greska = "greska"
-    /// Slučajan ključ lokalnog servera. Menja se pri svakom pokretanju
-    /// aplikacije, a tastatura ga šalje u zaglavlju `X-Diktator-Token`.
-    static let serverToken = "serverToken"
 
     /// Darwin notifikacije prenose samo ime, pa u njega pakujemo kratku
     /// poruku. Tako tastatura i aplikacija rade i ako imenovani pasteboard
@@ -332,7 +342,11 @@ final class AppStanje: ObservableObject {
         sesijaKraj = Date().addingTimeInterval(TimeInterval(Snimac.najduzeSesijeSekundi))
         pokreniTimerSesije()
         pokreniIPCHeartbeat()
-        server.postaviTekst(poslednjiTekst)
+        server.postaviTekst(
+            poslednjiTekst,
+            token: zadnjiIPCtoken ?? "",
+            vreme: zadnjiIPCtokenVreme ?? 0
+        )
         server.pokreni()
         pisiIPCStanje()
         Dnevnik.pisi("Sesija uključena, traje do \(Snimac.najduzeSesijeSekundi) s.")
@@ -760,7 +774,6 @@ final class AppStanje: ObservableObject {
         }
 
         poslednjiTekst = sredjen
-        server.postaviTekst(sredjen)
         statistika.dodaj(
             tekst: sredjen,
             trajanje: trajanje,
@@ -768,9 +781,13 @@ final class AppStanje: ObservableObject {
         )
         StatistikaSkladiste.sacuvaj(statistika)
         Dnevnik.pisi("Prepis gotov, dužina=\(sredjen.count), saTastature=\(pokrenutSaTastature)")
-        let token = postaviClipboard(sredjen, automatski: pokrenutSaTastature)
-        zadnjiIPCtoken = token
-        zadnjiIPCtokenVreme = token == nil ? nil : Date().timeIntervalSince1970
+        let token = postaviClipboard(sredjen, automatski: pokrenutSaTastature) ?? ""
+        let vreme = Date().timeIntervalSince1970
+        zadnjiIPCtoken = token.isEmpty ? nil : token
+        zadnjiIPCtokenVreme = token.isEmpty ? nil : vreme
+        // Server je jedini kanal koji tastatura pouzdano vidi, pa uz tekst
+        // nosi i token i vreme za automatsko lepljenje.
+        server.postaviTekst(sredjen, token: token, vreme: vreme)
 
         if pokrenutSaTastature {
             posaljiTekstTastaturi(sredjen)
@@ -855,8 +872,7 @@ final class AppStanje: ObservableObject {
         var vrednosti: [String: String] = [
             DiktatorIPC.sesija: sesijaAktivna ? "1" : "0",
             DiktatorIPC.stanjeKljuc: stanjeTekst,
-            DiktatorIPC.vreme: String(sada),
-            DiktatorIPC.serverToken: server.token
+            DiktatorIPC.vreme: String(sada)
         ]
 
         if sesijaAktivna, let kraj = sesijaKraj {
@@ -1419,37 +1435,28 @@ final class AppStanje: ObservableObject {
 /// vrednost.
 ///
 /// Server ne sluša spoljašnji saobraćaj i traži tajni ključ u zaglavlju
-/// `X-Diktator-Token`. Ključ se pravi pri svakom pokretanju aplikacije i
-/// deli sa tastaturom preko imenovanog pasteboard-a, pa druga aplikacija na
-/// uređaju ne može da pročita poslednji prepis samo zato što zna port.
+/// `X-Diktator-Token`. Ključ se izvodi iz `identifierForVendor` (vidi
+/// `TajnaServera`) i nigde se ne upisuje, pa druga aplikacija na uređaju ne
+/// može da pročita poslednji prepis samo zato što zna port.
 final class ServerTeksta {
     private let port: UInt16 = 8765
     private let queue = DispatchQueue(label: "com.cedomirovic.diktator.server")
     private let brava = NSLock()
     private var poslednji = ""
+    private var poslednjiToken = ""
+    private var poslednjeVreme: Double = 0
     private var listener: NWListener?
 
-    /// 32 slučajna bajta, base64url. Ne loguje se.
-    let token: String = ServerTeksta.noviToken()
+    /// Ključ se ne menja pri svakom pokretanju, jer tastatura ne može
+    /// pouzdano da ga pročita iz pasteboard-a. Izvodi se iz identiteta
+    /// proizvođača, pa ga druga aplikacija na uređaju ne može pogoditi.
+    let token: String = TajnaServera.token
 
-    private static func noviToken() -> String {
-        var bajtovi = [UInt8](repeating: 0, count: 32)
-        let status = SecRandomCopyBytes(kSecRandomDefault, bajtovi.count, &bajtovi)
-        guard status == errSecSuccess else {
-            // Rezerva: dva UUID-a spojena, i dalje dovoljno slučajno.
-            return (UUID().uuidString + UUID().uuidString)
-                .replacingOccurrences(of: "-", with: "")
-                .lowercased()
-        }
-        return Data(bajtovi).base64EncodedString()
-            .replacingOccurrences(of: "+", with: "-")
-            .replacingOccurrences(of: "/", with: "_")
-            .replacingOccurrences(of: "=", with: "")
-    }
-
-    func postaviTekst(_ tekst: String) {
+    func postaviTekst(_ tekst: String, token: String, vreme: Double) {
         brava.lock()
         poslednji = tekst
+        poslednjiToken = token
+        poslednjeVreme = vreme
         brava.unlock()
     }
 
@@ -1603,6 +1610,8 @@ final class ServerTeksta {
     ) {
         var kod = "404 Not Found"
         var tekst = ""
+        var tekstToken = ""
+        var tekstVreme: Double = 0
 
         if putanja == "/tekst" {
             if metod != "GET" {
@@ -1610,6 +1619,8 @@ final class ServerTeksta {
             } else if let kljuc, istiKljuc(kljuc, token) {
                 brava.lock()
                 tekst = poslednji
+                tekstToken = poslednjiToken
+                tekstVreme = poslednjeVreme
                 brava.unlock()
                 kod = "200 OK"
             } else {
@@ -1623,6 +1634,10 @@ final class ServerTeksta {
         zaglavlje += "Content-Length: \(telo.count)\r\n"
         zaglavlje += "Cache-Control: no-store\r\n"
         zaglavlje += "X-Content-Type-Options: nosniff\r\n"
+        // Token i vreme prepisa — tastatura po njima zna da je tekst nov i
+        // da ga nije već nalepila.
+        zaglavlje += "X-Diktator-Tekst-Token: \(tekstToken)\r\n"
+        zaglavlje += "X-Diktator-Tekst-Vreme: \(String(format: "%.3f", tekstVreme))\r\n"
         zaglavlje += "Connection: close\r\n\r\n"
         var odgovor = Data(zaglavlje.utf8)
         odgovor.append(telo)

@@ -36,14 +36,20 @@ vrednost). Zaštita:
 
 - sluša **isključivo loopback**; ako primarni `NWListener` ne uspe, rezervni
   put je vezan na `.loopback` interfejs — nikada na sve interfejse;
-- traži zaglavlje **`X-Diktator-Token`**; ključ je 32 slučajna bajta
-  (`SecRandomCopyBytes`), pravi se pri svakom pokretanju aplikacije i deli se
-  sa tastaturom preko imenovanog pasteboard-a;
+- traži zaglavlje **`X-Diktator-Token`**; ključ se izvodi kao
+  `SHA-256("com.cedomirovic.diktator.server." + identifierForVendor)`.
+  Aplikacija i tastatura ga računaju same, pa se ne prenosi preko
+  pasteboard-a (koji u keyboard extension-u ume da vrati zastarelu
+  vrednost). Druga aplikacija na uređaju ima drugi `identifierForVendor` i
+  ne može da ga pogodi;
 - prihvata samo `GET /tekst`; sve ostalo vraća `401`/`404`/`405`;
-- odgovor nosi `Cache-Control: no-store`, a veza se zatvara posle 8 s;
+- odgovor nosi `Cache-Control: no-store` i zaglavlja sa tokenom i vremenom
+  prepisa (za automatsko lepljenje), a veza se zatvara posle 8 s;
 - poređenje ključa je bez ranog prekida.
 
-Ključ se **ne** upisuje u dnevnik.
+Ključ se **ne** upisuje u dnevnik. Pošto se izvodi iz identiteta proizvođača,
+ne menja se pri svakom pokretanju — to je namerno, jer tastatura ne može
+pouzdano da pročita novi ključ iz pasteboard-a.
 
 ## Fajlovi
 
