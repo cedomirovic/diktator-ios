@@ -6,6 +6,11 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Status
 
+- **28.10.2026.** — **brzina prepisa**: whisper sada računa audio kontekst
+  samo za stvarnu dužinu snimka (umesto punih 30 s), koristi 3 niti na CPU i
+  podrazumevano bira **Turbo** model. Dodat je i opcioni **Groq** prepis u
+  oblaku (~1 s) sa lokalnim fallback-om; u Podešavanjima → **Brzina** biraš
+  Brzo / Najtačnije / Groq. Verzija **0.1.7 (8)**.
 - **28.10.2026.** — dodato je **opciono doterivanje teksta** preko
   **Gemini**, OpenAI, Claude, DeepSeek, Ollama i drugih OpenAI-kompatibilnih
   servisa. U Podešavanjima je sekcija **Doterivanje** sa API ključem u

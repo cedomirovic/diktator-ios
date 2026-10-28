@@ -12,16 +12,16 @@ Projekat je nastao iz macOS aplikacije
 **snimak i tekst ostaju na uređaju**, bez slanja zvuka na server.
 
 - GitHub: <https://github.com/cedomirovic/diktator-ios>
-- Verzija: **0.1.6 (7)**
+- Verzija: **0.1.7 (8)**
 - Aplikacija: **Diktator iOS** (`com.cedomirovic.diktator.ios`)
 - Tastatura: `com.cedomirovic.diktator.ios.keyboard`
-- Preporučeni model: **Large v3 q5_0** (~1,0 GB) — tačniji za srpski.
-  **Large v3 Turbo q5_0** (~547 MB) je brža opcija sa manje RAM-a.
+- Modeli: **Large v3 Turbo q5_0** (~547 MB) za brzinu i
+  **Large v3 q5_0** (~1,0 GB) za najtačniji srpski.
 - Minimum iOS 17; testirano na iPhone 15 Pro (iPhone16,1), iOS 27.0.1.
 
 ## Status
 
-Verzija **0.1.6 (7)** je potpisana i instalirana na **iPhone 15 Pro**
+Verzija **0.1.7 (8)** je potpisana i instalirana na **iPhone 15 Pro**
 (iOS 27.0.1). Debug i Release build prolaze na macOS 26.7.1 i Xcode 27.1;
 whisper.cpp za iOS (arm64, Metal + Accelerate) je izgrađen. Skripta pravi
 nepotpisan `build/DiktatorIOS.ipa` (~1.6 MB bez modela).
@@ -38,8 +38,9 @@ Status i komande idu preko imenovanih pasteboard-a i Darwin notifikacija, a
 gotov tekst preko clipboarda.
 
 Na srpskom sistemu aplikacija podrazumevano bira jezik **Srpski**, a ne
-automatsku detekciju. Za srpski je preporučen **Large v3**; Turbo je brži, ali
-na srpskom ume više da pogreši.
+automatsku detekciju. Podrazumevani način je **Brzo (Turbo)**, a u
+Podešavanjima → **Brzina** možeš izabrati **Najtačnije (Large v3)** ili
+**Groq (oblak)**.
 
 ## Ažuriranja
 
@@ -80,6 +81,25 @@ Posle toga rade i `devicectl device install app` i
    **„Spremno je, nalepi.“**, tapni **Nalepi**.
 5. Sledeći put, dok sesija traje (do 15 minuta), tapni **Diktiraj** direktno
    u tastaturi; Diktator se ne otvara.
+
+## Brzina prepisa
+
+Whisper je ranije uvek računao enkoder za punih 30 sekundi, i kada je snimak
+kraći, pa je kratak diktat trajao skoro isto kao dug. Sada se audio kontekst
+svodi na **stvarnu dužinu snimka** (uz malu rezervu), a broj niti je prilagođen
+Apple Siliconu. Uz **Turbo** model kratak diktat se prepisuje nekoliko puta
+brže nego pre, i dalje potpuno lokalno.
+
+U **Podešavanjima → Brzina** biraš:
+
+- **Brzo — Turbo, na uređaju** (podrazumevano): najbrži lokalni prepis.
+- **Najtačnije — Large v3**: bolji srpski, sporije.
+- **Najbrže — Groq (oblak)**: snimak ide na Groq i prepis traje oko sekund.
+  Potreban je ključ sa `console.groq.com → API Keys`. Ako Groq ne odgovori,
+  isti snimak se prepisuje lokalno, pa tekst ne izostaje.
+
+Zvuk napušta uređaj samo kada je izabran **Groq**; u lokalnim režimima sve
+ostaje na telefonu.
 
 ## Doterivanje teksta (opciono)
 

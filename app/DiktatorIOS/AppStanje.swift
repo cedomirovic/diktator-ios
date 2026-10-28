@@ -136,6 +136,9 @@ final class AppStanje: ObservableObject {
     @Published var kljucDoterivanja = ""
     @Published var testiraDoterivanje = false
     @Published var porukaDoterivanja: String?
+    @Published var kljucOblaka = ""
+    @Published var testiraOblak = false
+    @Published var porukaOblaka: String?
 
     private let snimac = Snimac()
     private let prepisivac = Prepisivac()
@@ -175,6 +178,7 @@ final class AppStanje: ObservableObject {
 
         dostupnoAzuriranje = Azuriranja.kesirano()
         kljucDoterivanja = Kljuc.citaj(za: podesavanja.provajderDoterivanja) ?? ""
+        kljucOblaka = Kljuc.citaj(za: "groq") ?? ""
 
         let centar = CFNotificationCenterGetDarwinNotifyCenter()
         let osmatrac = Unmanaged.passUnretained(self).toOpaque()
@@ -279,7 +283,8 @@ final class AppStanje: ObservableObject {
             Dnevnik.pisi("ukljuciSesijuAsync odbijeno: nema dozvole za mikrofon")
             return false
         }
-        guard let model = Modeli.nadji(podesavanja.model), model.preuzet else {
+        let model = modelZaPrepis
+        guard (model?.preuzet == true) || oblakSpreman else {
             stanje = .greska("Model nije preuzet. Otvori Podešavanja i preuzmi model.")
             Dnevnik.pisi("ukljuciSesijuAsync odbijeno: model nije preuzet")
             pisiIPCStanje()
@@ -299,6 +304,16 @@ final class AppStanje: ObservableObject {
             stanje = .mirno
         }
         sesijaAktivna = true
+        // Model se učitava odmah, dok korisnik prelazi u drugu aplikaciju, da
+        // prvi Diktiraj ne čeka na učitavanje. U sesiji se koristi CPU, jer
+        // Metal u pozadini nije dostupan.
+        if !podesavanja.prepisOblak, let model, model.preuzet {
+            let prepisivac = self.prepisivac
+            let putanja = model.putanja.path
+            DispatchQueue.global(qos: .utility).async {
+                try? prepisivac.ucitaj(putanja: putanja, useGPU: false)
+            }
+        }
         sesijaPreostalo = Snimac.najduzeSesijeSekundi
         sesijaKraj = Date().addingTimeInterval(TimeInterval(Snimac.najduzeSesijeSekundi))
         pokreniTimerSesije()
@@ -445,36 +460,140 @@ final class AppStanje: ObservableObject {
             return
         }
 
-        guard let model = Modeli.nadji(podesavanja.model), model.preuzet else {
+        let jezik = podesavanja.jezik
+        let rezim = RezimPrepisa.iz(podesavanja.rezimPrepisa)
+        let prompt = Recnik.kaoPrompt(recnik)
+        // Metal u pozadini nije dostupan, a i prelazak GPU/CPU tera ponovno
+        // učitavanje modela. Zato GPU koristimo samo za diktat direktno u
+        // aplikaciji, dok sesija nije uključena.
+        let useGPU = UIApplication.shared.applicationState == .active && !sesijaAktivna
+        let kljucOblaka = self.kljucOblaka.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        stanje = .priprema
+        pisiIPCStanje()
+        pocniZadatakUPozadini()
+
+        if podesavanja.prepisOblak, !kljucOblaka.isEmpty {
+            Dnevnik.pisi("Prepis u oblaku (Groq), jezik=\(jezik)")
+            pokreniOblakPrepis(
+                uzorci: ocisceni,
+                trajanje: trajanje,
+                jezik: jezik,
+                kljuc: kljucOblaka,
+                prompt: prompt,
+                rezim: rezim,
+                useGPU: useGPU
+            )
+            return
+        }
+
+        guard let model = modelZaPrepis, model.preuzet else {
+            zavrsiZadatakUPozadini()
             stanje = .greska("Model nije preuzet. Otvori Podešavanja i preuzmi model.")
             pisiIPCStanje()
             return
         }
 
-        let jezik = podesavanja.jezik
-        let rezim = RezimPrepisa.iz(podesavanja.rezimPrepisa)
-        let prompt = Recnik.kaoPrompt(recnik)
-        let useGPU = UIApplication.shared.applicationState == .active
         Dnevnik.pisi(
-            "Prepis pocinje: model=\(model.id), fajl=\(model.putanja.lastPathComponent), jezik=\(jezik), GPU=\(useGPU), app=\(UIApplication.shared.applicationState.rawValue)"
+            "Prepis pocinje: model=\(model.id), jezik=\(jezik), GPU=\(useGPU), app=\(UIApplication.shared.applicationState.rawValue)"
         )
-        stanje = .priprema
-        pisiIPCStanje()
-        pocniZadatakUPozadini()
+        pokreniLokalniPrepis(
+            uzorci: ocisceni,
+            trajanje: trajanje,
+            jezik: jezik,
+            prompt: prompt,
+            rezim: rezim,
+            useGPU: useGPU,
+            model: model,
+            napomena: nil
+        )
+    }
 
+    /// Prepis u oblaku je najbrži, ali šalje zvuk Groq-u. Ako ne uspe, isti
+    /// snimak se prepisuje lokalno, pa korisnik ne ostaje bez teksta.
+    private func pokreniOblakPrepis(
+        uzorci: [Float],
+        trajanje: Double,
+        jezik: String,
+        kljuc: String,
+        prompt: String,
+        rezim: RezimPrepisa,
+        useGPU: Bool
+    ) {
+        stanje = .prepisuje
+        pisiIPCStanje()
+        let model = modelOblaka
+
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            do {
+                let tekst = try await PrepisOblak.prepisi(
+                    uzorci: uzorci,
+                    jezik: jezik,
+                    kljuc: kljuc,
+                    model: model
+                )
+                Dnevnik.pisi("Oblak prepis gotov, duzina=\(tekst.count)")
+                self.zavrsiPrepis(tekst, trajanje: trajanje, jezik: jezik)
+            } catch {
+                Dnevnik.pisi("Oblak greska: \(error.localizedDescription)")
+                guard let lokalni = self.modelZaPrepis, lokalni.preuzet else {
+                    self.zavrsiZadatakUPozadini()
+                    self.stanje = .greska(
+                        "\(error.localizedDescription) Lokalni model nije preuzet, pa nema rezervnog prepisa."
+                    )
+                    self.pisiIPCStanje()
+                    return
+                }
+                self.stanje = .priprema
+                self.pisiIPCStanje()
+                self.pokreniLokalniPrepis(
+                    uzorci: uzorci,
+                    trajanje: trajanje,
+                    jezik: jezik,
+                    prompt: prompt,
+                    rezim: rezim,
+                    useGPU: useGPU,
+                    model: lokalni,
+                    napomena: "Groq nije odgovorio — prepis je urađen na uređaju."
+                )
+            }
+        }
+    }
+
+    private func pokreniLokalniPrepis(
+        uzorci: [Float],
+        trajanje: Double,
+        jezik: String,
+        prompt: String,
+        rezim: RezimPrepisa,
+        useGPU: Bool,
+        model: PonudaModela,
+        napomena: String?
+    ) {
         let prepisivac = self.prepisivac
         DispatchQueue.global(qos: .userInitiated).async {
             do {
+                let pocetak = Date()
                 try prepisivac.ucitaj(putanja: model.putanja.path, useGPU: useGPU)
+                let ucitavanje = Date().timeIntervalSince(pocetak)
                 let tekst = try prepisivac.prepisi(
-                    uzorci: ocisceni,
+                    uzorci: uzorci,
                     jezik: jezik,
                     recnik: prompt,
                     rezim: rezim
                 )
                 let jezikPrepisa = prepisivac.jezikZadnjegPrepisa()
+                Dnevnik.pisi(
+                    "Model spreman za \(String(format: "%.2f", ucitavanje))s"
+                )
                 DispatchQueue.main.async { [weak self] in
-                    self?.zavrsiPrepis(tekst, trajanje: trajanje, jezik: jezikPrepisa)
+                    self?.zavrsiPrepis(
+                        tekst,
+                        trajanje: trajanje,
+                        jezik: jezikPrepisa,
+                        napomena: napomena
+                    )
                 }
             } catch {
                 Dnevnik.pisi("Prepis greska: \(error.localizedDescription)")
@@ -489,7 +608,12 @@ final class AppStanje: ObservableObject {
         }
     }
 
-    private func zavrsiPrepis(_ tekst: String, trajanje: Double, jezik: String) {
+    private func zavrsiPrepis(
+        _ tekst: String,
+        trajanje: Double,
+        jezik: String,
+        napomena: String? = nil
+    ) {
         let sredjen = Tekst.sredi(tekst)
         Dnevnik.pisi("Prepis tekst: duzina=\(sredjen.count)")
         guard !sredjen.isEmpty else {
@@ -505,7 +629,7 @@ final class AppStanje: ObservableObject {
         let trebaKljuc = provajder.traziKljuc && kljuc.isEmpty
 
         guard podesavanja.doterivanje else {
-            dovrsiPrepis(sredjen, trajanje: trajanje, jezik: jezik, napomena: nil)
+            dovrsiPrepis(sredjen, trajanje: trajanje, jezik: jezik, napomena: napomena)
             return
         }
 
@@ -514,7 +638,9 @@ final class AppStanje: ObservableObject {
                 sredjen,
                 trajanje: trajanje,
                 jezik: jezik,
-                napomena: "Doterivanje je preskočeno — \(provajder.naziv) ključ nije unet."
+                napomena: [napomena, "Doterivanje je preskočeno — \(provajder.naziv) ključ nije unet."]
+                    .compactMap { $0 }
+                    .joined(separator: " ")
             )
             return
         }
@@ -540,15 +666,16 @@ final class AppStanje: ObservableObject {
                     doteran,
                     trajanje: trajanje,
                     jezik: jezik,
-                    napomena: nil
+                    napomena: napomena
                 )
             } catch {
                 Dnevnik.pisi("Doterivanje greska: \(error.localizedDescription)")
+                let greska = "Doterivanje nije uspelo (\(provajder.naziv)) — ostavljen je sirov prepis."
                 self.dovrsiPrepis(
                     sredjen,
                     trajanje: trajanje,
                     jezik: jezik,
-                    napomena: "Doterivanje nije uspelo (\(provajder.naziv)) — ostavljen je sirov prepis."
+                    napomena: napomena.map { "\($0) \(greska)" } ?? greska
                 )
             }
         }
@@ -855,8 +982,19 @@ final class AppStanje: ObservableObject {
 
     // MARK: - Modeli
 
+    /// Model koji se stvarno koristi. U brzom režimu to je Turbo čim je
+    /// preuzet, i ako je korisnik ranije izabrao Large v3.
+    var modelZaPrepis: PonudaModela? {
+        if RezimBrzine.iz(podesavanja.rezimBrzine) == .brzo,
+           let turbo = Modeli.nadji("ggml-large-v3-turbo-q5_0.bin"),
+           turbo.preuzet {
+            return turbo
+        }
+        return Modeli.nadji(podesavanja.model)
+    }
+
     var modelJePreuzet: Bool {
-        Modeli.nadji(podesavanja.model)?.preuzet == true
+        modelZaPrepis?.preuzet == true || oblakSpreman
     }
 
     func preuzmiModel(_ model: PonudaModela) {
@@ -902,11 +1040,42 @@ final class AppStanje: ObservableObject {
     func izaberiModel(_ model: PonudaModela) {
         if model.preuzet {
             podesavanja.model = model.id
+            if model.id == "ggml-large-v3-turbo-q5_0.bin" {
+                podesavanja.rezimBrzine = RezimBrzine.brzo.rawValue
+                podesavanja.prepisOblak = false
+            } else if model.id == "ggml-large-v3-q5_0.bin" {
+                podesavanja.rezimBrzine = RezimBrzine.tacno.rawValue
+                podesavanja.prepisOblak = false
+            }
             SkladistePodesavanja.sacuvaj(podesavanja)
             prepisivac.oslobodi()
             poruka = "Izabran je model \(model.naziv)."
         } else {
             preuzmiModel(model)
+        }
+    }
+
+    /// Izbor u sekciji Brzina menja i model, da korisnik ne mora da bira na
+    /// dva mesta. Ako Turbo nije preuzet, ostaje izabrani model.
+    func postaviRezimBrzine(_ id: String) {
+        let rezim = RezimBrzine.iz(id)
+        podesavanja.rezimBrzine = rezim.rawValue
+        podesavanja.prepisOblak = rezim == .oblak
+
+        switch rezim {
+        case .brzo:
+            if let turbo = Modeli.nadji("ggml-large-v3-turbo-q5_0.bin"), turbo.preuzet {
+                podesavanja.model = turbo.id
+            }
+        case .tacno:
+            if let large = Modeli.nadji("ggml-large-v3-q5_0.bin"), large.preuzet {
+                podesavanja.model = large.id
+            }
+        case .oblak:
+            break
+        }
+        if !sesijaAktivna {
+            prepisivac.oslobodi()
         }
     }
 
@@ -1012,8 +1181,48 @@ final class AppStanje: ObservableObject {
         }
     }
 
+    // MARK: - Prepis u oblaku
+
+    var modelOblaka: String {
+        let upisan = podesavanja.modelOblaka.trimmingCharacters(in: .whitespacesAndNewlines)
+        return upisan.isEmpty ? PrepisOblak.podrazumevaniModel : upisan
+    }
+
+    var oblakSpreman: Bool {
+        podesavanja.prepisOblak &&
+            !kljucOblaka.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    @discardableResult
+    func sacuvajKljucOblaka() -> Bool {
+        let ociscen = kljucOblaka.trimmingCharacters(in: .whitespacesAndNewlines)
+        kljucOblaka = ociscen
+        let uspeh = Kljuc.upisi(ociscen, za: "groq")
+        porukaOblaka = uspeh
+            ? "Groq ključ je sačuvan u Keychain-u."
+            : "Groq ključ nije mogao da se sačuva u Keychain-u."
+        return uspeh
+    }
+
+    func testirajOblak() {
+        guard !testiraOblak else { return }
+        let kljuc = kljucOblaka.trimmingCharacters(in: .whitespacesAndNewlines)
+        testiraOblak = true
+        Task { @MainActor in
+            do {
+                try await PrepisOblak.proveriKljuc(kljuc)
+                testiraOblak = false
+                porukaOblaka = "Veza radi. Model: \(modelOblaka)."
+            } catch {
+                testiraOblak = false
+                porukaOblaka = "Test nije uspeo: \(error.localizedDescription)"
+            }
+        }
+    }
+
     func sacuvajPodesavanja() {
         SkladistePodesavanja.sacuvaj(podesavanja)
+        guard !sesijaAktivna else { return }
         prepisivac.oslobodi()
         oslobodiModelPosle()
     }

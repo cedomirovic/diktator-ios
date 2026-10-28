@@ -97,6 +97,24 @@ final class Prepisivac: @unchecked Sendable {
         bravaStanja.unlock()
     }
 
+    /// Whisper uvek računa enkoder za punih 30 sekundi, i kada je snimak kraći.
+    /// Zato kratak diktat traje skoro isto kao dug. Ako unapred smanjimo audio
+    /// kontekst na stvarnu dužinu snimka (uz malu rezervu), enkoder radi samo
+    /// potreban broj frejmova — nekoliko puta brže, bez gubitka teksta.
+    ///
+    /// Vrednost mora da pokrije ceo snimak: kraći kontekst bi odsekao kraj
+    /// rečenice i naterao model da ponavlja. Zato 0 (punih 1500) za sve preko
+    /// ~28 sekundi.
+    private static func audioKontekst(uzorci: Int) -> Int32 {
+        let sekunde = Double(uzorci) / 16_000.0
+        guard sekunde > 0.5 else { return 0 }
+        // 50 pozicija u enkoderu pokriva jednu sekundu zvuka.
+        let potrebno = Int((sekunde * 50.0).rounded(.up)) + 64
+        guard potrebno < 1440 else { return 0 }
+        let zaokruzeno = ((potrebno + 63) / 64) * 64
+        return Int32(min(1440, max(192, zaokruzeno)))
+    }
+
     func prepisi(uzorci: [Float], jezik: String, recnik: String, rezim: RezimPrepisa = .stedljivo) throws -> String {
         try red.sync {
             guard let kontekst else { throw GreskaPrepisa.modelNijePreuzet }
@@ -117,7 +135,11 @@ final class Prepisivac: @unchecked Sendable {
                 p = whisper_full_default_params(WHISPER_SAMPLING_GREEDY)
                 p.greedy.best_of = 1
             }
-            p.n_threads = 4
+            // Na Apple Siliconu su 2-3 niti brže od 4+: dodatne niti završe na
+            // efikasnim jezgrima i samo usporavaju enkoder. Metal koristi GPU
+            // za matrične operacije, pa tu broj niti manje utiče.
+            p.n_threads = ucitanaGPU ? 4 : 3
+            p.audio_ctx = Prepisivac.audioKontekst(uzorci: uzorci.count)
             p.translate = false
             p.no_context = true
             p.no_timestamps = true
@@ -136,6 +158,7 @@ final class Prepisivac: @unchecked Sendable {
             p.detect_language = false
 
             let prompt = recnik.trimmingCharacters(in: .whitespacesAndNewlines)
+            let pocetak = Date()
 
             let rezultat: Int32 = jezik.withCString { jez in
                 prompt.withCString { rec in
@@ -152,6 +175,11 @@ final class Prepisivac: @unchecked Sendable {
                     }
                 }
             }
+
+            let trajanje = Date().timeIntervalSince(pocetak)
+            Dnevnik.pisi(
+                "Whisper: audio=\(String(format: "%.2f", Double(uzorci.count) / 16_000.0))s, ac=\(p.audio_ctx), niti=\(p.n_threads), GPU=\(ucitanaGPU), obrada=\(String(format: "%.2f", trajanje))s"
+            )
 
             guard rezultat == 0 else {
                 Dnevnik.pisi(

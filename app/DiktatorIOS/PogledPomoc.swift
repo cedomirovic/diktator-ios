@@ -39,6 +39,7 @@ struct PogledPomoc: View {
                         .font(.title2.bold())
                     Text("Snimak se obrađuje lokalno. Aplikacija ne šalje zvuk na server. Model se preuzima sa Hugging Face-a.")
                     Text("Ako uključiš doterivanje, samo gotov tekst ide izabranom servisu (Gemini, OpenAI, Claude, DeepSeek ili drugi). Nikada se ne šalje zvuk.")
+                    Text("Ako izabereš Groq u Podešavanjima → Brzina, snimak se šalje Groq-u radi bržeg prepisa. U režimima Brzo i Najtačnije sve ostaje na uređaju.")
 
                     Divider()
 

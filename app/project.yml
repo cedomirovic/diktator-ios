@@ -31,8 +31,8 @@ targets:
       properties:
         CFBundleDisplayName: Diktator
         CFBundleName: Diktator
-        CFBundleShortVersionString: "0.1.6"
-        CFBundleVersion: "7"
+        CFBundleShortVersionString: "0.1.7"
+        CFBundleVersion: "8"
         UILaunchScreen: {}
         UIBackgroundModes:
           - audio
@@ -100,8 +100,8 @@ targets:
       properties:
         CFBundleDisplayName: Diktator
         CFBundleName: Diktator
-        CFBundleShortVersionString: "0.1.6"
-        CFBundleVersion: "7"
+        CFBundleShortVersionString: "0.1.7"
+        CFBundleVersion: "8"
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
         NSExtension:

@@ -20,6 +20,7 @@
 		7F899CB7C681D8EE6266283D /* Statistika.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA1E0F6EF3E4D95878C454E9 /* Statistika.swift */; };
 		8AEFD397044454A822A042B1 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D319E51BA1C441F49CF777D /* KeyboardViewController.swift */; };
 		933944E1BC2F012E332A1849 /* PogledIstorija.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6D579545458783F98DD33B /* PogledIstorija.swift */; };
+		93DB9F36BE0006AB9F198783 /* PrepisOblak.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCB893F47646B0D69B230036 /* PrepisOblak.swift */; };
 		94F8BCCE51B02101CE009BF0 /* PogledStatistika.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E2D48993A765741AFA31BE8 /* PogledStatistika.swift */; };
 		9B1AD4661F980D3502864CF7 /* PogledDiktat.swift in Sources */ = {isa = PBXBuildFile; fileRef = E98742B6EFA7462CED1983E6 /* PogledDiktat.swift */; };
 		A9741BFAC2D228E53F350A8E /* Podesavanja.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31EB7D7F59EF1CFE3D869AEF /* Podesavanja.swift */; };
@@ -82,6 +83,7 @@
 		97891DDD9878C4AD3F561229 /* AppStanje.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStanje.swift; sourceTree = "<group>"; };
 		A5C631B7C4BC7D5E1DF680F1 /* PonudaModela.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PonudaModela.swift; sourceTree = "<group>"; };
 		CA1E0F6EF3E4D95878C454E9 /* Statistika.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Statistika.swift; sourceTree = "<group>"; };
+		CCB893F47646B0D69B230036 /* PrepisOblak.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrepisOblak.swift; sourceTree = "<group>"; };
 		DA613E2FCC4C47914E7A962B /* DiktatorIOS-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "DiktatorIOS-Bridging-Header.h"; sourceTree = "<group>"; };
 		E98742B6EFA7462CED1983E6 /* PogledDiktat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PogledDiktat.swift; sourceTree = "<group>"; };
 		F04EB5CE75811FF1188C1A13 /* Doterivanje.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Doterivanje.swift; sourceTree = "<group>"; };
@@ -119,6 +121,7 @@
 				5E2D48993A765741AFA31BE8 /* PogledStatistika.swift */,
 				A5C631B7C4BC7D5E1DF680F1 /* PonudaModela.swift */,
 				20316097F523817AD4BBA083 /* Prepisivac.swift */,
+				CCB893F47646B0D69B230036 /* PrepisOblak.swift */,
 				275C7CD6E540C9810103E49D /* Preuzimanje.swift */,
 				0D151EFE97E9DBD96818BDCA /* ProvajderiDoterivanja.swift */,
 				F3EC31002A94081E2BD18ECA /* Putanje.swift */,
@@ -264,6 +267,7 @@
 				D15633B282DFD84931A0F53A /* PogledRecnik.swift in Sources */,
 				94F8BCCE51B02101CE009BF0 /* PogledStatistika.swift in Sources */,
 				58735B81EB834F2BBB3FC49D /* PonudaModela.swift in Sources */,
+				93DB9F36BE0006AB9F198783 /* PrepisOblak.swift in Sources */,
 				F07D6AF7774E528B355D0D59 /* Prepisivac.swift in Sources */,
 				BF63604AFF2519489C66144A /* Preuzimanje.swift in Sources */,
 				F1C47B9141B8A01B4E7F6FFF /* ProvajderiDoterivanja.swift in Sources */,

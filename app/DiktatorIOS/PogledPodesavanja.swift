@@ -90,6 +90,105 @@ struct PogledPodesavanja: View {
                 Toggle("Čuvaj istoriju", isOn: $stanje.podesavanja.cuvajIstoriju)
             }
 
+            Section("Brzina") {
+                Picker(
+                    "Način",
+                    selection: Binding(
+                        get: { stanje.podesavanja.rezimBrzine },
+                        set: { stanje.postaviRezimBrzine($0) }
+                    )
+                ) {
+                    ForEach(RezimBrzine.allCases) { rezim in
+                        Text(rezim.naziv).tag(rezim.rawValue)
+                    }
+                }
+
+                Text(RezimBrzine.iz(stanje.podesavanja.rezimBrzine).opis)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                if stanje.podesavanja.prepisOblak {
+                    HStack {
+                        if kljucVidljiv {
+                            TextField("Groq API ključ", text: $stanje.kljucOblaka)
+                                .textInputAutocapitalization(.never)
+                                .autocorrectionDisabled()
+                        } else {
+                            SecureField("Groq API ključ", text: $stanje.kljucOblaka)
+                        }
+                        Button {
+                            kljucVidljiv.toggle()
+                        } label: {
+                            Image(systemName: kljucVidljiv ? "eye.slash" : "eye")
+                        }
+                        .buttonStyle(.borderless)
+                        .accessibilityLabel(kljucVidljiv ? "Sakrij ključ" : "Prikaži ključ")
+                    }
+
+                    Button("Sačuvaj ključ") {
+                        stanje.sacuvajKljucOblaka()
+                    }
+
+                    HStack {
+                        Text("Model")
+                            .font(.caption.weight(.medium))
+                            .frame(width: 58, alignment: .leading)
+                        TextField(
+                            PrepisOblak.podrazumevaniModel,
+                            text: $stanje.podesavanja.modelOblaka
+                        )
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                    }
+
+                    Button {
+                        stanje.testirajOblak()
+                    } label: {
+                        if stanje.testiraOblak {
+                            HStack(spacing: 6) {
+                                ProgressView()
+                                Text("Testiram…")
+                            }
+                        } else {
+                            Label("Test veze", systemImage: "bolt.horizontal")
+                        }
+                    }
+                    .disabled(
+                        stanje.testiraOblak ||
+                        stanje.kljucOblaka.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                    )
+
+                    if let poruka = stanje.porukaOblaka {
+                        Text(poruka)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Text("Ključ praviš na console.groq.com → API Keys. Model: whisper-large-v3-turbo (može i whisper-large-v3). Ako Groq ne odgovori, prepis se radi na uređaju.")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+
+                if !stanje.podesavanja.prepisOblak {
+                    Text("Model za prepis: \(stanje.modelZaPrepis?.naziv ?? "nije preuzet")")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
+                if RezimBrzine.iz(stanje.podesavanja.rezimBrzine) == .brzo,
+                   let turbo = Modeli.nadji("ggml-large-v3-turbo-q5_0.bin"),
+                   !turbo.preuzet {
+                    Button("Preuzmi Turbo (~547 MB)") {
+                        stanje.preuzmiModel(turbo)
+                    }
+                    .disabled(stanje.modelSePreuzima)
+                }
+
+                Text("Enkoder se sada računa samo za stvarnu dužinu snimka, pa je kratak diktat nekoliko puta brži nego pre.")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+
             Section("Doterivanje") {
                 Toggle("Popravi interpunkciju i imena", isOn: $stanje.podesavanja.doterivanje)
 

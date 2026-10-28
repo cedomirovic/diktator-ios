@@ -120,7 +120,7 @@ struct PogledDiktat: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Savet za srpski")
                                 .font(.headline)
-                            Text("Turbo model je brz, ali za srpski ume da pogreši. Large v3 daje tačniji tekst (~1,0 GB).")
+                            Text("Turbo je izabran zbog brzine. Ako želiš tačniji srpski, prebaci na Large v3 (~1,0 GB).")
                                 .font(.footnote)
                                 .foregroundStyle(.secondary)
 

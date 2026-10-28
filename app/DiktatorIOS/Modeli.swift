@@ -85,6 +85,39 @@ enum RezimPrepisa: String, CaseIterable, Identifiable {
     }
 }
 
+/// Odnos brzine i tačnosti. Turbo model ima 4 dekoderska sloja umesto 32,
+/// pa je nekoliko puta brži, ali za srpski ume da pogreši imena i završetke.
+enum RezimBrzine: String, CaseIterable, Identifiable {
+    case brzo
+    case tacno
+    case oblak
+
+    var id: String { rawValue }
+
+    var naziv: String {
+        switch self {
+        case .brzo: return "Brzo — Turbo, na uređaju"
+        case .tacno: return "Najtačnije — Large v3"
+        case .oblak: return "Najbrže — Groq (oblak)"
+        }
+    }
+
+    var opis: String {
+        switch self {
+        case .brzo:
+            return "Turbo model i kraći audio kontekst. Nekoliko puta brže od Large v3, uz moguće greške u imenima."
+        case .tacno:
+            return "Large v3 je najtačniji za srpski, ali sporiji. Kratak snimak i dalje traje nekoliko sekundi."
+        case .oblak:
+            return "Groq prepiše kratak snimak za oko sekund, ali zvuk tada napušta uređaj."
+        }
+    }
+
+    static func iz(_ id: String) -> RezimBrzine {
+        RezimBrzine(rawValue: id) ?? .brzo
+    }
+}
+
 /// Koliko dugo model ostaje u memoriji posle prepisa.
 enum OslobadjanjeModela: String, CaseIterable, Identifiable {
     case odmah
@@ -141,6 +174,9 @@ struct Podesavanja: Codable, Equatable {
     var provajderDoterivanja = ProvajderiDoterivanja.podrazumevani.id
     var modeliDoterivanja: [String: String] = [:]
     var adresaCustomDoterivanja = ProvajderiDoterivanja.custom.adresa
+    var prepisOblak = false
+    var modelOblaka = PrepisOblak.podrazumevaniModel
+    var rezimBrzine = RezimBrzine.brzo.rawValue
 
     init() {}
 
@@ -155,6 +191,9 @@ struct Podesavanja: Codable, Equatable {
         case provajderDoterivanja
         case modeliDoterivanja
         case adresaCustomDoterivanja
+        case prepisOblak
+        case modelOblaka
+        case rezimBrzine
     }
 
     init(from decoder: Decoder) throws {
@@ -186,5 +225,13 @@ struct Podesavanja: Codable, Equatable {
             ?? [:]
         adresaCustomDoterivanja = try kontejner.decodeIfPresent(String.self, forKey: .adresaCustomDoterivanja)
             ?? ProvajderiDoterivanja.custom.adresa
+        prepisOblak = try kontejner.decodeIfPresent(Bool.self, forKey: .prepisOblak) ?? false
+        modelOblaka = try kontejner.decodeIfPresent(String.self, forKey: .modelOblaka)
+            ?? PrepisOblak.podrazumevaniModel
+        rezimBrzine = try kontejner.decodeIfPresent(String.self, forKey: .rezimBrzine)
+            ?? RezimBrzine.brzo.rawValue
+        if RezimBrzine(rawValue: rezimBrzine) == nil {
+            rezimBrzine = RezimBrzine.brzo.rawValue
+        }
     }
 }
