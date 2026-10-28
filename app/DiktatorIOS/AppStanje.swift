@@ -296,6 +296,13 @@ final class AppStanje: ObservableObject {
     private func ukljuciSesijuAsync() async -> Bool {
         Dnevnik.pisi("ukljuciSesijuAsync početak, sesija=\(sesijaAktivna)")
         if sesijaAktivna {
+            // Sesija je mogla da istekne dok je aplikacija bila u pozadini
+            // (iOS ne pušta tajmer dok je suspendovana). Pošto je korisnik
+            // upravo tapnuo Diktiraj, produžavamo je umesto da je gasimo.
+            if let kraj = sesijaKraj, kraj <= Date() {
+                Dnevnik.pisi("Sesija je istekla u pozadini — produžavam.")
+                produziSesiju()
+            }
             pisiIPCStanje()
             return true
         }
@@ -353,6 +360,18 @@ final class AppStanje: ObservableObject {
         NSLog("Diktator: sesija uključena, traje do %d s.", Snimac.najduzeSesijeSekundi)
         poruka = "Sesija je aktivna. Pređi u drugu aplikaciju i tapni Diktiraj na tastaturi."
         return true
+    }
+
+    /// Produžava prozor pozadinske sesije i osigurava da server, tajmeri i
+    /// heartbeat rade. Bez ovoga bi sesija istekla posle 15 minuta i tastatura
+    /// bi morala ponovo da otvara aplikaciju.
+    private func produziSesiju() {
+        sesijaKraj = Date().addingTimeInterval(TimeInterval(Snimac.najduzeSesijeSekundi))
+        sesijaPreostalo = Snimac.najduzeSesijeSekundi
+        pokreniTimerSesije()
+        pokreniIPCHeartbeat()
+        server.pokreni()
+        Dnevnik.pisi("Sesija produžena do \(Int(sesijaKraj?.timeIntervalSince1970 ?? 0)).")
     }
 
     func zavrsiSesiju() {
@@ -472,6 +491,10 @@ final class AppStanje: ObservableObject {
     func pocniSnimanje(saTastature: Bool = false) {
         guard !stanje.jeSnimanje, !stanje.jeZauzet else { return }
         Dnevnik.pisi("pocniSnimanje(saTastature=\(saTastature))")
+        // Svaki diktat produžava prozor sesije, da ne istekne usred snimanja.
+        if sesijaAktivna {
+            produziSesiju()
+        }
         pokrenutSaTastature = saTastature
         if case .greska = stanje {
             stanje = .mirno

@@ -563,6 +563,7 @@ final class KeyboardViewController: UIInputViewController {
             snimaSesijom = false
             obradaSesije = true
             prikaziStatus("Obrada…")
+            pokreniTimeoutSesije()
             azurirajPrikaz()
             return
         }
@@ -572,30 +573,42 @@ final class KeyboardViewController: UIInputViewController {
             return
         }
 
-        if !sesijaAktivna {
-            // Prvi put, dok sesija nije uključena, otvaramo Diktator da
-            // korisnik uključi sesiju. Kad je sesija aktivna, Diktiraj
-            // snima odmah i ne dira drugu aplikaciju.
-            prikaziStatus("Otvori Diktator i uključi sesiju.")
-            // I ovaj prvi diktat treba da se nalepi sam po povratku, ako
-            // aplikacija uspe da ga završi dok je tastatura na ekranu.
+        // Sesija je istekla, aplikacija je ugašena ili status ne stiže.
+        // U svim tim slučajevima otvaramo Diktator, koji uključi sesiju i
+        // odmah počne da snima — tastatura posle povratka samo preuzme tekst.
+        if !sesijaAktivna || !statusSvez {
+            Dnevnik.pisi(
+                "Diktiraj: nema žive sesije (sesija=\(sesijaAktivna), svez=\(statusSvez)) — otvaram app."
+            )
+            prikaziStatus("Otvaram Diktator…")
             diktatPocetakVreme = Date().timeIntervalSince1970
             UserDefaults.standard.set(diktatPocetakVreme, forKey: diktatPocetakKey)
             UserDefaults.standard.set(true, forKey: cekaDiktatKey)
-            otvoriAplikaciju("diktator-ios://sesija-prikaz")
+            otvoriAplikaciju("diktator-ios://dictate")
             return
         }
 
         posaljiKomandu("start")
         snimaSesijom = true
         obradaSesije = false
-        cekaStartSesije = false
+        cekaStartSesije = true
         diktatPocetakVreme = Date().timeIntervalSince1970
         UserDefaults.standard.set(diktatPocetakVreme, forKey: diktatPocetakKey)
         UserDefaults.standard.set(true, forKey: cekaDiktatKey)
         prikaziStatus("Snimam…")
         pustiZvukDiktata()
+        // Ako aplikacija ne odgovori (ugašena je ili suspendovana), timeout
+        // će je otvoriti umesto da tastatura ostane na „Snimam…“.
+        pokreniTimeoutSesije()
         azurirajPrikaz()
+    }
+
+    /// Status koji je stariji od nekoliko sekundi znači da aplikacija više ne
+    /// radi (heartbeat je 1 s), pa je bolje odmah je otvoriti nego čekati
+    /// timeout.
+    private var statusSvez: Bool {
+        zadnjiStatusVreme > 0
+            && Date().timeIntervalSince1970 - zadnjiStatusVreme <= 5
     }
 
     /// Blagi haptički odziv odmah na dodir. Zvuk pušta aplikacija kada
@@ -878,6 +891,19 @@ final class KeyboardViewController: UIInputViewController {
             obradaSesije = false
             timerSesijaTimeout?.invalidate()
             timerSesijaTimeout = nil
+        }
+
+        // Aplikacija je nestala usred obrade (ugašena ili srušena). Ne
+        // ostavljamo tastaturu zaglavljenu na „Obrada…“ — vraćamo Diktiraj,
+        // a sledeći dodir će otvoriti Diktator.
+        if obradaSesije, !cekaStartSesije, sada - zadnjiStatusVreme > 20 {
+            Dnevnik.pisi("Obrada je zastarela — vraćam Diktiraj.")
+            obradaSesije = false
+            tekstSpreman = false
+            UserDefaults.standard.set(false, forKey: cekaDiktatKey)
+            timerAutoNalepi?.invalidate()
+            timerAutoNalepi = nil
+            prikaziStatus("Prepis nije stigao — tapni Diktiraj.")
         }
 
         // Stariji statusi nemaju sesijaDo. Ako su zastareli, ne verujemo im.

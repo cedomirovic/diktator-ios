@@ -6,6 +6,11 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Status
 
+- **28.10.2026.** — **sesija se sama obnavlja**: kada sesija istekne, ili
+  kada je Diktator ugašen (status tastature nije svež), tap na **Diktiraj**
+  otvara Diktator preko `diktator-ios://dictate`, koji uključi sesiju i odmah
+  počne snimanje. Svaki diktat produžava sesiju za novih 15 minuta, a
+  tastatura posle 6 s bez odgovora na `start` sama otvara aplikaciju.
 - **28.10.2026.** — **automatsko lepljenje**: posle diktata iz tastature
   tekst se sam ubacuje u polje, bez klika na **Nalepi**. Aplikacija uz tekst
   upisuje token i vreme, a tastatura preko lokalnog servera prepoznaje novi

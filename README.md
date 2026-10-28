@@ -73,16 +73,17 @@ Posle toga rade i `devicectl device install app` i
 
 1. U bilo kojoj aplikaciji otvori tekstualno polje i prebaci tastaturu na
    **Diktator**.
-2. Tapni **Diktiraj**. Ako sesija nije uključena, otvoriće se Diktator;
-   tapni **Uključi sesiju**, pa se vrati u host aplikaciju i ponovo tapni
-   **Diktiraj**. Ako iOS prikaže **„Open in Diktator?“**, tapni **Open**.
+2. Tapni **Diktiraj**. Ako sesija nije uključena (ili je istekla, ili je
+   Diktator ugašen), otvoriće se Diktator, sam uključiti sesiju i odmah
+   početi snimanje. Ako iOS prikaže **„Open in Diktator?“**, tapni **Open**.
 3. Govori. Tastatura prikazuje **Snimam…**.
 4. Tapni **Stop** — aplikacija prepisuje lokalno, a tastatura **sama
    ubaci tekst** u polje čim prepis stigne. Ako se ne ubaci (aplikacija je
    ugašena ili je snimak odbijen), prikazaće **„Spremno je, nalepi.“** i
    tada tapni **Nalepi**.
-5. Sledeći put, dok sesija traje (do 15 minuta), tapni **Diktiraj** direktno
-   u tastaturi; Diktator se ne otvara.
+5. Sledeći put, dok sesija traje, tapni **Diktiraj** direktno u tastaturi;
+   Diktator se ne otvara. Svaki diktat produžava sesiju za novih 15 minuta,
+   a kada ona ipak istekne, prvi **Diktiraj** je ponovo otvara i snima.
 
 ## Brzina prepisa
 
