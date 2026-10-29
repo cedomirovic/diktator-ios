@@ -68,10 +68,18 @@ struct PogledDiktat: View {
                                 .font(.footnote)
                                 .foregroundStyle(.secondary)
 
-                            Button("Završi sesiju") {
+                            // Crveno i punom širinom — jasno se vidi da sesiju
+                            // treba ugasiti kada se ne diktira.
+                            Button {
                                 stanje.zavrsiSesiju()
+                            } label: {
+                                Label("Završi sesiju", systemImage: "stop.circle.fill")
+                                    .font(.body.weight(.semibold))
+                                    .frame(maxWidth: .infinity)
                             }
-                            .buttonStyle(.bordered)
+                            .buttonStyle(.borderedProminent)
+                            .tint(.red)
+                            .accessibilityHint("Gasi sesiju diktata i oslobađa mikrofon.")
                         } else {
                             Text("Uključi sesiju da Diktiraj na tastaturi snima dok je otvorena bilo koja aplikacija. Kada sesija istekne ili je aplikacija ugašena, tastatura sama otvara Diktator i uključi je.")
                                 .font(.footnote)
