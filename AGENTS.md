@@ -8,7 +8,7 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 - **29.10.2026.** — **dugme „Završi sesiju“ je crveno** i punom širinom kada je
   sesija aktivna, da se odmah vidi da je treba ugasiti (u repou je i dalje
-  verzija **0.2.0 (10)**).
+  verzija **0.2.0 (10)**). Korisnik je potvrdio da sve radi na uređaju.
 - **28.10.2026.** — **priprema za App Store** (verzija **0.2.0 (10)**):
   dodat je `PrivacyInfo.xcprivacy` u aplikaciju i tastaturu (bez tracking-a i
   prikupljanja; `UserDefaults` `CA92.1`, file timestamp `C617.1`),
