@@ -8,25 +8,33 @@ struct PogledStatistika: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 16) {
+            VStack(spacing: 14) {
+                NaslovEkrana(
+                    naslov: "Statistika",
+                    podnaslov: "Pregled napretka i načina korišćenja aplikacije."
+                )
+
                 if s.ukupnoSnimaka == 0 {
                     Text("Još nema diktata. Prvi diktat će pokrenuti statistiku.")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
+                        .font(.system(size: 14))
+                        .foregroundStyle(Dizajn.tekstSekundarni)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 4)
                 }
-                hero
+
                 mreza
                 grafikon
                 detalji
                 jezici
                 reset
             }
-            .padding()
+            .frame(maxWidth: 640)
+            .padding(.horizontal, 16)
+            .padding(.top, 4)
+            .padding(.bottom, 28)
+            .frame(maxWidth: .infinity)
         }
-        .background(Color(.systemGroupedBackground))
-        .navigationTitle("Statistika")
+        .background(Dizajn.pozadina)
+        .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .confirmationDialog(
             "Obrisati statistiku?",
@@ -42,72 +50,36 @@ struct PogledStatistika: View {
         }
     }
 
-    private var hero: some View {
-        VStack(spacing: 10) {
-            Text(s.ukupnoReci.formatted())
-                .font(.system(size: 54, weight: .bold, design: .rounded))
-                .minimumScaleFactor(0.5)
-                .lineLimit(1)
-
-            Text("izdiktiranih reči")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-
-            HStack(spacing: 18) {
-                Label(
-                    "\(s.ukupnoSnimaka.formatted()) \(s.ukupnoSnimaka == 1 ? "diktat" : "diktata")",
-                    systemImage: "mic.fill"
-                )
-                Label(s.ustedaTekst, systemImage: "clock.fill")
-            }
-            .font(.caption.weight(.semibold))
-            .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 24)
-        .padding(.horizontal, 16)
-        .background(
-            LinearGradient(
-                colors: [Color.accentColor.opacity(0.22), Color.accentColor.opacity(0.06)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 22))
-    }
+    // MARK: - Kartice sa brojevima
 
     private var mreza: some View {
         LazyVGrid(
-            columns: [GridItem(.flexible()), GridItem(.flexible())],
+            columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
             spacing: 12
         ) {
             kartica(
                 naslov: "Danas",
                 vrednost: s.danasReci.formatted(),
                 jedinica: "reči",
-                ikona: "sun.max.fill",
-                boja: .orange
+                ikona: "sun.max.fill"
             )
             kartica(
                 naslov: "Niz",
                 vrednost: "\(s.nizDana)",
                 jedinica: s.nizDana == 1 ? "dan" : "dana",
-                ikona: "flame.fill",
-                boja: .red
+                ikona: "flame.fill"
             )
             kartica(
                 naslov: "Prosečno",
                 vrednost: "\(Int(s.prosecnoReciUMinuti.rounded()))",
                 jedinica: "reči/min",
-                ikona: "speedometer",
-                boja: .blue
+                ikona: "speedometer"
             )
             kartica(
                 naslov: "Ušteđeno",
                 vrednost: s.ustedaTekst,
                 jedinica: "vremena",
-                ikona: "hourglass",
-                boja: .green
+                ikona: "hourglass"
             )
         }
     }
@@ -116,150 +88,163 @@ struct PogledStatistika: View {
         naslov: String,
         vrednost: String,
         jedinica: String,
-        ikona: String,
-        boja: Color
+        ikona: String
     ) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Image(systemName: ikona)
-                    .foregroundStyle(boja)
+            HStack(spacing: 8) {
+                IkonaUKrugu(simbol: ikona, velicina: 32)
                 Text(naslov)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                Spacer()
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(Dizajn.tekstSekundarni)
+                    .lineLimit(1)
+                Spacer(minLength: 0)
             }
             Text(vrednost)
-                .font(.title2.bold())
+                .font(.system(size: 26, weight: .bold))
+                .foregroundStyle(Dizajn.tekst)
                 .minimumScaleFactor(0.6)
                 .lineLimit(1)
             Text(jedinica)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
+                .font(.system(size: 12))
+                .foregroundStyle(Dizajn.tekstTercijarni)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(14)
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .kartica(padding: 14)
     }
+
+    // MARK: - Grafikon
 
     private var grafikon: some View {
         let podaci = s.poslednjih7Dana
         let najveci = max(podaci.map(\.reci).max() ?? 0, 1)
 
         return VStack(alignment: .leading, spacing: 14) {
-            HStack {
-                Text("Poslednjih 7 dana")
-                    .font(.headline)
+            HStack(alignment: .firstTextBaseline) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Dnevno korišćenje")
+                        .font(.system(size: 17, weight: .semibold))
+                    Text("Broj diktiranih reči po danima")
+                        .font(.system(size: 13))
+                        .foregroundStyle(Dizajn.tekstSekundarni)
+                }
                 Spacer()
-                Text("\(s.nedeljaReci.formatted()) reči")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                Oznaka(tekst: "\(s.nedeljaReci.formatted()) reči")
             }
 
             HStack(alignment: .bottom, spacing: 8) {
                 ForEach(podaci) { dan in
                     VStack(spacing: 6) {
                         Text(dan.reci > 0 ? "\(dan.reci)" : "")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
+                            .font(.system(size: 10, weight: .medium))
+                            .foregroundStyle(Dizajn.tekstTercijarni)
                             .lineLimit(1)
                             .minimumScaleFactor(0.7)
 
-                        RoundedRectangle(cornerRadius: 5)
+                        RoundedRectangle(cornerRadius: 5, style: .continuous)
                             .fill(
                                 dan.reci > 0
-                                    ? Color.accentColor.gradient
-                                    : Color.secondary.opacity(0.15).gradient
+                                    ? Dizajn.akcenat.opacity(0.85)
+                                    : Dizajn.ivica
                             )
                             .frame(height: visina(dan.reci, najveci: najveci))
 
                         Text(dan.oznaka)
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
+                            .font(.system(size: 11))
+                            .foregroundStyle(Dizajn.tekstSekundarni)
                     }
                     .frame(maxWidth: .infinity)
                 }
             }
-            .frame(height: 150, alignment: .bottom)
+            .frame(height: 148, alignment: .bottom)
         }
-        .padding()
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .kartica()
     }
 
     private func visina(_ reci: Int, najveci: Int) -> CGFloat {
         guard reci > 0 else { return 5 }
         let odnos = CGFloat(reci) / CGFloat(najveci)
-        return max(8, odnos * 108)
+        return max(8, odnos * 104)
     }
+
+    // MARK: - Detalji
 
     private var detalji: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Detalji")
-                .font(.headline)
+                .font(.system(size: 17, weight: .semibold))
 
-            red("Ukupno vremena govora", s.vremeGovoraTekst)
-            Divider()
-            red("Prosečan diktat", Statistika.vreme(s.prosecanDiktatSekundi))
-            Divider()
-            red("Ovaj mesec", "\(s.mesecReci.formatted()) reči")
-            Divider()
-            red("Najduži niz", "\(s.najduziNiz) \(s.najduziNiz == 1 ? "dan" : "dana")")
+            RedPodatka(naslov: "Ukupno vremena govora", vrednost: s.vremeGovoraTekst)
+            Divider().overlay(Dizajn.ivica)
+            RedPodatka(naslov: "Prosečan diktat", vrednost: Statistika.vreme(s.prosecanDiktatSekundi))
+            Divider().overlay(Dizajn.ivica)
+            RedPodatka(naslov: "Ovaj mesec", vrednost: "\(s.mesecReci.formatted()) reči")
+            Divider().overlay(Dizajn.ivica)
+            RedPodatka(naslov: "Najduži niz", vrednost: "\(s.najduziNiz) \(s.najduziNiz == 1 ? "dan" : "dana")")
             if let prvi = s.prviDatum {
-                Divider()
-                red("Prvi diktat", prvi.formatted(date: .abbreviated, time: .omitted))
+                Divider().overlay(Dizajn.ivica)
+                RedPodatka(
+                    naslov: "Prvi diktat",
+                    vrednost: prvi.formatted(date: .abbreviated, time: .omitted)
+                )
             }
         }
-        .padding()
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .kartica()
     }
 
-    private func red(_ naslov: String, _ vrednost: String) -> some View {
-        HStack {
-            Text(naslov)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-            Spacer()
-            Text(vrednost)
-                .font(.subheadline.weight(.semibold))
-        }
-    }
+    // MARK: - Jezici
 
     @ViewBuilder
     private var jezici: some View {
         let podaci = s.jeziciSortirano
         if !podaci.isEmpty {
+            let ukupno = max(podaci.reduce(0) { $0 + $1.broj }, 1)
+
             VStack(alignment: .leading, spacing: 12) {
                 Text("Jezici")
-                    .font(.headline)
+                    .font(.system(size: 17, weight: .semibold))
 
                 ForEach(podaci) { jezik in
-                    HStack {
-                        Text(jezik.naziv)
-                            .font(.subheadline)
-                        Spacer()
-                        Text("\(jezik.broj) \(jezik.broj == 1 ? "diktat" : "diktata")")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(.secondary)
+                    VStack(alignment: .leading, spacing: 6) {
+                        HStack {
+                            Text(jezik.naziv)
+                                .font(.system(size: 15))
+                            Spacer()
+                            Text("\(jezik.broj) \(jezik.broj == 1 ? "diktat" : "diktata")")
+                                .font(.system(size: 13))
+                                .foregroundStyle(Dizajn.tekstSekundarni)
+                        }
+
+                        GeometryReader { geometrija in
+                            ZStack(alignment: .leading) {
+                                Capsule()
+                                    .fill(Dizajn.pozadina)
+                                Capsule()
+                                    .fill(Dizajn.akcenat.opacity(0.85))
+                                    .frame(
+                                        width: geometrija.size.width
+                                            * CGFloat(jezik.broj) / CGFloat(ukupno)
+                                    )
+                            }
+                        }
+                        .frame(height: 6)
                     }
                 }
             }
-            .padding()
-            .background(Color(.secondarySystemGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .kartica()
         }
     }
+
+    // MARK: - Brisanje
 
     private var reset: some View {
         Button(role: .destructive) {
             potvrdiBrisanje = true
         } label: {
             Label("Obriši statistiku", systemImage: "trash")
-                .frame(maxWidth: .infinity)
         }
-        .buttonStyle(.bordered)
+        .buttonStyle(StilDugmeta(boja: Dizajn.crvena, pun: false))
         .disabled(s.ukupnoSnimaka == 0)
-        .padding(.top, 4)
+        .opacity(s.ukupnoSnimaka == 0 ? 0.5 : 1)
+        .padding(.top, 2)
     }
 }

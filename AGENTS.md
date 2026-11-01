@@ -6,6 +6,18 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Status
 
+- **01.11.2026.** — **novi vizuelni identitet sa desktop dizajna**: boje,
+  stil i tipografija preuzeti su sa macOS Diktatora i prilagođeni telefonu.
+  Dodat je `Dizajn.swift` sa tokenima (akcenat **#2F7CF6**, pozadina
+  **#F2F3F5**, bele kartice sa ivicom **#E4E6EA**, tekst **#14161A**,
+  radijus 18), dinamičkim bojama za tamni režim i komponentama
+  (`NaslovEkrana`, `IkonaUKrugu`, `Oznaka`, `RedPodatka`, `StilDugmeta`).
+  Svi ekrani su redizajnirani: **Diktat** (kartica mikrofona, sesija,
+  statistika, koraci), **Istorija** (pretraga, kartice sa trajanjem
+  `01:32`, meni), **Statistika** (4 kartice sa brojevima, stubičasti
+  grafikon), **Podešavanja** (kartice u `Form`-i sa bold zaglavljima) i
+  **Pomoć** (numerisani koraci, kartica podrške). Verzija ostaje
+  **0.2.0 (10)**; snimci za App Store su regenerisani u novom dizajnu.
 - **01.11.2026.** — **„Oslobodi model sada“ sada daje povratnu informaciju**:
   u Podešavanjima piše da li je model **u memoriji** ili **nije učitan**, a
   posle dodira se prikaže zelena potvrda „Model je oslobođen iz memorije.“

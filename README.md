@@ -59,6 +59,29 @@ vreme. Tap na karticu otvara detalje: ukupno reči i diktata, prosečnu brzinu
 prosečan diktat. Statistika se računa lokalno iz broja reči i trajanja; ne
 čuva tekst i može se obrisati nezavisno od istorije.
 
+## Dizajn
+
+Izgled je preuzet sa desktop Diktatora: svetla pozadina, bele kartice sa
+tankom ivicom, plavi akcenat **#2F7CF6** i SF Pro tipografija. Raspored je
+prilagođen telefonu — kartice idu jedna pod drugu, a na iPad-u ostaju
+centrirane u koloni od 640 pt.
+
+Sve boje, radijusi i stilovi dugmadi su na jednom mestu u
+`app/DiktatorIOS/Dizajn.swift`. Boje su dinamičke, pa tamni režim ima
+tamniju pozadinu, tamnije kartice i svetliji akcenat **#4C93FF**.
+
+- **Diktat** — veliki naslov sa podnaslovom, kartica sa mikrofonom, sesija,
+  kartica statistike sa dnevnim brojem reči, savet za model i koraci
+  „Kako radi“.
+- **Istorija** — polje pretrage, kartice sa trajanjem u formatu `01:32`,
+  meni sa kopiranjem i brisanjem, tap na karticu kopira tekst.
+- **Statistika** — četiri kartice sa brojevima (danas, niz, prosečno,
+  ušteđeno), stubičasti grafikon sa vrednostima iznad stubova, detalji,
+  jezici i crveno dugme za brisanje.
+- **Podešavanja** — `Form` sa karticama, zaglavlja grupa su bold bez
+  velikih slova; kontrole su ostale iste.
+- **Pomoć** — kartice sa numerisanim koracima i kartica podrške.
+
 Ako Xcode ili `devicectl` prijave da uređaj nije uparen, prvo ga upari:
 
 ```bash

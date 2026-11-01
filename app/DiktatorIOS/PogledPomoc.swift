@@ -1,63 +1,157 @@
 import SwiftUI
 
 struct PogledPomoc: View {
+    private let podrska = URL(string: "mailto:cedomirovicnemanja@gmail.com?subject=Diktator%20iOS")
+    private let github = URL(string: "https://github.com/cedomirovic/diktator-ios")!
+
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 14) {
-                    Text("Kako da uključiš tastaturu")
-                        .font(.title2.bold())
-                    Text("1. Podešavanja → General → Keyboard → Keyboards → Add New Keyboard.")
-                    Text("2. Izaberi Diktator.")
-                    Text("3. Tapni Diktator i uključi Allow Full Access.")
-                    Text("Full Access je potreban da tastatura pročita clipboard, ubaci tekst i otvori aplikaciju dugmetom Diktiraj (iOS 26+). U gornjoj traci tastature treba da piše Full Access ✓.")
+                VStack(spacing: 14) {
+                    NaslovEkrana(
+                        naslov: "Pomoć",
+                        podnaslov: "Sve što treba da znaš o tastaturi, sesiji i privatnosti."
+                    )
 
-                    Divider()
-
-                    Text("Diktat")
-                        .font(.title2.bold())
-                    Text("1. Pređi u bilo koju aplikaciju i otvori Diktator tastaturu.")
-                    Text("2. Tapni Diktiraj. Ako sesija nije uključena, Diktator se sam otvori, uključi je i počne da snima.")
-                    Text("3. Tapni Stop — tekst se sam ubaci u polje u kome pišeš. Ako ne uspe, tapni Nalepi.")
-                    Text("Sesija traje 15 minuta i svaki diktat je produžava. Kada istekne, prvi Diktiraj je ponovo uključi.")
-                    Text("Za najbolji srpski: Jezik = Srpski, Model = Large v3, Režim = Najbolji kvalitet.")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-
-                    Divider()
-
-                    Text("Statistika")
-                        .font(.title2.bold())
-                    Text("Na glavnom ekranu vidiš današnje reči, niz dana i ušteđeno vreme. Tapni karticu za grafikon poslednjih 7 dana, prosečnu brzinu i pregled jezika.")
-                    Text("Statistika se računa lokalno iz broja reči i trajanja diktata. Ne čuva tekst; možeš je obrisati bez brisanja istorije.")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-
-                    Divider()
-
-                    Text("Privatnost")
-                        .font(.title2.bold())
-                    Text("Snimak se obrađuje lokalno. Aplikacija ne šalje zvuk na server. Model se preuzima sa Hugging Face-a.")
-                    Text("Ako uključiš doterivanje, samo gotov tekst ide izabranom servisu (Gemini, OpenAI, Claude, DeepSeek ili drugi). Nikada se ne šalje zvuk.")
-                    Text("Ako izabereš Groq u Podešavanjima → Brzina, snimak se šalje Groq-u radi bržeg prepisa. U režimima Brzo i Najtačnije sve ostaje na uređaju.")
-
-                    Divider()
-
-                    Text("Ograničenja")
-                        .font(.title2.bold())
-                    Text("Tastatura ne može direktno da snima — Apple to zabranjuje. Zato snima glavna aplikacija u pozadinskoj sesiji, a tastatura samo šalje start/stop.")
-                    Text("Sesija drži mikrofon u pripravnosti najviše 15 minuta i troši bateriju. Zato se automatski gasi.")
-                    Text("Kada je sesija uključena, Diktiraj ne otvara aplikaciju. Ako sesija nije uključena, Diktiraj otvara Diktator; tapni Uključi sesiju i vrati se. Posle Stop sačekaj da piše Spremno je, nalepi, pa tapni Nalepi.")
-                    Text("Besplatni Apple ID profil traje 7 dana; posle toga build treba obnoviti.")
-
-                    Divider()
-
-                    Link("GitHub projekat", destination: URL(string: "https://github.com/cedomirovic/diktator-ios")!)
-                        .font(.footnote)
+                    koraciKartica
+                    diktatKartica
+                    tekstKartica(
+                        naslov: "Statistika",
+                        pasusi: [
+                            "Na glavnom ekranu vidiš današnje reči, niz dana i ušteđeno vreme. Tapni karticu za grafikon poslednjih 7 dana, prosečnu brzinu i pregled jezika.",
+                            "Statistika se računa lokalno iz broja reči i trajanja diktata. Ne čuva tekst; možeš je obrisati bez brisanja istorije."
+                        ]
+                    )
+                    tekstKartica(
+                        naslov: "Privatnost",
+                        pasusi: [
+                            "Snimak se obrađuje lokalno. Aplikacija ne šalje zvuk na server. Model se preuzima sa Hugging Face-a.",
+                            "Ako uključiš doterivanje, samo gotov tekst ide izabranom servisu (Gemini, OpenAI, Claude, DeepSeek ili drugi). Nikada se ne šalje zvuk.",
+                            "Ako izabereš Groq u Podešavanjima → Brzina, snimak se šalje Groq-u radi bržeg prepisa. U režimima Brzo i Najtačnije sve ostaje na uređaju."
+                        ]
+                    )
+                    tekstKartica(
+                        naslov: "Ograničenja",
+                        pasusi: [
+                            "Tastatura ne može direktno da snima — Apple to zabranjuje. Zato snima glavna aplikacija u pozadinskoj sesiji, a tastatura samo šalje start/stop.",
+                            "Sesija drži mikrofon u pripravnosti najviše 15 minuta i troši bateriju. Zato se automatski gasi.",
+                            "Kada je sesija uključena, Diktiraj ne otvara aplikaciju. Ako sesija nije uključena, Diktiraj otvara Diktator; tapni Uključi sesiju i vrati se. Posle Stop sačekaj da piše Spremno je, nalepi, pa tapni Nalepi.",
+                            "Besplatni Apple ID profil traje 7 dana; posle toga build treba obnoviti."
+                        ]
+                    )
+                    podrskaKartica
                 }
-                .padding()
+                .frame(maxWidth: 640)
+                .padding(.horizontal, 16)
+                .padding(.top, 4)
+                .padding(.bottom, 28)
+                .frame(maxWidth: .infinity)
             }
-            .navigationTitle("Pomoć")
+            .background(Dizajn.pozadina)
+            .toolbar(.hidden, for: .navigationBar)
+        }
+    }
+
+    // MARK: - Delovi
+
+    private var koraciKartica: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Kako da uključiš tastaturu")
+                .font(.system(size: 17, weight: .semibold))
+
+            korak(1, "Podešavanja → General → Keyboard → Keyboards → Add New Keyboard.")
+            korak(2, "Izaberi Diktator.")
+            korak(3, "Tapni Diktator i uključi Allow Full Access.")
+
+            Text("Full Access je potreban da tastatura pročita clipboard, ubaci tekst i otvori aplikaciju dugmetom Diktiraj (iOS 26+). U gornjoj traci tastature treba da piše Full Access ✓.")
+                .font(.system(size: 13))
+                .foregroundStyle(Dizajn.tekstSekundarni)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .kartica()
+    }
+
+    private var diktatKartica: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Diktat")
+                .font(.system(size: 17, weight: .semibold))
+
+            korak(1, "Pređi u bilo koju aplikaciju i otvori Diktator tastaturu.")
+            korak(2, "Tapni Diktiraj. Ako sesija nije uključena, Diktator se sam otvori, uključi je i počne da snima.")
+            korak(3, "Tapni Stop — tekst se sam ubaci u polje u kome pišeš. Ako ne uspe, tapni Nalepi.")
+
+            Text("Sesija traje 15 minuta i svaki diktat je produžava. Kada istekne, prvi Diktiraj je ponovo uključi.")
+                .font(.system(size: 13))
+                .foregroundStyle(Dizajn.tekstSekundarni)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Text("Za najbolji srpski: Jezik = Srpski, Model = Large v3, Režim = Najbolji kvalitet.")
+                .font(.system(size: 12))
+                .foregroundStyle(Dizajn.tekstTercijarni)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .kartica()
+    }
+
+    private func tekstKartica(naslov: String, pasusi: [String]) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(naslov)
+                .font(.system(size: 17, weight: .semibold))
+
+            ForEach(pasusi, id: \.self) { pasus in
+                Text(pasus)
+                    .font(.system(size: 14))
+                    .foregroundStyle(Dizajn.tekstSekundarni)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .kartica()
+    }
+
+    private var podrskaKartica: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 12) {
+                IkonaUKrugu(simbol: "questionmark.bubble.fill", velicina: 40)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("I dalje imate pitanja?")
+                        .font(.system(size: 15, weight: .semibold))
+                    Text("Pošalji model uređaja, verziju iOS-a i kratak opis problema.")
+                        .font(.system(size: 13))
+                        .foregroundStyle(Dizajn.tekstSekundarni)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 0)
+            }
+
+            if let podrska {
+                Link(destination: podrska) {
+                    Label("Kontaktiraj podršku", systemImage: "envelope.fill")
+                }
+                .buttonStyle(StilDugmeta())
+            }
+
+            Link(destination: github) {
+                Label("GitHub projekat", systemImage: "link")
+                    .font(.system(size: 13, weight: .medium))
+            }
+            .tint(Dizajn.akcenat)
+        }
+        .kartica()
+    }
+
+    private func korak(_ broj: Int, _ tekst: String) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Text("\(broj)")
+                .font(.system(size: 13, weight: .bold))
+                .foregroundStyle(Dizajn.akcenat)
+                .frame(width: 24, height: 24)
+                .background(Dizajn.akcenat.opacity(0.12), in: Circle())
+
+            Text(tekst)
+                .font(.system(size: 14))
+                .foregroundStyle(Dizajn.tekst)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.top, 2)
         }
     }
 }

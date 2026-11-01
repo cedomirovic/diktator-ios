@@ -28,6 +28,9 @@ struct ContentView: View {
                 .tabItem { Label("Pomoć", systemImage: "questionmark.circle") }
                 .tag(4)
         }
+        .tint(Dizajn.akcenat)
+        .toolbarBackground(.visible, for: .tabBar)
+        .toolbarBackground(.ultraThinMaterial, for: .tabBar)
         .onChange(of: scenePhase) { _, nova in
             switch nova {
             case .background:

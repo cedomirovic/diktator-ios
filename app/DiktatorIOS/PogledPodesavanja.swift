@@ -10,7 +10,17 @@ struct PogledPodesavanja: View {
 
     var body: some View {
         Form {
-            Section("Model") {
+            Section {
+                NaslovEkrana(
+                    naslov: "Podešavanja",
+                    podnaslov: "Prilagodi Diktator svom načinu rada."
+                )
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets(top: 0, leading: 4, bottom: 8, trailing: 4))
+                .listRowSeparator(.hidden)
+            }
+
+            Section(header: zaglavlje("Model")) {
                 Text("Izabran: \(Modeli.nadji(stanje.podesavanja.model)?.naziv ?? "—")")
                     .font(.headline)
 
@@ -92,7 +102,7 @@ struct PogledPodesavanja: View {
                     .foregroundStyle(.secondary)
             }
 
-            Section("Diktat") {
+            Section(header: zaglavlje("Diktat")) {
                 Picker("Jezik", selection: $stanje.podesavanja.jezik) {
                     Text("Automatski (sr/en)").tag("auto")
                     Text("Srpski").tag("sr")
@@ -118,7 +128,7 @@ struct PogledPodesavanja: View {
                 Toggle("Čuvaj istoriju", isOn: $stanje.podesavanja.cuvajIstoriju)
             }
 
-            Section("Brzina") {
+            Section(header: zaglavlje("Brzina")) {
                 Picker(
                     "Način",
                     selection: Binding(
@@ -240,7 +250,7 @@ struct PogledPodesavanja: View {
                     .foregroundStyle(.secondary)
             }
 
-            Section("Doterivanje") {
+            Section(header: zaglavlje("Doterivanje")) {
                 Toggle("Popravi interpunkciju i imena", isOn: $stanje.podesavanja.doterivanje)
 
                 Text("Šalje samo gotov tekst izabranom servisu. Isključeno znači da ništa ne napušta uređaj.")
@@ -383,7 +393,7 @@ struct PogledPodesavanja: View {
                 kljucVidljiv = false
             }
 
-            Section("Ažuriranja") {
+            Section(header: zaglavlje("Ažuriranja")) {
                 Toggle("Proveri nove verzije", isOn: $stanje.podesavanja.proveravajAzuriranja)
 
                 Button {
@@ -433,7 +443,7 @@ struct PogledPodesavanja: View {
                 }
             }
 
-            Section("O aplikaciji") {
+            Section(header: zaglavlje("O aplikaciji")) {
                 LabeledContent("Verzija", value: verzija)
                 Link("GitHub projekat", destination: URL(string: "https://github.com/cedomirovic/diktator-ios")!)
                 Text("Snimak i tekst ostaju na uređaju. Model se preuzima sa Hugging Face-a.")
@@ -441,7 +451,13 @@ struct PogledPodesavanja: View {
                     .foregroundStyle(.secondary)
             }
         }
-        .navigationTitle("Podešavanja")
+        .scrollContentBackground(.hidden)
+        .background(Dizajn.pozadina)
+        .listRowBackground(Dizajn.kartica)
+        .listSectionSpacing(16)
+        .tint(Dizajn.akcenat)
+        .navigationTitle("")
+        .toolbar(stanje.izabraniTab == 3 ? .hidden : .visible, for: .navigationBar)
         .onChange(of: stanje.podesavanja) { _, _ in
             stanje.sacuvajPodesavanja()
         }
@@ -453,5 +469,13 @@ struct PogledPodesavanja: View {
                 stanje.porukaAzuriranja = nil
             }
         }
+    }
+
+    /// Zaglavlje grupe u stilu desktop dizajna: bold, bez velikih slova.
+    private func zaglavlje(_ naslov: String) -> some View {
+        Text(naslov)
+            .font(.system(size: 17, weight: .semibold))
+            .foregroundStyle(Dizajn.tekst)
+            .textCase(nil)
     }
 }
