@@ -6,6 +6,12 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Status
 
+- **01.11.2026.** — **„Oslobodi model sada“ sada daje povratnu informaciju**:
+  u Podešavanjima piše da li je model **u memoriji** ili **nije učitan**, a
+  posle dodira se prikaže zelena potvrda „Model je oslobođen iz memorije.“
+  (ili narandžasto obaveštenje ako model nije bio učitan). Stanje se prati
+  preko `Prepisivac.naPromenuUcitanosti`, pa se osveži i kada model oslobodi
+  tajmer ili odlazak u pozadinu.
 - **29.10.2026.** — **dugme „Završi sesiju“ je crveno** i punom širinom kada je
   sesija aktivna, da se odmah vidi da je treba ugasiti (u repou je i dalje
   verzija **0.2.0 (10)**). Korisnik je potvrdio da sve radi na uređaju.

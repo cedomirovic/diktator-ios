@@ -34,7 +34,7 @@ struct ContentView: View {
                 if stanje.sesijaAktivna || stanje.stanje.jeZauzet {
                     stanje.osveziIPC()
                 } else {
-                    stanje.oslobodiModel()
+                    stanje.oslobodiModel(prikaziPotvrdu: false)
                 }
             case .active:
                 stanje.osveziIPC()

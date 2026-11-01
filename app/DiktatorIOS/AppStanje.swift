@@ -162,6 +162,11 @@ final class AppStanje: ObservableObject {
     @Published var porukaOblaka: String?
     @Published var potvrdaKljucaOblaka: String?
     @Published var potvrdaKljucaOblakaGreska = false
+    /// Da li je whisper model trenutno učitan u memoriji (prikaz u Podešavanjima).
+    @Published var modelUMemoriji = false
+    /// Kratka potvrda ispod dugmeta „Oslobodi model sada“.
+    @Published var potvrdaOslobadjanja: String?
+    @Published var potvrdaOslobadjanjaUpozorenje = false
 
     private let snimac = Snimac()
     private let prepisivac = Prepisivac()
@@ -194,6 +199,12 @@ final class AppStanje: ObservableObject {
             izabraniTab = broj
         }
         Prepisivac.utisajLog()
+        modelUMemoriji = prepisivac.ucitano
+        prepisivac.naPromenuUcitanosti = { [weak self] ucitan in
+            Task { @MainActor in
+                self?.modelUMemoriji = ucitan
+            }
+        }
         snimac.naNivo = { [weak self] nivo in
             self?.nivo = nivo
         }
@@ -1207,11 +1218,27 @@ final class AppStanje: ObservableObject {
         }
     }
 
-    func oslobodiModel() {
+    /// Oslobađa model iz memorije i vraća da li je bio učitan. Kada je
+    /// `prikaziPotvrdu` false, ništa se ne prikazuje (npr. odlazak u pozadinu).
+    @discardableResult
+    func oslobodiModel(prikaziPotvrdu: Bool = true) -> Bool {
         timerOslobadjanja?.invalidate()
         timerOslobadjanja = nil
+        let bioUcitan = prepisivac.ucitano
         prepisivac.oslobodi()
-        poruka = "Model je oslobođen iz memorije."
+        guard prikaziPotvrdu else { return bioUcitan }
+        potvrdaOslobadjanja = bioUcitan
+            ? "Model je oslobođen iz memorije."
+            : "Model nije bio učitan — memorija je već slobodna."
+        potvrdaOslobadjanjaUpozorenje = !bioUcitan
+        poruka = potvrdaOslobadjanja
+        UINotificationFeedbackGenerator().notificationOccurred(bioUcitan ? .success : .warning)
+        nestaniPosle(potvrdaOslobadjanja) { [weak self] potvrda in
+            if self?.potvrdaOslobadjanja == potvrda {
+                self?.potvrdaOslobadjanja = nil
+            }
+        }
+        return bioUcitan
     }
 
     private func oslobodiModelPosle() {

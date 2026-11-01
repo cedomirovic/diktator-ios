@@ -91,10 +91,18 @@ final class Prepisivac: @unchecked Sendable {
         red.sync { zadnjiJezik }
     }
 
+    /// Javlja UI-ju da se promenilo da li je model u memoriji. Poziva se sa
+    /// reda za whisper, pa pozivalac sam prelazi na glavni red.
+    var naPromenuUcitanosti: (@Sendable (Bool) -> Void)?
+
     private func postaviUcitan(_ vrednost: Bool) {
         bravaStanja.lock()
+        let promena = uMemoriji != vrednost
         uMemoriji = vrednost
         bravaStanja.unlock()
+        if promena {
+            naPromenuUcitanosti?(vrednost)
+        }
     }
 
     /// Whisper uvek računa enkoder za punih 30 sekundi, i kada je snimak kraći.

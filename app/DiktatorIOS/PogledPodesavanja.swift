@@ -59,9 +59,37 @@ struct PogledPodesavanja: View {
                     .padding(.vertical, 2)
                 }
 
-                Button("Oslobodi model sada") {
-                    stanje.oslobodiModel()
+                HStack(spacing: 8) {
+                    Button("Oslobodi model sada") {
+                        withAnimation(.easeInOut(duration: 0.15)) {
+                            _ = stanje.oslobodiModel()
+                        }
+                    }
+
+                    Spacer()
+
+                    Text(stanje.modelUMemoriji ? "u memoriji" : "nije učitan")
+                        .font(.caption)
+                        .foregroundStyle(stanje.modelUMemoriji ? Color.green : Color.secondary)
                 }
+
+                if let potvrda = stanje.potvrdaOslobadjanja {
+                    Label(
+                        potvrda,
+                        systemImage: stanje.potvrdaOslobadjanjaUpozorenje
+                            ? "info.circle.fill"
+                            : "checkmark.circle.fill"
+                    )
+                    .font(.caption)
+                    .foregroundStyle(
+                        stanje.potvrdaOslobadjanjaUpozorenje ? Color.orange : Color.green
+                    )
+                    .transition(.opacity)
+                }
+
+                Text("Model se sam oslobađa posle izabranog vremena, a ovde možeš da ga oslobodiš odmah. Sledeći diktat ga ponovo učitava.")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
             }
 
             Section("Diktat") {
