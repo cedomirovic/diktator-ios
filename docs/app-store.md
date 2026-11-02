@@ -83,7 +83,7 @@ analitike, a snimci se ne čuvaju.
 KAKO RADI
 1. Dodaj tastaturu Diktator u iOS Podešavanjima i uključi Full Access.
 2. Jednom preuzmi model (Turbo ~547 MB, Large v3 ~1,0 GB).
-3. U bilo kojoj aplikaciji tapni Diktiraj na tastaturi Diktator i govori.
+3. U bilo kojoj aplikaciji tapni mikrofon u donjem redu tastature Diktator i govori.
 4. Tapni Stop. Tekst se sam ubacuje — bez kopiranja i lepljenja.
 
 MOGUĆNOSTI
@@ -103,7 +103,7 @@ Mreža se koristi samo za preuzimanje modela, proveru nove verzije i, ako ih sam
 uključiš, opcione servise u oblaku.
 
 Tastatura traži Full Access da bi pročitala clipboard kada tapneš Nalepi i da bi
-otvorila Diktator dugmetom Diktiraj. Bez Full Access-a i dalje normalno kuca.
+otvorila Diktator dodirom na mikrofon. Bez Full Access-a i dalje normalno kuca.
 ```
 
 ## Keywords (100, EN)

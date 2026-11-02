@@ -164,7 +164,7 @@ struct PogledDiktat: View {
                 .buttonStyle(StilDugmeta(boja: Dizajn.crvena))
                 .accessibilityHint("Gasi sesiju diktata i oslobađa mikrofon.")
             } else {
-                Text("Uključi sesiju da Diktiraj na tastaturi snima dok je otvorena bilo koja aplikacija. Kada sesija istekne ili je aplikacija ugašena, tastatura sama otvara Diktator i uključi je.")
+                Text("Uključi sesiju da mikrofon u tastaturi snima dok je otvorena bilo koja aplikacija. Kada sesija istekne ili je aplikacija ugašena, tastatura sama otvara Diktator i uključi je.")
                     .font(.system(size: 14))
                     .foregroundStyle(Dizajn.tekstSekundarni)
                     .fixedSize(horizontal: false, vertical: true)
@@ -378,10 +378,10 @@ struct PogledDiktat: View {
                 .font(.system(size: 17, weight: .semibold))
 
             korak("keyboard", "Otvori Diktator tastaturu", "U bilo kojoj aplikaciji prebaci na Diktator tastaturu.")
-            korak("mic.fill", "Tapni Diktiraj i govori", "Sesija se uključuje sama, a svaki diktat je produžava.")
-            korak("text.cursor", "Tekst se sam ubaci", "Tapni Stop — tekst ide u polje u kome pišeš. Ako ne uspe, tapni Nalepi.")
+            korak("mic.fill", "Tapni mikrofon i govori", "Sesija se uključuje sama, a svaki diktat je produžava.")
+            korak("text.cursor", "Tekst se sam ubaci", "Tapni crveni Stop — tekst ide u polje u kome pišeš. Ako ne uspe, tapni Nalepi iznad tastature.")
 
-            Text("Ako je Diktator ugašen, Diktiraj ga otvara i odmah snima.")
+            Text("Ako je Diktator ugašen, mikrofon ga otvara i odmah snima.")
                 .font(.system(size: 12))
                 .foregroundStyle(Dizajn.tekstTercijarni)
         }

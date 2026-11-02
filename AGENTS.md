@@ -6,6 +6,20 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Status
 
+- **02.11.2026.** — **tastatura redizajnirana kao sistemska iOS tastatura**:
+  uklonjena je traka sa plavim **Diktiraj** i zelenim **Nalepi** dugmetom.
+  Tastatura sada izgleda kao osnovna iOS tastatura — iste boje pozadine i
+  tipki, zaobljene bele tipke sa senkom, sivi specijalni tasteri, sistemski
+  fontovi i raspored. Srpska latinica je raspoređena kao kod Apple-a:
+  `q w e r t z u i o p` / `a s d f g h j k l č ć` / `⇧ z x c v b n m š đ ⌫`,
+  pa nema više zasebnog reda sa `čćžšđ`. **Diktiraj** je sada mikrofon na mestu
+  sistemskog mikrofona u donjem redu (`123`, globus, razmak, mikrofon,
+  return), a dok snima pokazuje crveni **Stop**. Tanka traka iznad tastature
+  (kao sistemska traka predloga) prikazuje samo stanje — `Snimam…`,
+  `Prepišujem…`, `Uključi Full Access` — i **Nalepi** samo kada prepis čeka;
+  u mirovanju je prazna. Tastatura prati `keyboardAppearance` polja u koje se
+  kuca, pa se tamni/svetli izgled poklapa sa host aplikacijom. Provereno u
+  simulatoru (iPhone i iPad, svetlo/tamno, slova/brojevi/shift).
 - **02.11.2026.** — **tačnost srpskog izjednačena sa desktopom**: uporedni
   test je pokazao tri razlike u odnosu na macOS Diktator, koji radi sa
   **Large v3 + pretragom snopom + punim audio kontekstom**. Mobilna
@@ -172,9 +186,11 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 - `DiktatorIOS` (SwiftUI): snimanje, whisper.cpp, modeli, istorija, rečnik,
   podešavanja, kopiranje u clipboard, URL scheme `diktator-ios://dictate`.
-- `DiktatorKeyboard` (`UIInputViewController`): **puna tastatura** — QWERTY
-  slova, srpska slova `čćžšđ`, brojevi, shift, brisanje, razmak, enter, globus;
-  gornja traka sa **Diktiraj** i **Nalepi**.
+- `DiktatorKeyboard` (`UIInputViewController`): **puna tastatura u stilu
+  sistemske iOS tastature** — srpska latinica (`čćžšđ` u redovima, kao na
+  Apple tastaturi), brojevi, simboli, shift, brisanje, razmak, return i
+  globus. Mikrofon u donjem redu je **Diktiraj**, a tanka traka iznad
+  tastature prikazuje stanje i **Nalepi** kada tekst čeka.
 - Bez App Group-a; jedini deljeni kanal je `UIPasteboard.general`.
 - Whisper.cpp statički za iOS (arm64); modeli se preuzimaju u aplikaciji.
 - Preporučeni model je Large v3 q5_0; Turbo q5_0, Small i Base su opcije za

@@ -35,7 +35,7 @@ struct PogledPomoc: View {
                         pasusi: [
                             "Tastatura ne može direktno da snima — Apple to zabranjuje. Zato snima glavna aplikacija u pozadinskoj sesiji, a tastatura samo šalje start/stop.",
                             "Sesija drži mikrofon u pripravnosti najviše 15 minuta i troši bateriju. Zato se automatski gasi.",
-                            "Kada je sesija uključena, Diktiraj ne otvara aplikaciju. Ako sesija nije uključena, Diktiraj otvara Diktator; tapni Uključi sesiju i vrati se. Posle Stop sačekaj da piše Spremno je, nalepi, pa tapni Nalepi.",
+                            "Kada je sesija uključena, mikrofon u tastaturi ne otvara aplikaciju. Ako sesija nije uključena, mikrofon otvara Diktator; tapni Uključi sesiju i vrati se. Posle Stop sačekaj da se tekst ubaci; ako ne uspe, u traci iznad tastature pojaviće se Nalepi.",
                             "Besplatni Apple ID profil traje 7 dana; posle toga build treba obnoviti."
                         ]
                     )
@@ -63,7 +63,7 @@ struct PogledPomoc: View {
             korak(2, "Izaberi Diktator.")
             korak(3, "Tapni Diktator i uključi Allow Full Access.")
 
-            Text("Full Access je potreban da tastatura pročita clipboard, ubaci tekst i otvori aplikaciju dugmetom Diktiraj (iOS 26+). U gornjoj traci tastature treba da piše Full Access ✓.")
+            Text("Full Access je potreban da tastatura pročita clipboard, ubaci tekst i otvori aplikaciju dodirom na mikrofon (iOS 26+). Ako u traci iznad tastature piše Uključi Full Access, dodir na mikrofon neće raditi.")
                 .font(.system(size: 13))
                 .foregroundStyle(Dizajn.tekstSekundarni)
                 .fixedSize(horizontal: false, vertical: true)
@@ -77,15 +77,15 @@ struct PogledPomoc: View {
                 .font(.system(size: 17, weight: .semibold))
 
             korak(1, "Pređi u bilo koju aplikaciju i otvori Diktator tastaturu.")
-            korak(2, "Tapni Diktiraj. Ako sesija nije uključena, Diktator se sam otvori, uključi je i počne da snima.")
-            korak(3, "Tapni Stop — tekst se sam ubaci u polje u kome pišeš. Ako ne uspe, tapni Nalepi.")
+            korak(2, "Tapni mikrofon u donjem redu tastature. Ako sesija nije uključena, Diktator se sam otvori, uključi je i počne da snima.")
+            korak(3, "Tapni crveni Stop — tekst se sam ubaci u polje u kome pišeš. Ako ne uspe, tapni Nalepi u traci iznad tastature.")
 
-            Text("Sesija traje 15 minuta i svaki diktat je produžava. Kada istekne, prvi Diktiraj je ponovo uključi.")
+            Text("Sesija traje 15 minuta i svaki diktat je produžava. Kada istekne, prvi dodir na mikrofon je ponovo uključi.")
                 .font(.system(size: 13))
                 .foregroundStyle(Dizajn.tekstSekundarni)
                 .fixedSize(horizontal: false, vertical: true)
 
-            Text("Za najbolji srpski: Jezik = Srpski, Model = Large v3, Režim = Najbolji kvalitet.")
+            Text("Za najbolji srpski: Jezik = Srpski i Brzina = Najtačnije — Large v3.")
                 .font(.system(size: 12))
                 .foregroundStyle(Dizajn.tekstTercijarni)
                 .fixedSize(horizontal: false, vertical: true)

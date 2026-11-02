@@ -118,19 +118,88 @@ final class KeyboardViewController: UIInputViewController {
         case simboli
     }
 
-    private let gornjaTraka = UIStackView()
+    /// Iste boje kao na sistemskoj tastaturi. Dinamičke su, pa tastatura
+    /// prati svetli i tamni režim bez posebnog koda.
+    private enum BojeTastature {
+        static let pozadina = UIColor { izgled in
+            izgled.userInterfaceStyle == .dark
+                ? UIColor(red: 0.13, green: 0.13, blue: 0.14, alpha: 1)
+                : UIColor(red: 0.82, green: 0.83, blue: 0.85, alpha: 1)
+        }
+
+        static let slovo = UIColor { izgled in
+            izgled.userInterfaceStyle == .dark
+                ? UIColor(red: 0.42, green: 0.42, blue: 0.44, alpha: 1)
+                : UIColor(white: 1, alpha: 1)
+        }
+
+        static let slovoPritisnuto = UIColor { izgled in
+            izgled.userInterfaceStyle == .dark
+                ? UIColor(white: 0.32, alpha: 1)
+                : UIColor(white: 0.85, alpha: 1)
+        }
+
+        static let specijalno = UIColor { izgled in
+            izgled.userInterfaceStyle == .dark
+                ? UIColor(red: 0.30, green: 0.30, blue: 0.31, alpha: 1)
+                : UIColor(red: 0.69, green: 0.71, blue: 0.75, alpha: 1)
+        }
+
+        static let specijalnoPritisnuto = UIColor { izgled in
+            izgled.userInterfaceStyle == .dark
+                ? UIColor(red: 0.24, green: 0.24, blue: 0.25, alpha: 1)
+                : UIColor(red: 0.61, green: 0.63, blue: 0.67, alpha: 1)
+        }
+    }
+
+    /// Tipka se ponaša kao sistemska: na dodir potamni, bez plavog tona
+    /// koji `UIButton` inače dodaje.
+    private final class Tipka: UIButton {
+        private var osnovnaBoja = UIColor.white
+        private var pritisnutaBoja = UIColor.lightGray
+
+        init() {
+            super.init(frame: .zero)
+            titleLabel?.adjustsFontSizeToFitWidth = true
+            titleLabel?.minimumScaleFactor = 0.6
+        }
+
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) nije podržan")
+        }
+
+        func postaviBoju(_ osnovna: UIColor, pritisnuta: UIColor) {
+            osnovnaBoja = osnovna
+            pritisnutaBoja = pritisnuta
+            backgroundColor = osnovna
+        }
+
+        override var isHighlighted: Bool {
+            didSet {
+                backgroundColor = isHighlighted ? pritisnutaBoja : osnovnaBoja
+            }
+        }
+    }
+
+    private enum StilTipke {
+        case slovo
+        case specijalno
+        case ikona
+    }
+
+    private let trakaStanja = UIStackView()
     private let tastatura = UIStackView()
     private let status = UILabel()
     private let spinnerObrade = UIActivityIndicatorView(style: .medium)
-    private var dugmeDiktiraj: UIButton?
-    private var dugmeNalepi: UIButton?
+    private var dugmeDiktiraj: Tipka?
+    private var dugmeNalepi: Tipka?
     private var tekstSpreman = false
     private var poslednjiPrepis = ""
 
     private var tip: TipTastature = .slova
     private var velikaSlova = false
-    private var slovaDugmad: [(dugme: UIButton, osnovni: String)] = []
-    private var dugmeShift: UIButton?
+    private var slovaDugmad: [(dugme: Tipka, osnovni: String)] = []
+    private var dugmeShift: Tipka?
     private let zadnjiTokenKey = "diktator.zadnjiToken"
     private let cekaDiktatKey = "diktator.cekaDiktat"
     private let diktatPocetakKey = "diktator.diktatPocetak"
@@ -168,7 +237,7 @@ final class KeyboardViewController: UIInputViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = BojeTastature.pozadina
         postaviVisinu()
         postaviGlavni()
         napraviTastaturu()
@@ -176,6 +245,7 @@ final class KeyboardViewController: UIInputViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        azurirajIzgledTastature()
         Dnevnik.pisi(
             "viewWillAppear, cekaSesiju=\(UserDefaults.standard.bool(forKey: cekaSesijuKey)), cekaDiktat=\(UserDefaults.standard.bool(forKey: cekaDiktatKey))"
         )
@@ -280,77 +350,91 @@ final class KeyboardViewController: UIInputViewController {
         }
     }
 
+    override func textDidChange(_ textInput: UITextInput?) {
+        super.textDidChange(textInput)
+        azurirajIzgledTastature()
+    }
+
+    /// Sistemska tastatura prati izgled polja u koje se kuca, ne samo sistem.
+    /// Isto radimo i mi, da se ne pojavi svetla tastatura u tamnoj aplikaciji.
+    private func azurirajIzgledTastature() {
+        switch textDocumentProxy.keyboardAppearance {
+        case .dark:
+            overrideUserInterfaceStyle = .dark
+        case .light:
+            overrideUserInterfaceStyle = .light
+        default:
+            overrideUserInterfaceStyle = .unspecified
+        }
+    }
+
     private func postaviVisinu() {
-        let visina = view.heightAnchor.constraint(equalToConstant: 300)
-        visina.priority = .defaultHigh
-        visina.isActive = true
+        let visina: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 300 : 291
+        let ogranicenje = view.heightAnchor.constraint(equalToConstant: visina)
+        ogranicenje.priority = .defaultHigh
+        ogranicenje.isActive = true
     }
 
     private func postaviGlavni() {
-        gornjaTraka.axis = .horizontal
-        gornjaTraka.spacing = 8
-        gornjaTraka.alignment = .center
-        gornjaTraka.distribution = .fill
-        gornjaTraka.translatesAutoresizingMaskIntoConstraints = false
-
-        let diktiraj = napraviDugme(
-            "Diktiraj",
-            id: "diktiraj",
-            akcija: #selector(diktiraj)
-        )
-        diktiraj.backgroundColor = .systemBlue
-        diktiraj.setTitleColor(.white, for: .normal)
-        diktiraj.titleLabel?.font = .systemFont(ofSize: 15, weight: .semibold)
-        diktiraj.widthAnchor.constraint(equalToConstant: 92).isActive = true
-        dugmeDiktiraj = diktiraj
-
-        let nalepi = napraviDugme(
-            "Nalepi",
-            id: "nalepi",
-            akcija: #selector(nalepi)
-        )
-        nalepi.backgroundColor = .systemGreen
-        nalepi.setTitleColor(.white, for: .normal)
-        nalepi.titleLabel?.font = .systemFont(ofSize: 15, weight: .semibold)
-        nalepi.widthAnchor.constraint(equalToConstant: 80).isActive = true
-        dugmeNalepi = nalepi
-
-        status.font = .systemFont(ofSize: 11)
+        status.font = .systemFont(ofSize: 12, weight: .regular)
         status.textColor = .secondaryLabel
-        status.textAlignment = .right
+        status.textAlignment = .left
         status.numberOfLines = 1
         status.adjustsFontSizeToFitWidth = true
-        status.minimumScaleFactor = 0.75
+        status.minimumScaleFactor = 0.8
         status.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         status.setContentHuggingPriority(.defaultLow, for: .horizontal)
 
         spinnerObrade.hidesWhenStopped = true
-        spinnerObrade.color = .systemOrange
-        spinnerObrade.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
+        spinnerObrade.color = .secondaryLabel
+        spinnerObrade.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
+        spinnerObrade.setContentHuggingPriority(.required, for: .horizontal)
 
-        gornjaTraka.addArrangedSubview(diktiraj)
-        gornjaTraka.addArrangedSubview(nalepi)
-        gornjaTraka.addArrangedSubview(spinnerObrade)
-        gornjaTraka.addArrangedSubview(status)
-        gornjaTraka.heightAnchor.constraint(equalToConstant: 36).isActive = true
+        let nalepi = napraviNalepi()
+        dugmeNalepi = nalepi
+
+        trakaStanja.axis = .horizontal
+        trakaStanja.spacing = 8
+        trakaStanja.alignment = .center
+        trakaStanja.translatesAutoresizingMaskIntoConstraints = false
+        trakaStanja.addArrangedSubview(spinnerObrade)
+        trakaStanja.addArrangedSubview(status)
+        trakaStanja.addArrangedSubview(nalepi)
+        trakaStanja.heightAnchor.constraint(equalToConstant: 38).isActive = true
 
         tastatura.axis = .vertical
         tastatura.spacing = 6
         tastatura.distribution = .fillEqually
         tastatura.translatesAutoresizingMaskIntoConstraints = false
 
-        let glavni = UIStackView(arrangedSubviews: [gornjaTraka, tastatura])
+        let glavni = UIStackView(arrangedSubviews: [trakaStanja, tastatura])
         glavni.axis = .vertical
         glavni.spacing = 6
         glavni.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(glavni)
 
         NSLayoutConstraint.activate([
-            glavni.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 6),
-            glavni.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -6),
+            glavni.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 3),
+            glavni.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -3),
             glavni.topAnchor.constraint(equalTo: view.topAnchor, constant: 6),
-            glavni.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -4),
+            glavni.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -6),
         ])
+    }
+
+    /// Ručno lepljenje je samo rezerva — tekst se inače ubacuje sam. Zato se
+    /// dugme vidi tek kada prepis stvarno čeka u clipboard-u.
+    private func napraviNalepi() -> Tipka {
+        let dugme = Tipka()
+        dugme.setTitle("Nalepi", for: .normal)
+        dugme.titleLabel?.font = .systemFont(ofSize: 13, weight: .semibold)
+        dugme.setTitleColor(.label, for: .normal)
+        dugme.postaviBoju(.systemFill, pritisnuta: .tertiarySystemFill)
+        dugme.layer.cornerRadius = 12
+        dugme.contentEdgeInsets = UIEdgeInsets(top: 3, left: 12, bottom: 3, right: 12)
+        dugme.accessibilityIdentifier = "nalepi"
+        dugme.addTarget(self, action: #selector(nalepi), for: .touchUpInside)
+        dugme.isHidden = true
+        return dugme
     }
 
     private func napraviTastaturu() {
@@ -366,114 +450,153 @@ final class KeyboardViewController: UIInputViewController {
         case .simboli:
             napraviSimbole()
         }
+        azurirajPrikaz()
     }
 
+    /// Srpska latinica je raspoređena kao na sistemskoj tastaturi:
+    /// q w e r t z u i o p / a s d f g h j k l č ć / ⇧ z x c v b n m š đ ⌫.
     private func napraviSlova() {
-        tastatura.addArrangedSubview(redSlova(["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"]))
-        tastatura.addArrangedSubview(redSlova(["a", "s", "d", "f", "g", "h", "j", "k", "l"]))
+        let prvi = red()
+        for slovo in ["q", "w", "e", "r", "t", "z", "u", "i", "o", "p"] {
+            prvi.addArrangedSubview(napraviSlovo(slovo))
+        }
+        izjednaci(prvi)
+        tastatura.addArrangedSubview(prvi)
 
-        let treci = UIStackView()
-        treci.axis = .horizontal
-        treci.spacing = 5
-        treci.distribution = .fillEqually
+        let drugi = red()
+        for slovo in ["a", "s", "d", "f", "g", "h", "j", "k", "l", "č", "ć"] {
+            drugi.addArrangedSubview(napraviSlovo(slovo))
+        }
+        izjednaci(drugi)
+        tastatura.addArrangedSubview(drugi)
 
-        let shift = napraviDugme("⇧", id: "shift")
+        let treci = red()
+        let shift = napraviIkonu("shift", id: "shift")
         dugmeShift = shift
         treci.addArrangedSubview(shift)
-        for slovo in ["z", "x", "c", "v", "b", "n", "m"] {
-            treci.addArrangedSubview(napraviSlovo(slovo))
+
+        var slova: [Tipka] = []
+        for slovo in ["z", "x", "c", "v", "b", "n", "m", "š", "đ"] {
+            let dugme = napraviSlovo(slovo)
+            slova.append(dugme)
+            treci.addArrangedSubview(dugme)
         }
-        treci.addArrangedSubview(napraviDugme("⌫", id: "delete"))
+
+        let brisi = napraviIkonu("delete.left", id: "delete")
+        treci.addArrangedSubview(brisi)
+        if let prvo = slova.first {
+            for dugme in slova.dropFirst() {
+                dugme.widthAnchor.constraint(equalTo: prvo.widthAnchor).isActive = true
+            }
+            shift.widthAnchor.constraint(equalTo: prvo.widthAnchor, multiplier: 1.45).isActive = true
+            brisi.widthAnchor.constraint(equalTo: shift.widthAnchor).isActive = true
+        }
         tastatura.addArrangedSubview(treci)
 
-        let cetvrti = UIStackView()
-        cetvrti.axis = .horizontal
-        cetvrti.spacing = 5
-        cetvrti.distribution = .fillEqually
-        cetvrti.addArrangedSubview(napraviDugme("123", id: "123"))
-        cetvrti.addArrangedSubview(napraviDugme("🌐", id: "globe"))
-        for slovo in ["č", "ć", "ž", "š", "đ"] {
-            cetvrti.addArrangedSubview(napraviSlovo(slovo))
-        }
-        cetvrti.addArrangedSubview(napraviDugme("razmak", id: "space"))
-        cetvrti.addArrangedSubview(napraviDugme("return", id: "return"))
-        tastatura.addArrangedSubview(cetvrti)
-
+        tastatura.addArrangedSubview(redDonja())
         azurirajSlova()
     }
 
     private func napraviBrojeve() {
         tastatura.addArrangedSubview(redTekst(["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]))
         tastatura.addArrangedSubview(redTekst(["-", "/", ":", ";", "(", ")", "€", "&", "@", "\""]))
-
-        let treci = UIStackView()
-        treci.axis = .horizontal
-        treci.spacing = 5
-        treci.distribution = .fillEqually
-        treci.addArrangedSubview(napraviDugme("#+=", id: "simboli"))
-        for znak in [".", ",", "?", "!", "'"] {
-            treci.addArrangedSubview(napraviDugme(znak, id: "tekst:\(znak)"))
-        }
-        treci.addArrangedSubview(napraviDugme("⌫", id: "delete"))
-        tastatura.addArrangedSubview(treci)
-
-        tastatura.addArrangedSubview(donjaTraka())
+        tastatura.addArrangedSubview(
+            redZnakova("#+=", id: "simboli", znakovi: [".", ",", "?", "!", "'"])
+        )
+        tastatura.addArrangedSubview(redDonja(pocetna: "ABC", idPocetne: "abc"))
     }
 
     private func napraviSimbole() {
         tastatura.addArrangedSubview(redTekst(["[", "]", "{", "}", "#", "%", "^", "*", "+", "="]))
         tastatura.addArrangedSubview(redTekst(["_", "\\", "|", "~", "<", ">", "€", "£", "¥", "•"]))
-
-        let treci = UIStackView()
-        treci.axis = .horizontal
-        treci.spacing = 5
-        treci.distribution = .fillEqually
-        treci.addArrangedSubview(napraviDugme("123", id: "123"))
-        for znak in [".", ",", "?", "!", "'"] {
-            treci.addArrangedSubview(napraviDugme(znak, id: "tekst:\(znak)"))
-        }
-        treci.addArrangedSubview(napraviDugme("⌫", id: "delete"))
-        tastatura.addArrangedSubview(treci)
-
-        tastatura.addArrangedSubview(donjaTraka())
+        tastatura.addArrangedSubview(
+            redZnakova("123", id: "123", znakovi: [".", ",", "?", "!", "'"])
+        )
+        tastatura.addArrangedSubview(redDonja(pocetna: "ABC", idPocetne: "abc"))
     }
 
-    private func donjaTraka() -> UIStackView {
+    /// Donji red kao na iOS tastaturi: 123/ABC, globus, razmak, mikrofon
+    /// (Diktiraj) i return.
+    private func redDonja(pocetna: String = "123", idPocetne: String = "123") -> UIStackView {
+        let redTipki = red()
+
+        let pocetnaTipka = napraviDugme(pocetna, id: idPocetne, stil: .specijalno)
+        pocetnaTipka.widthAnchor.constraint(equalToConstant: 46).isActive = true
+        redTipki.addArrangedSubview(pocetnaTipka)
+
+        let globus = napraviIkonu("globe", id: "globe")
+        globus.widthAnchor.constraint(equalToConstant: 42).isActive = true
+        redTipki.addArrangedSubview(globus)
+
+        redTipki.addArrangedSubview(napraviDugme("razmak", id: "space", stil: .specijalno))
+
+        let mikrofon = napraviIkonu("mic", id: "diktiraj", akcija: #selector(diktiraj))
+        mikrofon.widthAnchor.constraint(equalToConstant: 42).isActive = true
+        dugmeDiktiraj = mikrofon
+        redTipki.addArrangedSubview(mikrofon)
+
+        let povratak = napraviDugme("return", id: "return", stil: .specijalno)
+        povratak.widthAnchor.constraint(equalToConstant: 88).isActive = true
+        redTipki.addArrangedSubview(povratak)
+
+        return redTipki
+    }
+
+    private func red() -> UIStackView {
         let red = UIStackView()
         red.axis = .horizontal
         red.spacing = 5
-        red.distribution = .fillEqually
-        red.addArrangedSubview(napraviDugme("ABC", id: "abc"))
-        red.addArrangedSubview(napraviDugme("🌐", id: "globe"))
-        red.addArrangedSubview(napraviDugme("razmak", id: "space"))
-        red.addArrangedSubview(napraviDugme("return", id: "return"))
+        red.alignment = .fill
+        red.distribution = .fill
         return red
     }
 
-    private func redSlova(_ slova: [String]) -> UIStackView {
-        let red = UIStackView()
-        red.axis = .horizontal
-        red.spacing = 5
-        red.distribution = .fillEqually
-        for slovo in slova {
-            red.addArrangedSubview(napraviSlovo(slovo))
+    private func izjednaci(_ red: UIStackView) {
+        guard let prva = red.arrangedSubviews.first else { return }
+        for pogled in red.arrangedSubviews.dropFirst() {
+            pogled.widthAnchor.constraint(equalTo: prva.widthAnchor).isActive = true
         }
-        return red
     }
 
     private func redTekst(_ tekstovi: [String]) -> UIStackView {
-        let red = UIStackView()
-        red.axis = .horizontal
-        red.spacing = 5
-        red.distribution = .fillEqually
+        let redTipki = red()
         for tekst in tekstovi {
-            red.addArrangedSubview(napraviDugme(tekst, id: "tekst:\(tekst)"))
+            redTipki.addArrangedSubview(napraviDugme(tekst, id: "tekst:\(tekst)", stil: .slovo))
         }
-        return red
+        izjednaci(redTipki)
+        return redTipki
     }
 
-    private func napraviSlovo(_ osnovni: String) -> UIButton {
-        let dugme = napraviDugme(osnovni, id: "slovo:\(osnovni)")
+    /// Red sa širokim prvim i zadnjim dugmetom (123 / #+= / ABC i brisanje),
+    /// kao na sistemskoj tastaturi.
+    private func redZnakova(_ naslov: String, id: String, znakovi: [String]) -> UIStackView {
+        let redTipki = red()
+
+        let prva = napraviDugme(naslov, id: id, stil: .specijalno)
+        redTipki.addArrangedSubview(prva)
+
+        var slova: [Tipka] = []
+        for znak in znakovi {
+            let dugme = napraviDugme(znak, id: "tekst:\(znak)", stil: .slovo)
+            slova.append(dugme)
+            redTipki.addArrangedSubview(dugme)
+        }
+
+        let brisi = napraviIkonu("delete.left", id: "delete")
+        redTipki.addArrangedSubview(brisi)
+
+        if let prvo = slova.first {
+            for dugme in slova.dropFirst() {
+                dugme.widthAnchor.constraint(equalTo: prvo.widthAnchor).isActive = true
+            }
+            prva.widthAnchor.constraint(equalTo: prvo.widthAnchor, multiplier: 1.5).isActive = true
+            brisi.widthAnchor.constraint(equalTo: prva.widthAnchor).isActive = true
+        }
+        return redTipki
+    }
+
+    private func napraviSlovo(_ osnovni: String) -> Tipka {
+        let dugme = napraviDugme(osnovni, id: "slovo:\(osnovni)", stil: .slovo)
         slovaDugmad.append((dugme, osnovni))
         return dugme
     }
@@ -481,20 +604,61 @@ final class KeyboardViewController: UIInputViewController {
     private func napraviDugme(
         _ naslov: String,
         id: String,
+        stil: StilTipke = .slovo,
         akcija: Selector = #selector(tapKey(_:))
-    ) -> UIButton {
-        let dugme = UIButton(type: .system)
+    ) -> Tipka {
+        let dugme = Tipka()
         dugme.setTitle(naslov, for: .normal)
-        dugme.titleLabel?.font = .systemFont(
-            ofSize: naslov.count > 1 ? 13 : 22,
-            weight: .regular
-        )
-        dugme.setTitleColor(.label, for: .normal)
-        dugme.backgroundColor = .secondarySystemBackground
-        dugme.layer.cornerRadius = 6
         dugme.accessibilityIdentifier = id
         dugme.addTarget(self, action: akcija, for: .touchUpInside)
+        dugme.layer.cornerRadius = 5
+        dugme.layer.shadowColor = UIColor.black.cgColor
+        dugme.layer.shadowOffset = CGSize(width: 0, height: 1)
+        dugme.layer.shadowOpacity = 0.22
+        dugme.layer.shadowRadius = 0
+
+        switch stil {
+        case .slovo:
+            dugme.titleLabel?.font = .systemFont(ofSize: 23, weight: .regular)
+            dugme.setTitleColor(.label, for: .normal)
+            dugme.postaviBoju(BojeTastature.slovo, pritisnuta: BojeTastature.slovoPritisnuto)
+        case .specijalno:
+            dugme.titleLabel?.font = .systemFont(ofSize: 16, weight: .regular)
+            dugme.setTitleColor(.label, for: .normal)
+            dugme.postaviBoju(BojeTastature.specijalno, pritisnuta: BojeTastature.specijalnoPritisnuto)
+        case .ikona:
+            dugme.postaviBoju(BojeTastature.specijalno, pritisnuta: BojeTastature.specijalnoPritisnuto)
+            dugme.tintColor = .label
+        }
         return dugme
+    }
+
+    private func napraviIkonu(
+        _ ime: String,
+        id: String,
+        akcija: Selector = #selector(tapKey(_:)),
+        velicina: CGFloat = 20
+    ) -> Tipka {
+        let dugme = napraviDugme("", id: id, stil: .ikona, akcija: akcija)
+        postaviIkonu(dugme, ime, velicina: velicina)
+        switch id {
+        case "shift":
+            dugme.accessibilityLabel = "Velika slova"
+        case "delete":
+            dugme.accessibilityLabel = "Obriši"
+        case "globe":
+            dugme.accessibilityLabel = "Sledeća tastatura"
+        case "diktiraj":
+            dugme.accessibilityLabel = "Diktiraj"
+        default:
+            break
+        }
+        return dugme
+    }
+
+    private func postaviIkonu(_ dugme: UIButton, _ ime: String, velicina: CGFloat = 20) {
+        let konfiguracija = UIImage.SymbolConfiguration(pointSize: velicina, weight: .regular)
+        dugme.setImage(UIImage(systemName: ime, withConfiguration: konfiguracija), for: .normal)
     }
 
     @objc private func tapKey(_ sender: UIButton) {
@@ -541,9 +705,16 @@ final class KeyboardViewController: UIInputViewController {
         for (dugme, osnovni) in slovaDugmad {
             dugme.setTitle(velikaSlova ? osnovni.uppercased() : osnovni, for: .normal)
         }
-        if let shift = dugmeShift {
-            shift.backgroundColor = velikaSlova ? .systemBlue : .secondarySystemBackground
-            shift.setTitleColor(velikaSlova ? .white : .label, for: .normal)
+        guard let shift = dugmeShift else { return }
+        if velikaSlova {
+            // Kao na iOS-u: uključen shift je beo, sa tamnom strelicom.
+            shift.postaviBoju(BojeTastature.slovo, pritisnuta: BojeTastature.slovoPritisnuto)
+            postaviIkonu(shift, "shift.fill")
+            shift.tintColor = .black
+        } else {
+            shift.postaviBoju(BojeTastature.specijalno, pritisnuta: BojeTastature.specijalnoPritisnuto)
+            postaviIkonu(shift, "shift")
+            shift.tintColor = .label
         }
     }
 
@@ -1297,6 +1468,8 @@ final class KeyboardViewController: UIInputViewController {
 
         textDocumentProxy.insertText(tekst)
         Dnevnik.pisi("Automatski nalepljeno (\(izvor)), token=\(token)")
+        tekstSpreman = false
+        poslednjiPrepis = ""
         podrazumevano.set(token, forKey: zadnjiTokenKey)
         podrazumevano.set(false, forKey: cekaDiktatKey)
         ocistiCekanjeSesije()
@@ -1412,51 +1585,52 @@ final class KeyboardViewController: UIInputViewController {
             privremeniStatusVreme = nil
 
             if !hasFullAccess {
-                status.text = "Full Access ✗"
+                status.text = "Uključi Full Access"
                 status.textColor = .systemOrange
             } else if obradaSesije {
-                status.text = "Obrada…"
-                status.textColor = .systemOrange
+                status.text = "Prepišujem…"
+                status.textColor = .secondaryLabel
             } else if snimaSesijom {
                 status.text = "Snimam…"
                 status.textColor = .systemRed
             } else if tekstSpreman {
-                status.text = "Spremno je, nalepi."
-                status.textColor = .systemGreen
-            } else if sesijaAktivna {
-                status.text = "Sesija ✓"
+                status.text = "Spremno za lepljenje"
                 status.textColor = .systemGreen
             } else {
-                status.text = "Sesija ✗"
-                status.textColor = .systemOrange
+                status.text = ""
             }
         }
 
-        dugmeNalepi?.isEnabled = hasFullAccess && !obradaSesije && !snimaSesijom
+        dugmeNalepi?.isHidden = !tekstSpreman || obradaSesije || snimaSesijom
+        dugmeNalepi?.isEnabled = hasFullAccess
 
         guard let dugme = dugmeDiktiraj else { return }
 
         if !hasFullAccess {
             dugme.isEnabled = false
-            dugme.setTitle("Diktiraj", for: .normal)
-            dugme.backgroundColor = .systemGray
+            dugme.accessibilityLabel = "Diktiraj — potreban je Full Access"
+            postaviIkonu(dugme, "mic.slash")
+            dugme.tintColor = .secondaryLabel
             return
         }
 
         if obradaSesije {
             dugme.isEnabled = false
-            dugme.setTitle("Obrada…", for: .normal)
-            dugme.backgroundColor = .systemGray
+            dugme.accessibilityLabel = "Prepišujem"
+            postaviIkonu(dugme, "mic")
+            dugme.tintColor = .secondaryLabel
             return
         }
 
         dugme.isEnabled = true
         if snimaSesijom {
-            dugme.setTitle("Stop", for: .normal)
-            dugme.backgroundColor = .systemRed
+            dugme.accessibilityLabel = "Zaustavi snimanje"
+            postaviIkonu(dugme, "stop.fill", velicina: 18)
+            dugme.tintColor = .systemRed
         } else {
-            dugme.setTitle("Diktiraj", for: .normal)
-            dugme.backgroundColor = .systemBlue
+            dugme.accessibilityLabel = "Diktiraj"
+            postaviIkonu(dugme, "mic")
+            dugme.tintColor = .label
         }
     }
 }

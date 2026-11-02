@@ -291,7 +291,7 @@ final class AppStanje: ObservableObject {
             // Ne uključujemo je sami, nego pokažemo dugme i uputstvo.
             izabraniTab = 0
             if !sesijaAktivna {
-                poruka = "Tapni Uključi sesiju, pa se vrati u aplikaciju i tapni Diktiraj."
+                poruka = "Tapni Uključi sesiju, pa se vrati u aplikaciju i tapni mikrofon na tastaturi."
             }
         case "sesija":
             izabraniTab = 0
@@ -385,7 +385,7 @@ final class AppStanje: ObservableObject {
         pisiIPCStanje()
         Dnevnik.pisi("Sesija uključena, traje do \(Snimac.najduzeSesijeSekundi) s.")
         NSLog("Diktator: sesija uključena, traje do %d s.", Snimac.najduzeSesijeSekundi)
-        poruka = "Sesija je aktivna. Pređi u drugu aplikaciju i tapni Diktiraj na tastaturi."
+        poruka = "Sesija je aktivna. Pređi u drugu aplikaciju i tapni mikrofon na tastaturi."
         return true
     }
 
@@ -871,7 +871,7 @@ final class AppStanje: ObservableObject {
         } else if pokrenutSaTastature {
             poruka = "Tekst je spreman. Vrati se strelicom ‹ — nalepiće se sam."
         } else {
-            poruka = "Tekst je kopiran. Otvori tastaturu i tapni Nalepi."
+            poruka = "Tekst je kopiran. Otvori tastaturu; ako se ne ubaci sam, tapni Nalepi iznad tastature."
         }
         zavrsiZadatakUPozadini()
         oslobodiModelPosle()

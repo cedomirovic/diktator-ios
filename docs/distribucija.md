@@ -97,7 +97,7 @@ Posle toga otvori `build/DiktatorIOS.xcarchive` u Xcode Organizer-u i uploaduj.
 ### Full Access i tastatura
 
 - Tastatura traži **Allow Full Access** da bi čitala clipboard i otvorila
-  matičnu aplikaciju dugmetom **Diktiraj** na iOS 26+.
+  matičnu aplikaciju dodirom na **mikrofon** na iOS 26+.
 - Bez Full Access-a tastatura i dalje **kuca** (QWERTY, `čćžšđ`, brojevi), pa
   ispunjava Apple zahtev da bude funkcionalna bez Full Access-a.
 - U Review Notes objasni da se clipboard čita **samo** kada korisnik tapne
