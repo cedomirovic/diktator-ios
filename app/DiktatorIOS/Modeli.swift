@@ -22,7 +22,7 @@ enum StanjeAplikacije: Equatable {
     var detalj: String {
         switch self {
         case .mirno:
-            return "Tapni mikrofon i govori. Tekst se posle prepisa sam ubaci u aplikaciju u kojoj kucaš."
+            return "Tapni mikrofon i pričaj. Tekst se posle diktiranja sam ubaci u aplikaciju u kojoj kucaš."
         case .snima:
             return "Govori sada. Tapni ponovo da završiš."
         case .priprema:
@@ -169,6 +169,10 @@ struct Podesavanja: Codable, Equatable {
     var rezimPrepisa = RezimPrepisa.stedljivo.rawValue
     var oslobadjanjeModela = OslobadjanjeModela.pet.rawValue
     var cuvajIstoriju = true
+    /// Kada je Diktator otvoren iz tastature samo zato što sesija nije bila
+    /// uključena, posle prepisa se sam zatvori da bi iOS vratio korisnika u
+    /// aplikaciju iz koje je došao.
+    var vratiSePosleDiktata = true
     var proveravajAzuriranja = true
     var doterivanje = false
     var provajderDoterivanja = ProvajderiDoterivanja.podrazumevani.id
@@ -186,6 +190,7 @@ struct Podesavanja: Codable, Equatable {
         case rezimPrepisa
         case oslobadjanjeModela
         case cuvajIstoriju
+        case vratiSePosleDiktata
         case proveravajAzuriranja
         case doterivanje
         case provajderDoterivanja
@@ -214,6 +219,7 @@ struct Podesavanja: Codable, Equatable {
             oslobadjanjeModela = OslobadjanjeModela.pet.rawValue
         }
         cuvajIstoriju = try kontejner.decodeIfPresent(Bool.self, forKey: .cuvajIstoriju) ?? true
+        vratiSePosleDiktata = try kontejner.decodeIfPresent(Bool.self, forKey: .vratiSePosleDiktata) ?? true
         proveravajAzuriranja = try kontejner.decodeIfPresent(Bool.self, forKey: .proveravajAzuriranja) ?? true
         doterivanje = try kontejner.decodeIfPresent(Bool.self, forKey: .doterivanje) ?? false
         provajderDoterivanja = try kontejner.decodeIfPresent(String.self, forKey: .provajderDoterivanja)

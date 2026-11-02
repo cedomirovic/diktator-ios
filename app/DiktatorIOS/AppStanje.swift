@@ -860,12 +860,40 @@ final class AppStanje: ObservableObject {
         if let napomena, !napomena.isEmpty {
             poruka = napomena
         } else if pokrenutSaTastature {
-            poruka = "Tekst je spreman. Vrati se u tastaturu i tapni Nalepi."
+            poruka = "Tekst je spreman. Vrati se strelicom ‹ — nalepiće se sam."
         } else {
             poruka = "Tekst je kopiran. Otvori tastaturu i tapni Nalepi."
         }
         zavrsiZadatakUPozadini()
         oslobodiModelPosle()
+
+        vratiSeUAplikaciju(napomena: napomena)
+    }
+
+    /// iOS ne daje aplikaciji način da sama prebaci korisnika u drugu
+    /// aplikaciju. Jedini pouzdan povratak je zatvaranje: kada se aplikacija
+    /// koju je otvorila tastatura ugasi, sistem vrati korisnika tamo odakle
+    /// je došao. Zato ovo radimo samo kada je diktat pokrenut iz tastature i
+    /// kada je Diktator u prvom planu — tekst je već u clipboard-u, u
+    /// imenovanom pasteboard-u i u istoriji, pa tastatura posle povratka
+    /// nalepi sama.
+    private func vratiSeUAplikaciju(napomena: String?) {
+        guard pokrenutSaTastature,
+              podesavanja.vratiSePosleDiktata,
+              UIApplication.shared.applicationState == .active else { return }
+
+        let potvrda = "Tekst je spreman. Vraćam te u tvoju aplikaciju…"
+        if let napomena, !napomena.isEmpty {
+            poruka = "\(napomena) \(potvrda)"
+        } else {
+            poruka = potvrda
+        }
+        Dnevnik.pisi("Povratak u aplikaciju posle diktata iz tastature.")
+        Task { @MainActor in
+            // Kratko se vidi potvrda, a clipboard i pasteboard su već upisani.
+            try? await Task.sleep(nanoseconds: 1_300_000_000)
+            exit(0)
+        }
     }
 
     /// Tekst ide u opšti clipboard zajedno sa tokenom i vremenom. Token

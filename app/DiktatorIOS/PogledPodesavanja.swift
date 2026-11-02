@@ -126,6 +126,18 @@ struct PogledPodesavanja: View {
                 }
 
                 Toggle("Čuvaj istoriju", isOn: $stanje.podesavanja.cuvajIstoriju)
+
+                Toggle("Vrati me u aplikaciju posle diktata", isOn: $stanje.podesavanja.vratiSePosleDiktata)
+
+                if stanje.podesavanja.vratiSePosleDiktata {
+                    Text("Kada Diktator otvoriš iz tastature, posle prepisa se sam zatvori i iOS te vrati u aplikaciju u kojoj si diktirao. Tekst se nalepi sam, a pozadinska sesija se pritom gasi.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("Diktator ostaje otvoren posle prepisa; vrati se strelicom ‹ u gornjem levom uglu, a pozadinska sesija ostaje uključena.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
 
             Section(header: zaglavlje("Brzina")) {
