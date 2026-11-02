@@ -4,6 +4,7 @@ import Foundation
 struct PogledDiktat: View {
     @EnvironmentObject var stanje: AppStanje
     @State private var prikaziPodesavanja = false
+    @State private var predlogRecnika: PredlogRecnika?
 
     private var jeGreska: Bool {
         if case .greska = stanje.stanje { return true }
@@ -56,6 +57,10 @@ struct PogledDiktat: View {
             .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(isPresented: $prikaziPodesavanja) {
                 PogledPodesavanja()
+            }
+            .sheet(item: $predlogRecnika) { predlog in
+                PogledDodajRecnik(tekst: predlog.tekst)
+                    .environmentObject(stanje)
             }
         }
     }
@@ -352,10 +357,14 @@ struct PogledDiktat: View {
     private var poslednjiTekstKartica: some View {
         if !stanje.poslednjiTekst.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
-                HStack {
+                HStack(spacing: 6) {
                     Text("Poslednji tekst")
                         .font(.system(size: 17, weight: .semibold))
                     Spacer()
+                    Button("U rečnik") {
+                        predlogRecnika = PredlogRecnika(tekst: stanje.poslednjiTekst)
+                    }
+                    .buttonStyle(StilDugmetaSvetli())
                     Button("Kopiraj") {
                         stanje.kopirajPoslednji()
                     }

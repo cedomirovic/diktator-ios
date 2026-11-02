@@ -1525,6 +1525,35 @@ final class AppStanje: ObservableObject {
         poruka = "Rečnik je sačuvan."
     }
 
+    /// Dodaje pojmove u rečnik, preskače duplikate (bez obzira na velika i
+    /// mala slova) i odmah čuva fajl. Vraća broj stvarno dodatih pojmova.
+    @discardableResult
+    func dodajURecnik(_ pojmovi: [String]) -> Int {
+        var postojeci = recnik
+            .components(separatedBy: .newlines)
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .filter { !$0.isEmpty }
+        var kljucevi = Set(postojeci.map { $0.lowercased() })
+        var dodatih = 0
+
+        for pojam in pojmovi {
+            let ociscen = pojam
+                .replacingOccurrences(of: "\n", with: " ")
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !ociscen.isEmpty else { continue }
+            let kljuc = ociscen.lowercased()
+            guard !kljucevi.contains(kljuc) else { continue }
+            kljucevi.insert(kljuc)
+            postojeci.append(ociscen)
+            dodatih += 1
+        }
+
+        guard dodatih > 0 else { return 0 }
+        recnik = postojeci.joined(separator: "\n")
+        Recnik.sacuvaj(recnik)
+        return dodatih
+    }
+
     func obrisiIstoriju() {
         istorija = []
         IstorijaSkladiste.sacuvaj([])

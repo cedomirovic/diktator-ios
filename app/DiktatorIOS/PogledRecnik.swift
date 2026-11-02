@@ -18,6 +18,11 @@ struct PogledRecnik: View {
                             .foregroundStyle(Dizajn.tekstSekundarni)
                             .fixedSize(horizontal: false, vertical: true)
 
+                        Text("Najbrže do popunjenog rečnika: u Istoriji tapni plus na diktatu i izaberi imena koja se ponavljaju.")
+                            .font(.system(size: 12))
+                            .foregroundStyle(Dizajn.tekstTercijarni)
+                            .fixedSize(horizontal: false, vertical: true)
+
                         TextEditor(text: $stanje.recnik)
                             .font(.system(size: 15))
                             .scrollContentBackground(.hidden)

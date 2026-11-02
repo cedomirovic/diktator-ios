@@ -3,6 +3,7 @@ import SwiftUI
 struct PogledIstorija: View {
     @EnvironmentObject var stanje: AppStanje
     @State private var pretraga = ""
+    @State private var predlogRecnika: PredlogRecnika?
 
     private var filtrirano: [Zapis] {
         let upit = pretraga.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
@@ -63,6 +64,10 @@ struct PogledIstorija: View {
             }
             .background(Dizajn.pozadina)
             .toolbar(.hidden, for: .navigationBar)
+            .sheet(item: $predlogRecnika) { predlog in
+                PogledDodajRecnik(tekst: predlog.tekst)
+                    .environmentObject(stanje)
+            }
         }
     }
 
@@ -132,22 +137,42 @@ struct PogledIstorija: View {
 
             VStack(alignment: .trailing, spacing: 6) {
                 Oznaka(tekst: trajanje(zapis.trajanje))
-                Menu {
+
+                HStack(spacing: 6) {
                     Button {
-                        stanje.kopiraj(zapis.tekst)
+                        predlogRecnika = PredlogRecnika(tekst: zapis.tekst)
                     } label: {
-                        Label("Kopiraj", systemImage: "doc.on.doc")
+                        Image(systemName: "text.badge.plus")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(Dizajn.akcenat)
+                            .frame(width: 26, height: 22)
+                            .contentShape(Rectangle())
                     }
-                    Button(role: .destructive) {
-                        obrisi(zapis)
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Dodaj u rečnik")
+
+                    Menu {
+                        Button {
+                            predlogRecnika = PredlogRecnika(tekst: zapis.tekst)
+                        } label: {
+                            Label("Dodaj u rečnik", systemImage: "text.badge.plus")
+                        }
+                        Button {
+                            stanje.kopiraj(zapis.tekst)
+                        } label: {
+                            Label("Kopiraj", systemImage: "doc.on.doc")
+                        }
+                        Button(role: .destructive) {
+                            obrisi(zapis)
+                        } label: {
+                            Label("Obriši", systemImage: "trash")
+                        }
                     } label: {
-                        Label("Obriši", systemImage: "trash")
+                        Image(systemName: "ellipsis")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(Dizajn.tekstTercijarni)
+                            .frame(width: 28, height: 22)
                     }
-                } label: {
-                    Image(systemName: "ellipsis")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(Dizajn.tekstTercijarni)
-                        .frame(width: 28, height: 22)
                 }
             }
         }
@@ -157,6 +182,11 @@ struct PogledIstorija: View {
             stanje.kopiraj(zapis.tekst)
         }
         .contextMenu {
+            Button {
+                predlogRecnika = PredlogRecnika(tekst: zapis.tekst)
+            } label: {
+                Label("Dodaj u rečnik", systemImage: "text.badge.plus")
+            }
             Button {
                 stanje.kopiraj(zapis.tekst)
             } label: {

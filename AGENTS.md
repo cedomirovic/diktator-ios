@@ -6,6 +6,17 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Status
 
+- **02.11.2026.** — **rečnik se gradi iz diktata**: u **Istoriji** svaki
+  zapis dobija dugme **Dodaj u rečnik** (ikona `text.badge.plus`), a isto
+  dugme je i u meniju zapisa, u kontekstnom meniju (dugi dodir) i na kartici
+  **Poslednji tekst** na ekranu **Diktat**. Otvara se lista
+  `PogledDodajRecnik` koja predlaže reči sa velikim početnim slovom, unapred
+  označava imena koja nisu na početku rečenice, skriva pojmove koji su već u
+  rečniku i dopušta ručni unos više pojmova odvojenih zarezom. Novi
+  `AppStanje.dodajURecnik` preskače duplikate bez obzira na velika i mala
+  slova, vraća broj dodatih pojmova i odmah čuva `recnik.txt`. Provereno u
+  simulatoru (svetlo/tamno) i upisom u fajl; verzija ostaje **0.2.0 (10)**.
+
 - **02.11.2026.** — **tastatura redizajnirana kao sistemska iOS tastatura**:
   uklonjena je traka sa plavim **Diktiraj** i zelenim **Nalepi** dugmetom.
   Tastatura sada izgleda kao osnovna iOS tastatura — iste boje pozadine i

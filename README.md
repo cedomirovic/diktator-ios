@@ -68,6 +68,20 @@ srpski.
 Red ispod izbora režima uvek tačno kaže šta će se koristiti, npr.
 „Prepisaće: Large v3, pretraga snopom, pun audio kontekst.“
 
+## Rečnik
+
+Rečnik su imena, firme i pojmovi koje Whisper koristi kao nagoveštaj pri
+prepisu. Gradi se iz uspešnih diktata: u **Istoriji** svaki zapis ima dugme
+**Dodaj u rečnik** (ikona `text.badge.plus`), a isto dugme postoji i u meniju
+zapisa, u kontekstnom meniju (dugi dodir) i na kartici **Poslednji tekst** na
+ekranu **Diktat**.
+
+Lista predlaže reči koje počinju velikim slovom, unapred označava imena koja
+nisu na početku rečenice (tu su najčešće obične reči), preskače pojmove koji
+su već u rečniku i dopušta ručni unos više pojmova odvojenih zarezom.
+Duplikati se ignorišu bez obzira na velika i mala slova, a izmene se odmah
+čuvaju u `recnik.txt`.
+
 ## Statistika
 
 Glavni ekran ima karticu **Statistika**: današnje reči, niz dana i ušteđeno

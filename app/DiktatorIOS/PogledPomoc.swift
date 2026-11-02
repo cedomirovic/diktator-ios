@@ -16,6 +16,15 @@ struct PogledPomoc: View {
                     koraciKartica
                     diktatKartica
                     tekstKartica(
+                        naslov: "Rečnik",
+                        pasusi: [
+                            "Rečnik su imena, firme i pojmovi koje Whisper treba da prepozna. Što je tačniji, to je prepis bolji.",
+                            "Najlakše ga gradiš iz diktata: u Istoriji tapni ikonu sa plusom na zapisu (ili duži dodir → Dodaj u rečnik). Isto dugme postoji i na kartici Poslednji tekst.",
+                            "Pojmovi koji počinju velikim slovom se predlažu, a imena koja nisu na početku rečenice su unapred označena. Ako nešto nije predloženo, upiši ga ručno, više pojmova odvoji zarezom.",
+                            "Duplikati se preskaču, a izmene se čuvaju odmah. Rečnik možeš urediti i u tabu Rečnik."
+                        ]
+                    )
+                    tekstKartica(
                         naslov: "Statistika",
                         pasusi: [
                             "Na glavnom ekranu vidiš današnje reči, niz dana i ušteđeno vreme. Tapni karticu za grafikon poslednjih 7 dana, prosečnu brzinu i pregled jezika.",
