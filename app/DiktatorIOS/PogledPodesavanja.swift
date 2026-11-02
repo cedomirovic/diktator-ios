@@ -157,6 +157,12 @@ struct PogledPodesavanja: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
 
+                if !stanje.podesavanja.prepisOblak {
+                    Text(stvarnaObrada)
+                        .font(.caption)
+                        .foregroundStyle(Dizajn.tekstTercijarni)
+                }
+
                 if stanje.podesavanja.prepisOblak {
                     HStack {
                         if kljucVidljiv {
@@ -489,5 +495,17 @@ struct PogledPodesavanja: View {
             .font(.system(size: 17, weight: .semibold))
             .foregroundStyle(Dizajn.tekst)
             .textCase(nil)
+    }
+
+    /// Tačan opis onoga što se koristi pri prepisu, da izbor modela i režima
+    /// nikada ne bude tih. Desktop Diktator radi Large v3, pun audio kontekst
+    /// i pretragu snopom — ovde se vidi da li je mobile isto podešen.
+    private var stvarnaObrada: String {
+        let model = stanje.modelZaPrepis?.naziv ?? "nijedan model"
+        let rezim = RezimPrepisa.iz(stanje.podesavanja.rezimPrepisa) == .kvalitet
+            ? "pretraga snopom"
+            : "greedy"
+        let kontekst = stanje.punAudioKontekst ? "pun audio kontekst" : "skraćen audio kontekst"
+        return "Prepisaće: \(model), \(rezim), \(kontekst)."
     }
 }

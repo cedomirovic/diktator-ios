@@ -589,6 +589,9 @@ final class AppStanje: ObservableObject {
 
         let jezik = podesavanja.jezik
         let rezim = RezimPrepisa.iz(podesavanja.rezimPrepisa)
+        // „Najtačnije“ radi kao desktop: pun audio kontekst. Skraćeni kontekst
+        // ostaje samo u režimu „Brzo“, gde je brzina važnija od tačnosti.
+        let punKontekst = punAudioKontekst
         let prompt = Recnik.kaoPrompt(recnik)
         // Metal u pozadini nije dostupan, a i prelazak GPU/CPU tera ponovno
         // učitavanje modela. Zato GPU koristimo samo za diktat direktno u
@@ -609,6 +612,7 @@ final class AppStanje: ObservableObject {
                 kljuc: kljucOblaka,
                 prompt: prompt,
                 rezim: rezim,
+                punKontekst: punKontekst,
                 useGPU: useGPU
             )
             return
@@ -630,6 +634,7 @@ final class AppStanje: ObservableObject {
             jezik: jezik,
             prompt: prompt,
             rezim: rezim,
+            punKontekst: punKontekst,
             useGPU: useGPU,
             model: model,
             napomena: nil
@@ -645,6 +650,7 @@ final class AppStanje: ObservableObject {
         kljuc: String,
         prompt: String,
         rezim: RezimPrepisa,
+        punKontekst: Bool,
         useGPU: Bool
     ) {
         stanje = .prepisuje
@@ -680,6 +686,7 @@ final class AppStanje: ObservableObject {
                     jezik: jezik,
                     prompt: prompt,
                     rezim: rezim,
+                    punKontekst: punKontekst,
                     useGPU: useGPU,
                     model: lokalni,
                     napomena: "Groq nije odgovorio — prepis je urađen na uređaju."
@@ -694,6 +701,7 @@ final class AppStanje: ObservableObject {
         jezik: String,
         prompt: String,
         rezim: RezimPrepisa,
+        punKontekst: Bool,
         useGPU: Bool,
         model: PonudaModela,
         napomena: String?
@@ -708,7 +716,8 @@ final class AppStanje: ObservableObject {
                     uzorci: uzorci,
                     jezik: jezik,
                     recnik: prompt,
-                    rezim: rezim
+                    rezim: rezim,
+                    punKontekst: punKontekst
                 )
                 let jezikPrepisa = prepisivac.jezikZadnjegPrepisa()
                 Dnevnik.pisi(
@@ -1150,14 +1159,31 @@ final class AppStanje: ObservableObject {
     // MARK: - Modeli
 
     /// Model koji se stvarno koristi. U brzom režimu to je Turbo čim je
-    /// preuzet, i ako je korisnik ranije izabrao Large v3.
+    /// preuzet, i ako je korisnik ranije izabrao Large v3. Izabrani model je
+    /// merodavan kada je preuzet; ako nije, uzimamo prvi preuzeti da diktat
+    /// ne bi pao na poruci „Model nije preuzet“.
     var modelZaPrepis: PonudaModela? {
         if RezimBrzine.iz(podesavanja.rezimBrzine) == .brzo,
            let turbo = Modeli.nadji("ggml-large-v3-turbo-q5_0.bin"),
            turbo.preuzet {
             return turbo
         }
+        if let izabran = Modeli.nadji(podesavanja.model), izabran.preuzet {
+            return izabran
+        }
+        if let large = Modeli.nadji("ggml-large-v3-q5_0.bin"), large.preuzet {
+            return large
+        }
+        if let turbo = Modeli.nadji("ggml-large-v3-turbo-q5_0.bin"), turbo.preuzet {
+            return turbo
+        }
         return Modeli.nadji(podesavanja.model)
+    }
+
+    /// Da li se koristi pun audio kontekst (kao na desktopu). Skraćeni
+    /// kontekst je rezervisan za režim „Brzo“.
+    var punAudioKontekst: Bool {
+        RezimBrzine.iz(podesavanja.rezimBrzine) == .tacno
     }
 
     var modelJePreuzet: Bool {
@@ -1234,10 +1260,13 @@ final class AppStanje: ObservableObject {
             if let turbo = Modeli.nadji("ggml-large-v3-turbo-q5_0.bin"), turbo.preuzet {
                 podesavanja.model = turbo.id
             }
+            podesavanja.rezimPrepisa = RezimPrepisa.stedljivo.rawValue
         case .tacno:
             if let large = Modeli.nadji("ggml-large-v3-q5_0.bin"), large.preuzet {
                 podesavanja.model = large.id
             }
+            // Isto kao desktop: pretraga snopom daje primetno bolji srpski.
+            podesavanja.rezimPrepisa = RezimPrepisa.kvalitet.rawValue
         case .oblak:
             break
         }

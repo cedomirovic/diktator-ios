@@ -48,6 +48,7 @@ enum Kljuc {
 final class SkladistePodesavanja {
     private static let kljuc = "diktator.ios.podesavanja.v1"
     private static let kljucMigracijeJezika = "diktator.ios.migracija.jezika.v1"
+    private static let kljucMigracijeTacnosti = "diktator.ios.migracija.tacnosti.v1"
 
     static func ucitaj() -> Podesavanja {
         guard let podaci = UserDefaults.standard.data(forKey: kljuc),
@@ -64,6 +65,22 @@ final class SkladistePodesavanja {
                 sacuvaj(p)
             }
             UserDefaults.standard.set(true, forKey: kljucMigracijeJezika)
+        }
+
+        // Ručno izabran Large v3 uz podrazumevani (a ne ručno izabran) brzi
+        // režim ostavljao je aplikaciju u nedoslednom stanju: pisalo je
+        // „Izabran: Large v3“, a prepis je tiho koristio Turbo sa kraćim
+        // kontekstom. Prvi put posle ove ispravke takvo stanje prevodimo u
+        // „Najtačnije“, pa se mobile ponaša kao desktop.
+        if !UserDefaults.standard.bool(forKey: kljucMigracijeTacnosti) {
+            if p.model == "ggml-large-v3-q5_0.bin",
+               p.rezimBrzine == RezimBrzine.brzo.rawValue,
+               !p.prepisOblak {
+                p.rezimBrzine = RezimBrzine.tacno.rawValue
+                p.rezimPrepisa = RezimPrepisa.kvalitet.rawValue
+                sacuvaj(p)
+            }
+            UserDefaults.standard.set(true, forKey: kljucMigracijeTacnosti)
         }
 
         return p

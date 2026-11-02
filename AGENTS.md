@@ -6,6 +6,18 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Status
 
+- **02.11.2026.** — **tačnost srpskog izjednačena sa desktopom**: uporedni
+  test je pokazao tri razlike u odnosu na macOS Diktator, koji radi sa
+  **Large v3 + pretragom snopom + punim audio kontekstom**. Mobilna
+  aplikacija je do sada podrazumevano koristila **Turbo** (jer je „Brzina“
+  bila `brzo`, a `modelZaPrepis` je tada tiho vraćao Turbo i kada je u
+  Podešavanjima pisalo „Izabran: Large v3“), **greedy** dekodiranje i
+  **skraćen audio kontekst**. Sada: podrazumevani režim je **Najtačnije**
+  (Large v3 + beam 5 + pun kontekst), „Brzo“ zadržava Turbo + greedy +
+  skraćen kontekst, a skraćeni kontekst je vezan isključivo za taj režim.
+  Dodata je jednokratna migracija za nedosledno sačuvano stanje i red u
+  Podešavanjima → **Brzina** koji tačno piše šta će se koristiti
+  („Prepisaće: Large v3, pretraga snopom, pun audio kontekst.“).
 - **01.11.2026.** — **novi vizuelni identitet sa desktop dizajna**: boje,
   stil i tipografija preuzeti su sa macOS Diktatora i prilagođeni telefonu.
   Dodat je `Dizajn.swift` sa tokenima (akcenat **#2F7CF6**, pozadina

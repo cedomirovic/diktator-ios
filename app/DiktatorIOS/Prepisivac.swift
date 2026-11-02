@@ -123,7 +123,13 @@ final class Prepisivac: @unchecked Sendable {
         return Int32(min(1440, max(192, zaokruzeno)))
     }
 
-    func prepisi(uzorci: [Float], jezik: String, recnik: String, rezim: RezimPrepisa = .stedljivo) throws -> String {
+    func prepisi(
+        uzorci: [Float],
+        jezik: String,
+        recnik: String,
+        rezim: RezimPrepisa = .stedljivo,
+        punKontekst: Bool = false
+    ) throws -> String {
         try red.sync {
             guard let kontekst else { throw GreskaPrepisa.modelNijePreuzet }
             guard !uzorci.isEmpty else { return "" }
@@ -147,7 +153,11 @@ final class Prepisivac: @unchecked Sendable {
             // efikasnim jezgrima i samo usporavaju enkoder. Metal koristi GPU
             // za matrične operacije, pa tu broj niti manje utiče.
             p.n_threads = ucitanaGPU ? 4 : 3
-            p.audio_ctx = Prepisivac.audioKontekst(uzorci: uzorci.count)
+            // Skraćeni audio kontekst je brži, ali menja pozicione embedding-e
+            // koje je model naučio za punih 30 s, pa ume da pogreši završetke
+            // i imena. U režimu „Najtačnije“ radimo isto kao desktop: pun
+            // kontekst (0 = svih 1500 pozicija).
+            p.audio_ctx = punKontekst ? 0 : Prepisivac.audioKontekst(uzorci: uzorci.count)
             p.translate = false
             p.no_context = true
             p.no_timestamps = true

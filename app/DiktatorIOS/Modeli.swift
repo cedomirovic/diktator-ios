@@ -105,9 +105,9 @@ enum RezimBrzine: String, CaseIterable, Identifiable {
     var opis: String {
         switch self {
         case .brzo:
-            return "Turbo model i kraći audio kontekst. Nekoliko puta brže od Large v3, uz moguće greške u imenima."
+            return "Turbo model, kraći audio kontekst i najbrža obrada. Nekoliko puta brže, uz moguće greške u imenima i završecima."
         case .tacno:
-            return "Large v3 je najtačniji za srpski, ali sporiji. Kratak snimak i dalje traje nekoliko sekundi."
+            return "Isto kao desktop Diktator: Large v3, pun audio kontekst i pretraga snopom. Najtačniji srpski, ali sporiji."
         case .oblak:
             return "Groq prepiše kratak snimak za oko sekund, ali zvuk tada napušta uređaj."
         }
@@ -166,7 +166,7 @@ struct Podesavanja: Codable, Equatable {
 
     var jezik = Podesavanja.podrazumevaniJezik
     var model = Modeli.podrazumevani.id
-    var rezimPrepisa = RezimPrepisa.stedljivo.rawValue
+    var rezimPrepisa = RezimPrepisa.kvalitet.rawValue
     var oslobadjanjeModela = OslobadjanjeModela.pet.rawValue
     var cuvajIstoriju = true
     /// Kada je Diktator otvoren iz tastature samo zato što sesija nije bila
@@ -180,7 +180,7 @@ struct Podesavanja: Codable, Equatable {
     var adresaCustomDoterivanja = ProvajderiDoterivanja.custom.adresa
     var prepisOblak = false
     var modelOblaka = PrepisOblak.podrazumevaniModel
-    var rezimBrzine = RezimBrzine.brzo.rawValue
+    var rezimBrzine = RezimBrzine.tacno.rawValue
 
     init() {}
 
@@ -209,9 +209,9 @@ struct Podesavanja: Codable, Equatable {
             ?? Modeli.nadjiPostojeci()?.id
             ?? Modeli.podrazumevani.id
         rezimPrepisa = try kontejner.decodeIfPresent(String.self, forKey: .rezimPrepisa)
-            ?? RezimPrepisa.stedljivo.rawValue
+            ?? RezimPrepisa.kvalitet.rawValue
         if RezimPrepisa(rawValue: rezimPrepisa) == nil {
-            rezimPrepisa = RezimPrepisa.stedljivo.rawValue
+            rezimPrepisa = RezimPrepisa.kvalitet.rawValue
         }
         oslobadjanjeModela = try kontejner.decodeIfPresent(String.self, forKey: .oslobadjanjeModela)
             ?? OslobadjanjeModela.pet.rawValue
@@ -235,9 +235,9 @@ struct Podesavanja: Codable, Equatable {
         modelOblaka = try kontejner.decodeIfPresent(String.self, forKey: .modelOblaka)
             ?? PrepisOblak.podrazumevaniModel
         rezimBrzine = try kontejner.decodeIfPresent(String.self, forKey: .rezimBrzine)
-            ?? RezimBrzine.brzo.rawValue
+            ?? RezimBrzine.tacno.rawValue
         if RezimBrzine(rawValue: rezimBrzine) == nil {
-            rezimBrzine = RezimBrzine.brzo.rawValue
+            rezimBrzine = RezimBrzine.tacno.rawValue
         }
     }
 }

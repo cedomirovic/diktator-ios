@@ -51,6 +51,21 @@ pošalje lokalno obaveštenje sa linkom na release. U Podešavanjima postoji
 prekidač **Proveri nove verzije**, dugme **Proveri sada** i **Testiraj
 obaveštenje** da se odmah proveri da li iOS dozvoljava notifikacije.
 
+## Tačnost srpskog
+
+Desktop Diktator je podešen na **Large v3 q5_0**, **pretragu snopom**
+(beam search 5) i **pun audio kontekst**. Mobilna aplikacija radi isto kada
+je u Podešavanjima → **Brzina** izabrano **Najtačnije — Large v3**, što je
+sada i podrazumevano.
+
+**Brzo — Turbo** namerno odstupa: Turbo model, greedy dekodiranje i skraćen
+audio kontekst (enkoder računa samo stvarnu dužinu snimka). Nekoliko puta je
+brže, ali ume da pogreši imena i završetke reči, pa nije preporučeno za
+srpski.
+
+Red ispod izbora režima uvek tačno kaže šta će se koristiti, npr.
+„Prepisaće: Large v3, pretraga snopom, pun audio kontekst.“
+
 ## Statistika
 
 Glavni ekran ima karticu **Statistika**: današnje reči, niz dana i ušteđeno
