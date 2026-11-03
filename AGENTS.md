@@ -6,6 +6,19 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Status
 
+- **03.11.2026.** — **sesija bez isteka — Diktator se više ne otvara pri
+  svakom diktatu**: podrazumevano trajanje pozadinske sesije je sada **Bez
+  isteka**, pa tastatura diktira u bilo kojoj aplikaciji, a Diktator se
+  otvara samo prvi put dok sesija još nije uključena. U Podešavanjima →
+  **Diktat** dodat je izbor **Trajanje sesije** (**Bez isteka** / **1 sat** /
+  **15 minuta**) koji odmah važi i za sesiju koja je već uključena.
+  `AppStanje` kod sesije bez isteka ne postavlja `sesijaKraj`, pa je timer ne
+  gasi, a IPC nosi `sesijaNeogranicena = 1`; tastatura zato ne odbija sesiju
+  po vremenu i u mirovanju prikazuje **Sesija ✓** ili **Sesija ✗**. Pošto bi
+  izlazak iz aplikacije ugasio sesiju, kod sesije bez isteka Diktator posle
+  prvog diktata ostaje otvoren i korisnik se vraća strelicom ‹, a dalji
+  diktati idu direktno iz tastature. Verzija ostaje **0.2.0 (10)**.
+
 - **03.11.2026.** — **tipke se osećaju i vide pod prstom**: svaka tipka
   tastature (slova, specijalni tasteri, **Diktiraj**, **Nalepi**) sada pusti
   blagi haptički odziv na dodir i uveća se na 112 % dok je pritisnuta, pa se

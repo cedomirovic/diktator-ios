@@ -90,7 +90,7 @@ MOGUĆNOSTI
 • Srpski i engleski, uključujući č, ć, ž, š, đ
 • Lokalni prepis preko Whisper-a (whisper.cpp)
 • Automatsko lepljenje u svaku aplikaciju, uz ručno Nalepi kao rezervu
-• Pozadinska sesija od 15 minuta, produžava se svakim diktatom
+• Pozadinska sesija bez isteka (opciono 1 sat ili 15 minuta)
 • Istorija, rečnik i statistika
 • Opcioni prepis u oblaku preko Groq-a (~1 s)
 • Opciono doterivanje teksta preko Gemini, OpenAI, Claude, DeepSeek ili Ollama

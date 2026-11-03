@@ -55,6 +55,7 @@ private enum DiktatorIPC {
     static let vreme = "vreme"
     static let sesija = "sesija"
     static let sesijaDo = "sesijaDo"
+    static let sesijaNeogranicena = "sesijaNeogranicena"
     static let stanjeKljuc = "stanje"
     static let token = "token"
     static let tokenVreme = "tokenVreme"
@@ -245,6 +246,7 @@ final class KeyboardViewController: UIInputViewController {
     private var timerSesijaTimeout: Timer?
     private var sesijaAktivna = false
     private var sesijaDo: Double = 0
+    private var sesijaBezIsteka = false
     private var snimaSesijom = false
     private var obradaSesije = false
     private var cekaStartSesije = false
@@ -1063,20 +1065,23 @@ final class KeyboardViewController: UIInputViewController {
             let sesija = vrednosti[DiktatorIPC.sesija] == "1"
             let stanjeApp = vrednosti[DiktatorIPC.stanjeKljuc] ?? "mirno"
             let doKada = Double(vrednosti[DiktatorIPC.sesijaDo] ?? "") ?? 0
+            let bezIsteka = vrednosti[DiktatorIPC.sesijaNeogranicena] == "1"
             primeniStanje(
                 sesija: sesija,
                 stanje: stanjeApp,
                 vreme: vreme,
-                sesijaDo: doKada
+                sesijaDo: doKada,
+                bezIsteka: bezIsteka
             )
         } else if zadnjaNotifikacija == nil
                     || Date().timeIntervalSince(zadnjaNotifikacija!) > 10 {
             obradiStaleStanje()
         }
 
-        // Sesija traje 15 minuta. Ako aplikacija u pozadini ne stigne da
-        // pošalje novi status, tastatura i dalje zna do kada je sesija živa.
-        if sesijaAktivna, sesijaDo > 0, sada >= sesijaDo {
+        // Ograničena sesija ima `sesijaDo`; sesija bez isteka se ne gasi po
+        // vremenu, već samo kada je korisnik završi ili aplikacija prestane
+        // da šalje status.
+        if sesijaAktivna, !sesijaBezIsteka, sesijaDo > 0, sada >= sesijaDo {
             Dnevnik.pisi("Sesija je istekla (sesijaDo).")
             obradiStaleStanje()
         }
@@ -1105,7 +1110,11 @@ final class KeyboardViewController: UIInputViewController {
         }
 
         // Stariji statusi nemaju sesijaDo. Ako su zastareli, ne verujemo im.
-        if sesijaAktivna, sesijaDo == 0, sada - zadnjiStatusVreme > 8 {
+        // Kod sesije bez isteka heartbeat je jedini znak da aplikacija radi,
+        // pa zastareo status gasi sesiju u tastaturi (sledeći Diktiraj će je
+        // ponovo otvoriti).
+        if sesijaAktivna, sada - zadnjiStatusVreme > 8,
+           sesijaBezIsteka || sesijaDo == 0 {
             Dnevnik.pisi("Sesija nema važenje i status je zastareo — gasim.")
             obradiStaleStanje()
         }
@@ -1123,16 +1132,21 @@ final class KeyboardViewController: UIInputViewController {
         sesija: Bool,
         stanje: String,
         vreme: Double,
-        sesijaDo noviSesijaDo: Double = 0
+        sesijaDo noviSesijaDo: Double = 0,
+        bezIsteka: Bool = false
     ) {
         guard vreme > zadnjeStanjeVreme else { return }
         zadnjeStanjeVreme = vreme
         zadnjiStatusVreme = vreme
         sesijaAktivna = sesija
         let prethodniSesijaDo = sesijaDo
+        let prethodnoBezIsteka = sesijaBezIsteka
         sesijaDo = sesija ? noviSesijaDo : 0
+        sesijaBezIsteka = sesija && bezIsteka
         if sesija, noviSesijaDo > 0, noviSesijaDo != prethodniSesijaDo {
             Dnevnik.pisi("Sesija važi do \(Int(noviSesijaDo)).")
+        } else if sesija, bezIsteka, !prethodnoBezIsteka {
+            Dnevnik.pisi("Sesija je bez isteka.")
         }
 
         ocistiCekanjeSesije()
@@ -1207,6 +1221,7 @@ final class KeyboardViewController: UIInputViewController {
         }
         sesijaAktivna = false
         sesijaDo = 0
+        sesijaBezIsteka = false
         if snimaSesijom && !cekaStartSesije {
             snimaSesijom = false
         }
@@ -1238,6 +1253,7 @@ final class KeyboardViewController: UIInputViewController {
             let sada = Date().timeIntervalSince1970
             let doKada = Double(vrednosti[DiktatorIPC.sesijaDo] ?? "") ?? 0
             let vazeceDo = doKada > sada ? doKada : 0
+            let bezIsteka = vrednosti[DiktatorIPC.sesijaNeogranicena] == "1"
             Dnevnik.pisi(
                 "Darwin fiksni status: sesija=\(sesija) stanje=\(stanje)"
             )
@@ -1247,7 +1263,8 @@ final class KeyboardViewController: UIInputViewController {
                 sesija: sesija,
                 stanje: stanje,
                 vreme: sada,
-                sesijaDo: vazeceDo
+                sesijaDo: vazeceDo,
+                bezIsteka: bezIsteka
             )
             azurirajPrikaz()
             return
@@ -1623,6 +1640,12 @@ final class KeyboardViewController: UIInputViewController {
             } else if tekstSpreman {
                 status.text = "Spremno za lepljenje"
                 status.textColor = .systemGreen
+            } else if sesijaAktivna {
+                status.text = "Sesija ✓"
+                status.textColor = .systemGreen
+            } else if hasFullAccess {
+                status.text = "Sesija ✗"
+                status.textColor = .tertiaryLabel
             } else {
                 status.text = ""
             }

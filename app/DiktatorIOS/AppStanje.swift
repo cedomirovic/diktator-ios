@@ -58,6 +58,8 @@ private enum DiktatorIPC {
     static let vreme = "vreme"
     static let sesija = "sesija"
     static let sesijaDo = "sesijaDo"
+    /// „1“ kada sesija nema istek; tastatura tada ne gasi sesiju po vremenu.
+    static let sesijaNeogranicena = "sesijaNeogranicena"
     static let stanjeKljuc = "stanje"
     static let token = "token"
     static let tokenVreme = "tokenVreme"
@@ -146,6 +148,8 @@ final class AppStanje: ObservableObject {
     @Published var napredakPreuzimanja: Double?
     @Published var sesijaAktivna = false
     @Published var sesijaPreostalo = 0
+    /// Sesija bez isteka nema odbrojavanje; gasi se samo na zahtev korisnika.
+    @Published var sesijaBezIsteka = false
     @Published var dostupnoAzuriranje: Azuriranje?
     @Published var proveravaAzuriranja = false
     @Published var porukaAzuriranja: String?
@@ -372,8 +376,7 @@ final class AppStanje: ObservableObject {
                 try? prepisivac.ucitaj(putanja: putanja, useGPU: false)
             }
         }
-        sesijaPreostalo = Snimac.najduzeSesijeSekundi
-        sesijaKraj = Date().addingTimeInterval(TimeInterval(Snimac.najduzeSesijeSekundi))
+        primeniTrajanjeSesije()
         pokreniTimerSesije()
         pokreniIPCHeartbeat()
         server.postaviTekst(
@@ -383,22 +386,53 @@ final class AppStanje: ObservableObject {
         )
         server.pokreni()
         pisiIPCStanje()
-        Dnevnik.pisi("Sesija uključena, traje do \(Snimac.najduzeSesijeSekundi) s.")
-        NSLog("Diktator: sesija uključena, traje do %d s.", Snimac.najduzeSesijeSekundi)
+        Dnevnik.pisi("Sesija uključena, trajanje: \(TrajanjeSesije.iz(podesavanja.trajanjeSesije).naziv).")
+        NSLog(
+            "Diktator: sesija uključena, trajanje: %@",
+            TrajanjeSesije.iz(podesavanja.trajanjeSesije).naziv
+        )
         poruka = "Sesija je aktivna. Pređi u drugu aplikaciju i tapni Diktiraj na tastaturi."
         return true
     }
 
+    /// Postavlja važenje sesije prema izabranom trajanju. Kada trajanje nema
+    /// istek, `sesijaKraj` ostaje `nil`, pa timer ne gasi sesiju po vremenu.
+    private func primeniTrajanjeSesije() {
+        let trajanje = TrajanjeSesije.iz(podesavanja.trajanjeSesije)
+        sesijaBezIsteka = trajanje.sekundi == nil
+        if let sekundi = trajanje.sekundi {
+            sesijaPreostalo = sekundi
+            sesijaKraj = Date().addingTimeInterval(TimeInterval(sekundi))
+        } else {
+            sesijaPreostalo = 0
+            sesijaKraj = nil
+        }
+    }
+
+    /// Promena trajanja iz Podešavanja odmah važi i za sesiju koja je već
+    /// uključena, bez potrebe da se gasi i ponovo uključuje.
+    func postaviTrajanjeSesije(_ id: String) {
+        podesavanja.trajanjeSesije = id
+        guard sesijaAktivna else { return }
+        primeniTrajanjeSesije()
+        pokreniTimerSesije()
+        pisiIPCStanje()
+        Dnevnik.pisi("Trajanje sesije promenjeno: \(TrajanjeSesije.iz(id).naziv).")
+    }
+
     /// Produžava prozor pozadinske sesije i osigurava da server, tajmeri i
-    /// heartbeat rade. Bez ovoga bi sesija istekla posle 15 minuta i tastatura
-    /// bi morala ponovo da otvara aplikaciju.
+    /// heartbeat rade. Kod sesije bez isteka nema šta da se produžava, ali se
+    /// servisi i dalje podižu ako su stali.
     private func produziSesiju() {
-        sesijaKraj = Date().addingTimeInterval(TimeInterval(Snimac.najduzeSesijeSekundi))
-        sesijaPreostalo = Snimac.najduzeSesijeSekundi
+        primeniTrajanjeSesije()
         pokreniTimerSesije()
         pokreniIPCHeartbeat()
         server.pokreni()
-        Dnevnik.pisi("Sesija produžena do \(Int(sesijaKraj?.timeIntervalSince1970 ?? 0)).")
+        if let kraj = sesijaKraj {
+            Dnevnik.pisi("Sesija produžena do \(Int(kraj.timeIntervalSince1970)).")
+        } else {
+            Dnevnik.pisi("Sesija bez isteka — nema produžavanja.")
+        }
     }
 
     func zavrsiSesiju() {
@@ -418,6 +452,7 @@ final class AppStanje: ObservableObject {
         sesijaAktivna = false
         sesijaKraj = nil
         sesijaPreostalo = 0
+        sesijaBezIsteka = false
         pisiIPCStanje()
         Dnevnik.pisi("Sesija završena.")
         NSLog("Diktator: sesija završena.")
@@ -891,6 +926,15 @@ final class AppStanje: ObservableObject {
               podesavanja.vratiSePosleDiktata,
               UIApplication.shared.applicationState == .active else { return }
 
+        // Izlazak bi ugasio sesiju bez isteka, pa bi svaki sledeći diktat
+        // ponovo otvarao Diktator. Zato je kod takve sesije ne gasimo —
+        // korisnik se ovamo vrati samo prvi put, strelicom ‹.
+        if TrajanjeSesije.iz(podesavanja.trajanjeSesije).sekundi == nil {
+            poruka = "Sesija je uključena. Vrati se strelicom ‹ u svoju aplikaciju — dalji diktati te neće prebacivati ovamo."
+            Dnevnik.pisi("Sesija bez isteka — aplikacija ostaje u pozadini.")
+            return
+        }
+
         let potvrda = "Tekst je spreman. Vraćam te u tvoju aplikaciju…"
         if let napomena, !napomena.isEmpty {
             poruka = "\(napomena) \(potvrda)"
@@ -962,8 +1006,12 @@ final class AppStanje: ObservableObject {
             DiktatorIPC.vreme: String(sada)
         ]
 
-        if sesijaAktivna, let kraj = sesijaKraj {
-            vrednosti[DiktatorIPC.sesijaDo] = String(kraj.timeIntervalSince1970)
+        if sesijaAktivna {
+            if let kraj = sesijaKraj {
+                vrednosti[DiktatorIPC.sesijaDo] = String(kraj.timeIntervalSince1970)
+            } else {
+                vrednosti[DiktatorIPC.sesijaNeogranicena] = "1"
+            }
         }
 
         if let token = zadnjiIPCtoken {
@@ -1107,17 +1155,19 @@ final class AppStanje: ObservableObject {
 
     private func pokreniTimerSesije() {
         timerSesije?.invalidate()
+        // Sesija bez isteka ne odbrojava, pa joj timer ne treba. I dalje je
+        // gasi samo korisnik ili prekid rada aplikacije.
+        guard sesijaKraj != nil else {
+            timerSesije = nil
+            return
+        }
         timerSesije = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             Task { @MainActor in
-                guard let self, self.sesijaAktivna else { return }
-                if let kraj = self.sesijaKraj {
-                    self.sesijaPreostalo = max(
-                        0,
-                        Int(kraj.timeIntervalSinceNow.rounded())
-                    )
-                } else {
-                    self.sesijaPreostalo = max(0, self.sesijaPreostalo - 1)
-                }
+                guard let self, self.sesijaAktivna, let kraj = self.sesijaKraj else { return }
+                self.sesijaPreostalo = max(
+                    0,
+                    Int(kraj.timeIntervalSinceNow.rounded())
+                )
                 if self.sesijaPreostalo <= 0 {
                     self.zavrsiSesiju()
                 }

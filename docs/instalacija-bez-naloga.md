@@ -177,7 +177,8 @@ Telefon mora biti otključan; ako je zaključan, `devicectl` prijavi
    **„Open in Diktator?“**, tapni **Open**.
 3. Snimi govor; aplikacija prepisuje lokalno i kopira tekst u clipboard.
 4. Vrati se u prethodnu aplikaciju preko **„Back to …“** u statusnoj traci ili
-   preko app switcher-a.
+   preko app switcher-a. Pozadinska sesija ostaje uključena (podrazumevano
+   **bez isteka**), pa svaki sledeći **Diktiraj** radi direktno iz tastature.
 5. Ako se tekst ne ubaci sam, tapni **Nalepi** u traci iznad tastature.
 
 ---

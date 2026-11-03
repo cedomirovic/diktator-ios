@@ -127,12 +127,28 @@ struct PogledPodesavanja: View {
 
                 Toggle("Čuvaj istoriju", isOn: $stanje.podesavanja.cuvajIstoriju)
 
+                Picker("Trajanje sesije", selection: $stanje.podesavanja.trajanjeSesije) {
+                    ForEach(TrajanjeSesije.allCases) { opcija in
+                        Text(opcija.naziv).tag(opcija.rawValue)
+                    }
+                }
+
+                Text(TrajanjeSesije.iz(stanje.podesavanja.trajanjeSesije).opis)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
                 Toggle("Vrati me u aplikaciju posle diktata", isOn: $stanje.podesavanja.vratiSePosleDiktata)
 
                 if stanje.podesavanja.vratiSePosleDiktata {
                     Text("Kada Diktator otvoriš iz tastature, posle prepisa se sam zatvori i iOS te vrati u aplikaciju u kojoj si diktirao. Tekst se nalepi sam, a pozadinska sesija se pritom gasi.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
+
+                    if TrajanjeSesije.iz(stanje.podesavanja.trajanjeSesije).sekundi == nil {
+                        Text("Kod sesije bez isteka Diktator posle prvog diktata ostaje otvoren da sesija ne bi propala — vrati se strelicom ‹, a dalji diktati idu direktno iz tastature.")
+                            .font(.caption)
+                            .foregroundStyle(Dizajn.tekstTercijarni)
+                    }
                 } else {
                     Text("Diktator ostaje otvoren posle prepisa; vrati se strelicom ‹ u gornjem levom uglu, a pozadinska sesija ostaje uključena.")
                         .font(.caption)
@@ -478,6 +494,9 @@ struct PogledPodesavanja: View {
         .toolbar(stanje.izabraniTab == 3 ? .hidden : .visible, for: .navigationBar)
         .onChange(of: stanje.podesavanja) { _, _ in
             stanje.sacuvajPodesavanja()
+        }
+        .onChange(of: stanje.podesavanja.trajanjeSesije) { _, novo in
+            stanje.postaviTrajanjeSesije(novo)
         }
         .onChange(of: stanje.podesavanja.proveravajAzuriranja) { _, novo in
             if novo {

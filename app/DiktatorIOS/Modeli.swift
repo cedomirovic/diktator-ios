@@ -156,6 +156,49 @@ enum OslobadjanjeModela: String, CaseIterable, Identifiable {
     }
 }
 
+/// Koliko dugo pozadinska sesija drži mikrofon u pripravnosti. Kada sesija
+/// nema istek, tastatura diktira u svakoj aplikaciji i Diktator se ne otvara
+/// dok korisnik sam ne završi sesiju.
+enum TrajanjeSesije: String, CaseIterable, Identifiable {
+    case bezIsteka = "bez"
+    case sat = "sat"
+    case petnaestMinuta = "15"
+
+    var id: String { rawValue }
+
+    var naziv: String {
+        switch self {
+        case .bezIsteka: return "Bez isteka"
+        case .sat: return "1 sat"
+        case .petnaestMinuta: return "15 minuta"
+        }
+    }
+
+    /// `nil` znači da sesija nema istek i gasi se samo na zahtev korisnika.
+    var sekundi: Int? {
+        switch self {
+        case .bezIsteka: return nil
+        case .sat: return 3600
+        case .petnaestMinuta: return 900
+        }
+    }
+
+    var opis: String {
+        switch self {
+        case .bezIsteka:
+            return "Tastatura diktira u bilo kojoj aplikaciji i Diktator se ne otvara. Mikrofon ostaje u pripravnosti dok god je sesija uključena, pa baterija troši malo više. Preporučeno."
+        case .sat:
+            return "Sesija traje jedan sat i svaki diktat je produžava za novih sat vremena."
+        case .petnaestMinuta:
+            return "Sesija traje 15 minuta i svaki diktat je produžava. Posle isteka tastatura ponovo otvara Diktator."
+        }
+    }
+
+    static func iz(_ id: String) -> TrajanjeSesije {
+        TrajanjeSesije(rawValue: id) ?? .bezIsteka
+    }
+}
+
 struct Podesavanja: Codable, Equatable {
     /// Na srpskom sistemu odmah biramo srpski, jer je automatska detekcija
     /// na kratkim snimcima manje pouzdana. Na drugim jezicima ostaje "auto".
@@ -169,6 +212,9 @@ struct Podesavanja: Codable, Equatable {
     var rezimPrepisa = RezimPrepisa.kvalitet.rawValue
     var oslobadjanjeModela = OslobadjanjeModela.pet.rawValue
     var cuvajIstoriju = true
+    /// Koliko dugo pozadinska sesija radi. Podrazumevano bez isteka, da se
+    /// Diktator ne bi otvarao pri svakom diktatu.
+    var trajanjeSesije = TrajanjeSesije.bezIsteka.rawValue
     /// Kada je Diktator otvoren iz tastature samo zato što sesija nije bila
     /// uključena, posle prepisa se sam zatvori da bi iOS vratio korisnika u
     /// aplikaciju iz koje je došao.
@@ -190,6 +236,7 @@ struct Podesavanja: Codable, Equatable {
         case rezimPrepisa
         case oslobadjanjeModela
         case cuvajIstoriju
+        case trajanjeSesije
         case vratiSePosleDiktata
         case proveravajAzuriranja
         case doterivanje
@@ -219,6 +266,11 @@ struct Podesavanja: Codable, Equatable {
             oslobadjanjeModela = OslobadjanjeModela.pet.rawValue
         }
         cuvajIstoriju = try kontejner.decodeIfPresent(Bool.self, forKey: .cuvajIstoriju) ?? true
+        trajanjeSesije = try kontejner.decodeIfPresent(String.self, forKey: .trajanjeSesije)
+            ?? TrajanjeSesije.bezIsteka.rawValue
+        if TrajanjeSesije(rawValue: trajanjeSesije) == nil {
+            trajanjeSesije = TrajanjeSesije.bezIsteka.rawValue
+        }
         vratiSePosleDiktata = try kontejner.decodeIfPresent(Bool.self, forKey: .vratiSePosleDiktata) ?? true
         proveravajAzuriranja = try kontejner.decodeIfPresent(Bool.self, forKey: .proveravajAzuriranja) ?? true
         doterivanje = try kontejner.decodeIfPresent(Bool.self, forKey: .doterivanje) ?? false

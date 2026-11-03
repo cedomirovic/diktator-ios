@@ -154,10 +154,17 @@ struct PogledDiktat: View {
             }
 
             if stanje.sesijaAktivna {
-                Text("Tastatura sada može da snima u pozadini, bez otvaranja Diktatora. Preostalo: \(stanje.sesijaPreostalo / 60):\(String(format: "%02d", stanje.sesijaPreostalo % 60))")
-                    .font(.system(size: 14))
-                    .foregroundStyle(Dizajn.tekstSekundarni)
-                    .fixedSize(horizontal: false, vertical: true)
+                if stanje.sesijaBezIsteka {
+                    Text("Tastatura sada može da snima u pozadini, bez otvaranja Diktatora. Sesija nema istek i traje dok je ne završiš.")
+                        .font(.system(size: 14))
+                        .foregroundStyle(Dizajn.tekstSekundarni)
+                        .fixedSize(horizontal: false, vertical: true)
+                } else {
+                    Text("Tastatura sada može da snima u pozadini, bez otvaranja Diktatora. Preostalo: \(stanje.sesijaPreostalo / 60):\(String(format: "%02d", stanje.sesijaPreostalo % 60))")
+                        .font(.system(size: 14))
+                        .foregroundStyle(Dizajn.tekstSekundarni)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
 
                 // Crveno i punom širinom — jasno se vidi da sesiju treba
                 // ugasiti kada se ne diktira.
@@ -169,7 +176,7 @@ struct PogledDiktat: View {
                 .buttonStyle(StilDugmeta(boja: Dizajn.crvena))
                 .accessibilityHint("Gasi sesiju diktata i oslobađa mikrofon.")
             } else {
-                Text("Uključi sesiju da mikrofon u tastaturi snima dok je otvorena bilo koja aplikacija. Kada sesija istekne ili je aplikacija ugašena, tastatura sama otvara Diktator i uključi je.")
+                Text("Uključi sesiju da mikrofon u tastaturi snima dok je otvorena bilo koja aplikacija. Ako sesija nije uključena ili je aplikacija ugašena, tastatura sama otvara Diktator i uključi je.")
                     .font(.system(size: 14))
                     .foregroundStyle(Dizajn.tekstSekundarni)
                     .fixedSize(horizontal: false, vertical: true)
@@ -182,12 +189,24 @@ struct PogledDiktat: View {
                 .opacity(stanje.modelJePreuzet && !stanje.stanje.jeZauzet ? 1 : 0.5)
             }
 
-            Text("Sesija traje najviše 15 minuta i drži mikrofon u pripravnosti. Svaki diktat je produžava za novih 15 minuta.")
+            Text(opisTrajanjaSesije)
                 .font(.system(size: 12))
                 .foregroundStyle(Dizajn.tekstTercijarni)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .kartica()
+    }
+
+    /// Kratak opis ispod kartice sesije, prilagođen izabranom trajanju.
+    private var opisTrajanjaSesije: String {
+        switch TrajanjeSesije.iz(stanje.podesavanja.trajanjeSesije) {
+        case .bezIsteka:
+            return "Sesija bez isteka drži mikrofon u pripravnosti dok je ne završiš. Kada je završiš, tastatura ponovo otvara Diktator."
+        case .sat:
+            return "Sesija traje najviše jedan sat i drži mikrofon u pripravnosti. Svaki diktat je produžava za novih sat vremena."
+        case .petnaestMinuta:
+            return "Sesija traje najviše 15 minuta i drži mikrofon u pripravnosti. Svaki diktat je produžava za novih 15 minuta."
+        }
     }
 
     private func oznakaStanja(_ aktivna: Bool) -> some View {

@@ -35,7 +35,8 @@ clipboard, istorija, rečnik i puna tastatura. Tastatura na iOS 26+ traži
 Nova pozadinska sesija omogućava da tastatura snima dok je otvorena bilo koja
 aplikacija. Prvi dodir na **Diktiraj** otvara Diktator da uključi sesiju i
 odmah počinje snimanje; posle toga tastatura ostaje u host aplikaciji i šalje
-`start`/`stop`.
+`start`/`stop`. Sesija je podrazumevano **bez isteka** (Podešavanja → Diktat →
+**Trajanje sesije** može da je ograniči na 1 sat ili 15 minuta).
 Status i komande idu preko imenovanih pasteboard-a i Darwin notifikacija, a
 gotov tekst preko clipboarda.
 
@@ -137,8 +138,10 @@ Posle toga rade i `devicectl device install app` i
    (aplikacija je ugašena ili je snimak odbijen), tapni zeleno **Nalepi** u
    traci iznad tastature.
 5. Sledeći put, dok sesija traje, tapni **Diktiraj** direktno u tastaturi;
-   Diktator se ne otvara. Svaki diktat produžava sesiju za novih 15 minuta,
-   a kada ona ipak istekne, prvi dodir na **Diktiraj** je ponovo otvara i snima.
+   Diktator se ne otvara. Sesija podrazumevano **nema istek**, pa tako radi
+   dok god je sam ne završiš; u Podešavanjima → **Diktat** → **Trajanje
+   sesije** možeš da je ograničiš na 1 sat ili 15 minuta. Kada se završi,
+   prvi dodir na **Diktiraj** je ponovo uključi i snima.
 
 ## Brzina prepisa
 

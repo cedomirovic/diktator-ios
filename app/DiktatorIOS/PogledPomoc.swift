@@ -43,7 +43,7 @@ struct PogledPomoc: View {
                         naslov: "Ograničenja",
                         pasusi: [
                             "Tastatura ne može direktno da snima — Apple to zabranjuje. Zato snima glavna aplikacija u pozadinskoj sesiji, a tastatura samo šalje start/stop.",
-                            "Sesija drži mikrofon u pripravnosti najviše 15 minuta i troši bateriju. Zato se automatski gasi.",
+                            "Sesija drži mikrofon u pripravnosti dok je uključena i troši bateriju. Podrazumevano nema istek; u Podešavanjima → Diktat → Trajanje sesije možeš da je ograničiš na 1 sat ili 15 minuta.",
                             "Kada je sesija uključena, Diktiraj u tastaturi ne otvara aplikaciju. Ako sesija nije uključena, Diktiraj otvara Diktator; tapni Uključi sesiju i vrati se. Posle Stop sačekaj da se tekst ubaci; ako ne uspe, tapni Nalepi u traci iznad tastature.",
                             "Besplatni Apple ID profil traje 7 dana; posle toga build treba obnoviti."
                         ]
@@ -89,7 +89,7 @@ struct PogledPomoc: View {
             korak(2, "Tapni plavo Diktiraj u traci iznad tastature. Ako sesija nije uključena, Diktator se sam otvori, uključi je i počne da snima.")
             korak(3, "Tapni crveni Stop — tekst se sam ubaci u polje u kome pišeš. Ako ne uspe, tapni Nalepi u traci iznad tastature.")
 
-            Text("Sesija traje 15 minuta i svaki diktat je produžava. Kada istekne, prvi dodir na Diktiraj je ponovo uključi.")
+            Text("Sesija podrazumevano nema istek i traje dok je ne završiš, pa se Diktator ne otvara pri svakom diktatu. U Podešavanjima možeš da je ograničiš na 1 sat ili 15 minuta. Kada se završi, prvi dodir na Diktiraj je ponovo uključi.")
                 .font(.system(size: 13))
                 .foregroundStyle(Dizajn.tekstSekundarni)
                 .fixedSize(horizontal: false, vertical: true)
