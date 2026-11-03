@@ -6,6 +6,17 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Status
 
+- **03.11.2026.** — **„Testiraj obaveštenje“ reaguje odmah**: poruka
+  **Šaljem testno obaveštenje…** pojavi se čim se dodirne dugme, a samo
+  obaveštenje stiže bez čekanja na proveru dozvole. `Azuriranja` sada pamti
+  poslednju dozvolu (`dozvolaKeš`) i osvežava je tiho kada aplikacija dođe u
+  prvi plan ili kada se uključi prekidač **Proveri nove verzije**, pa test
+  preskače `notificationSettings()` i sistemski dijalog. Uklonjene su
+  dvostruke provere i dve `await` runde u `testirajNotifikaciju`, uveden je
+  `RezultatTestaObavestenja` (poslato / odbijeno / greška) da poruka tačno
+  kaže šta se desilo, a testno obaveštenje koristi kratak vremenski okidač
+  (0,1 s) jer je pouzdaniji od `trigger: nil`. Verzija ostaje **0.2.0 (10)**.
+
 - **03.11.2026.** — **sesija bez isteka — Diktator se više ne otvara pri
   svakom diktatu**: podrazumevano trajanje pozadinske sesije je sada **Bez
   isteka**, pa tastatura diktira u bilo kojoj aplikaciji, a Diktator se

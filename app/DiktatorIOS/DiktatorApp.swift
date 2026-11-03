@@ -75,6 +75,9 @@ struct DiktatorApp: App {
                         stanje.osveziIPC()
                     }
                     if nova == .active {
+                        // Keš dozvole se osveži unapred, da „Testiraj
+                        // obaveštenje“ ne čeka proveru sistema.
+                        Task { await Azuriranja.osveziDozvolu() }
                         stanje.proveriAzuriranja()
                     }
                 }

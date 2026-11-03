@@ -17,9 +17,15 @@ enum RezultatProvere {
 
 /// Provera novih verzija preko GitHub release-a. Aplikacija nije na App
 /// Store-u, pa nema sistemsku proveru ažuriranja; ovo je zamena za nju.
+@MainActor
 enum Azuriranja {
     static let repo = "cedomirovic/diktator-ios"
     static let releasesURL = URL(string: "https://github.com/\(repo)/releases")!
+
+    /// Poslednja poznata dozvola za obaveštenja. `nil` znači da još nije
+    /// provereno; kada je `true`, testno obaveštenje se šalje bez ponovnog
+    /// pitanja sistema i pojavljuje se odmah.
+    private static var dozvolaKeš: Bool?
 
     private static let apiURL = URL(
         string: "https://api.github.com/repos/\(repo)/releases/latest"
@@ -123,17 +129,41 @@ enum Azuriranja {
         UserDefaults.standard.set(azuriranje.verzija, forKey: kljucObavesteno)
     }
 
+    /// Ishod testnog obaveštenja. `odbijeno` znači da iOS nije dozvolio
+    /// obaveštenja, a `greska` da ih sistem nije prihvatio.
+    enum RezultatTestaObavestenja {
+        case poslato
+        case odbijeno
+        case greska
+    }
+
+    /// Tiho osvežava keš dozvole, bez sistemskog dijaloga. Zove se kada
+    /// aplikacija dođe u prvi plan, da testno obaveštenje ne čeka proveru.
+    static func osveziDozvolu() async {
+        let postavke = await UNUserNotificationCenter.current().notificationSettings()
+        dozvolaKeš = jeDozvoljeno(postavke.authorizationStatus)
+    }
+
     /// Testno obaveštenje da korisnik odmah vidi da li su notifikacije
     /// uključene, bez čekanja na stvarnu novu verziju.
-    @discardableResult
-    static func posaljiTestnuNotifikaciju() async -> Bool {
+    static func posaljiTestnuNotifikaciju() async -> RezultatTestaObavestenja {
         let centar = UNUserNotificationCenter.current()
-        var postavke = await centar.notificationSettings()
-        if postavke.authorizationStatus == .notDetermined {
-            _ = try? await centar.requestAuthorization(options: [.alert, .sound])
-            postavke = await centar.notificationSettings()
+        // Kada su obaveštenja već dozvoljena, ne pitamo sistem ponovo pri
+        // svakom testu — tako se testno obaveštenje pojavi bez odlaganja.
+        if dozvolaKeš != true {
+            let postavke = await centar.notificationSettings()
+            if postavke.authorizationStatus == .notDetermined {
+                let dozvoljeno = (try? await centar.requestAuthorization(options: [.alert, .sound])) ?? false
+                guard dozvoljeno else {
+                    dozvolaKeš = false
+                    return .odbijeno
+                }
+            } else if !jeDozvoljeno(postavke.authorizationStatus) {
+                dozvolaKeš = false
+                return .odbijeno
+            }
+            dozvolaKeš = true
         }
-        guard jeDozvoljeno(postavke.authorizationStatus) else { return false }
 
         let sadrzaj = UNMutableNotificationContent()
         sadrzaj.title = "Diktator"
@@ -142,13 +172,15 @@ enum Azuriranja {
         let zahtev = UNNotificationRequest(
             identifier: "diktator.test.\(UUID().uuidString)",
             content: sadrzaj,
-            trigger: nil
+            // Kratak vremenski okidač je pouzdaniji od `nil`: iOS ga isporuči
+            // odmah, dok se uz `nil` isporuka ponekad odloži za par sekundi.
+            trigger: UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
         )
         do {
             try await centar.add(zahtev)
-            return true
+            return .poslato
         } catch {
-            return false
+            return .greska
         }
     }
 
@@ -162,6 +194,8 @@ enum Azuriranja {
             _ = try? await centar.requestAuthorization(options: [.alert, .sound])
             postavke = await centar.notificationSettings()
         }
+        // Ishod upamtimo; kasniji test tada ne čeka ponovnu proveru sistema.
+        dozvolaKeš = jeDozvoljeno(postavke.authorizationStatus)
         return postavke.authorizationStatus
     }
 

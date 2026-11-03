@@ -498,24 +498,22 @@ final class AppStanje: ObservableObject {
     func testirajNotifikaciju() {
         guard !proveraObavestenjaUToku else { return }
         proveraObavestenjaUToku = true
+        // Odmah javljamo da je dodir primljen; sistemsko obaveštenje stiže
+        // čim ga iOS prikaže.
+        porukaObavestenja = "Šaljem testno obaveštenje…"
         Task { @MainActor in
             defer { proveraObavestenjaUToku = false }
-            let status = await Azuriranja.statusDozvole()
-            obavestenjaOdbijena = (status == .denied)
-            guard status != .denied else {
+            switch await Azuriranja.posaljiTestnuNotifikaciju() {
+            case .poslato:
+                porukaObavestenja = "Testno obaveštenje je poslato — treba da se pojavi odmah."
+                obavestenjaOdbijena = false
+            case .odbijeno:
                 porukaObavestenja = "Obaveštenja su isključena za Diktator u iOS Podešavanjima."
-                return
-            }
-            guard Azuriranja.jeDozvoljeno(status) else {
-                porukaObavestenja = "iOS nije dozvolio obaveštenja. Pokušaj ponovo u Podešavanjima iOS-a."
                 obavestenjaOdbijena = true
-                return
+            case .greska:
+                porukaObavestenja = "Obaveštenje nije poslato. Pokušaj ponovo."
+                obavestenjaOdbijena = false
             }
-            let uspeh = await Azuriranja.posaljiTestnuNotifikaciju()
-            porukaObavestenja = uspeh
-                ? "Testno obaveštenje je poslato — treba da se pojavi odmah."
-                : "Obaveštenje nije poslato. Proveri dozvolu u iOS Podešavanjima."
-            obavestenjaOdbijena = !uspeh
         }
     }
 
