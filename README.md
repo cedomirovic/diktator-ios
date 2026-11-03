@@ -29,11 +29,11 @@ nepotpisan `build/DiktatorIOS.ipa` (~1.6 MB bez modela).
 Na uređaju je potvrđeno: snimanje, lokalni whisper.cpp prepis, kopiranje u
 clipboard, istorija, rečnik i puna tastatura. Tastatura na iOS 26+ traži
 **Allow Full Access** za čitanje clipboarda i otvaranje aplikacije dodirom na
-**mikrofon**. Ako Full Access nije uključen, u traci iznad tastature piše
+**Diktiraj**. Ako Full Access nije uključen, u traci iznad tastature piše
 **Uključi Full Access**.
 
 Nova pozadinska sesija omogućava da tastatura snima dok je otvorena bilo koja
-aplikacija. Prvi dodir na **mikrofon** otvara Diktator da uključi sesiju i
+aplikacija. Prvi dodir na **Diktiraj** otvara Diktator da uključi sesiju i
 odmah počinje snimanje; posle toga tastatura ostaje u host aplikaciji i šalje
 `start`/`stop`.
 Status i komande idu preko imenovanih pasteboard-a i Darwin notifikacija, a
@@ -127,18 +127,18 @@ Posle toga rade i `devicectl device install app` i
 
 1. U bilo kojoj aplikaciji otvori tekstualno polje i prebaci tastaturu na
    **Diktator**.
-2. Tapni **mikrofon** u donjem redu tastature. Ako sesija nije uključena (ili
-   je istekla, ili je Diktator ugašen), otvoriće se Diktator, sam uključiti
-   sesiju i odmah početi snimanje. Ako iOS prikaže **„Open in Diktator?“**,
-   tapni **Open**.
-3. Govori. U traci iznad tastature piše **Snimam…**.
-4. Tapni **crveni Stop** (isti taster) — aplikacija prepisuje lokalno, a
+2. Tapni plavo **Diktiraj** u traci iznad tastature. Ako sesija nije
+   uključena (ili je istekla, ili je Diktator ugašen), otvoriće se Diktator,
+   sam uključiti sesiju i odmah početi snimanje. Ako iOS prikaže
+   **„Open in Diktator?“**, tapni **Open**.
+3. Govori. Desno u traci piše **Snimam…**.
+4. Tapni **Stop** (isto dugme, sada crveno) — aplikacija prepisuje lokalno, a
    tastatura **sama ubaci tekst** u polje čim prepis stigne. Ako se ne ubaci
-   (aplikacija je ugašena ili je snimak odbijen), pojaviće se **Nalepi** u
+   (aplikacija je ugašena ili je snimak odbijen), tapni zeleno **Nalepi** u
    traci iznad tastature.
-5. Sledeći put, dok sesija traje, tapni **mikrofon** direktno u tastaturi;
+5. Sledeći put, dok sesija traje, tapni **Diktiraj** direktno u tastaturi;
    Diktator se ne otvara. Svaki diktat produžava sesiju za novih 15 minuta,
-   a kada ona ipak istekne, prvi dodir na mikrofon je ponovo otvara i snima.
+   a kada ona ipak istekne, prvi dodir na **Diktiraj** je ponovo otvara i snima.
 
 ## Brzina prepisa
 
@@ -181,8 +181,8 @@ odgovori, zadržava se sirov prepis.
 - Tastatura izgleda kao **sistemska iOS tastatura**: iste boje, zaobljene
   bele tipke i sivi specijalni tasteri. Srpska latinica je raspoređena kao na
   Apple tastaturi (`q w e r t z u i o p`, `a s d f g h j k l č ć`,
-  `⇧ z x c v b n m š đ ⌫`), a mikrofon je na mestu sistemskog mikrofona u
-  donjem redu. **Nalepi** se pojavljuje iznad tastature samo kada prepis čeka.
+  `⇧ z x c v b n m š đ ⌫`). U traci iznad tastature su plavo **Diktiraj**,
+  zeleno **Nalepi** i status prepisa.
 - Za srpski je potreban **whisper.cpp**; Apple Speech ne podržava srpski.
 - Instalacija je moguća sa besplatnim Apple ID-jem, ali profil traje **7 dana**
   i mora da se obnovi (AltStore/SideStore ili Xcode).

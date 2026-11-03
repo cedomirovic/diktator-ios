@@ -157,7 +157,7 @@ Telefon mora biti otključan; ako je zaključan, `devicectl` prijavi
 2. Izaberi **Diktator**.
 3. Tapni **Diktator** u listi i uključi **Allow Full Access**.
    - Full Access je potreban da tastatura pročita clipboard, ubaci tekst i
-     otvori aplikaciju dodirom na **mikrofon** (iOS 26+).
+     otvori aplikaciju dodirom na **Diktiraj** (iOS 26+).
    - U traci iznad tastature ne sme da piše **Uključi Full Access**. Ako
      piše, uključi Full Access u podešavanjima tastature.
    - Bez Full Access-a možeš ručno da nalepiš tekst u ciljnoj aplikaciji.
@@ -173,7 +173,7 @@ Telefon mora biti otključan; ako je zaključan, `devicectl` prijavi
 1. U bilo kojoj aplikaciji otvori tekstualno polje i prebaci tastaturu na
    **Diktator** (globus/ikona tastature).
 2. Možeš da kucaš direktno na Diktator tastaturi (QWERTY + `čćžšđ`), ili da
-   tapneš **mikrofon** u donjem redu — otvoriće se Diktator aplikacija. Ako iOS prikaže
+   tapneš plavo **Diktiraj** u traci iznad tastature — otvoriće se Diktator aplikacija. Ako iOS prikaže
    **„Open in Diktator?“**, tapni **Open**.
 3. Snimi govor; aplikacija prepisuje lokalno i kopira tekst u clipboard.
 4. Vrati se u prethodnu aplikaciju preko **„Back to …“** u statusnoj traci ili
@@ -263,7 +263,7 @@ Xcode je jedini siguran način za prvi build.
 | **„Unable to launch … because the device was not, or could not be, unlocked“** | Otključaj iPhone pa ponovo pokreni `devicectl device process launch`. |
 | Xcode kaže **Build Failed**, a `xcodebuild` prolazi | Proveri da je izabran fizički iPhone, ne simulator; proveri da je uređaj uparen i otključan. Za build bez instalacije koristi `-destination 'generic/platform=iOS'`. |
 | Tastatura se ne vidi | Settings → General → Keyboard → Keyboards → Add New Keyboard → Diktator. |
-| Mikrofon ne otvara aplikaciju | Uključi **Allow Full Access** za Diktator tastaturu; traka iznad tastature ne sme da piše **Uključi Full Access**. Na iOS 26+ bez Full Access-a tastatura ne sme da otvori aplikaciju. |
+| Diktiraj ne otvara aplikaciju | Uključi **Allow Full Access** za Diktator tastaturu; traka iznad tastature ne sme da piše **Uključi Full Access**. Na iOS 26+ bez Full Access-a tastatura ne sme da otvori aplikaciju. |
 | **Nalepi** ne radi | Uključi **Allow Full Access** za Diktator tastaturu. |
 | Srpski prepis je loš | Izaberi **Jezik: Srpski** i model **Large v3** (tačniji od Turbo modela). |
 | Nema zvuka / mikrofon ne radi | Settings → Privacy & Security → Microphone → Diktator. |

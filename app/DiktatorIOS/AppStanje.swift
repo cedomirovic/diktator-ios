@@ -291,7 +291,7 @@ final class AppStanje: ObservableObject {
             // Ne uključujemo je sami, nego pokažemo dugme i uputstvo.
             izabraniTab = 0
             if !sesijaAktivna {
-                poruka = "Tapni Uključi sesiju, pa se vrati u aplikaciju i tapni mikrofon na tastaturi."
+                poruka = "Tapni Uključi sesiju, pa se vrati u aplikaciju i tapni Diktiraj na tastaturi."
             }
         case "sesija":
             izabraniTab = 0
@@ -385,7 +385,7 @@ final class AppStanje: ObservableObject {
         pisiIPCStanje()
         Dnevnik.pisi("Sesija uključena, traje do \(Snimac.najduzeSesijeSekundi) s.")
         NSLog("Diktator: sesija uključena, traje do %d s.", Snimac.najduzeSesijeSekundi)
-        poruka = "Sesija je aktivna. Pređi u drugu aplikaciju i tapni mikrofon na tastaturi."
+        poruka = "Sesija je aktivna. Pređi u drugu aplikaciju i tapni Diktiraj na tastaturi."
         return true
     }
 

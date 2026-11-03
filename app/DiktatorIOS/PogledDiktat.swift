@@ -387,10 +387,10 @@ struct PogledDiktat: View {
                 .font(.system(size: 17, weight: .semibold))
 
             korak("keyboard", "Otvori Diktator tastaturu", "U bilo kojoj aplikaciji prebaci na Diktator tastaturu.")
-            korak("mic.fill", "Tapni mikrofon i govori", "Sesija se uključuje sama, a svaki diktat je produžava.")
+            korak("mic.fill", "Tapni Diktiraj i govori", "Dugme je u traci iznad tastature; sesija se uključuje sama, a svaki diktat je produžava.")
             korak("text.cursor", "Tekst se sam ubaci", "Tapni crveni Stop — tekst ide u polje u kome pišeš. Ako ne uspe, tapni Nalepi iznad tastature.")
 
-            Text("Ako je Diktator ugašen, mikrofon ga otvara i odmah snima.")
+            Text("Ako je Diktator ugašen, Diktiraj ga otvara i odmah snima.")
                 .font(.system(size: 12))
                 .foregroundStyle(Dizajn.tekstTercijarni)
         }

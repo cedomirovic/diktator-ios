@@ -153,15 +153,24 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     /// Tipka se ponaša kao sistemska: na dodir potamni, bez plavog tona
-    /// koji `UIButton` inače dodaje.
+    /// koji `UIButton` inače dodaje. Dodatno blago uveća tipku i pusti
+    /// haptički odziv, da se tačno oseti šta je pritisnuto.
     private final class Tipka: UIButton {
         private var osnovnaBoja = UIColor.white
         private var pritisnutaBoja = UIColor.lightGray
+        private let generatorOdziva = UIImpactFeedbackGenerator(style: .light)
 
         init() {
             super.init(frame: .zero)
             titleLabel?.adjustsFontSizeToFitWidth = true
             titleLabel?.minimumScaleFactor = 0.6
+            addTarget(self, action: #selector(dodirDole), for: [.touchDown, .touchDragEnter])
+            addTarget(
+                self,
+                action: #selector(dodirGore),
+                for: [.touchUpInside, .touchUpOutside, .touchCancel, .touchDragExit]
+            )
+            generatorOdziva.prepare()
         }
 
         required init?(coder: NSCoder) {
@@ -172,6 +181,28 @@ final class KeyboardViewController: UIInputViewController {
             osnovnaBoja = osnovna
             pritisnutaBoja = pritisnuta
             backgroundColor = osnovna
+        }
+
+        @objc private func dodirDole() {
+            generatorOdziva.impactOccurred()
+            generatorOdziva.prepare()
+            UIView.animate(
+                withDuration: 0.08,
+                delay: 0,
+                options: [.allowUserInteraction, .beginFromCurrentState, .curveEaseOut]
+            ) {
+                self.transform = CGAffineTransform(scaleX: 1.12, y: 1.12)
+            }
+        }
+
+        @objc private func dodirGore() {
+            UIView.animate(
+                withDuration: 0.12,
+                delay: 0,
+                options: [.allowUserInteraction, .beginFromCurrentState, .curveEaseOut]
+            ) {
+                self.transform = .identity
+            }
         }
 
         override var isHighlighted: Bool {
@@ -376,12 +407,25 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private func postaviGlavni() {
-        status.font = .systemFont(ofSize: 12, weight: .regular)
+        let diktiraj = napraviDugme("Diktiraj", id: "diktiraj", akcija: #selector(diktiraj))
+        diktiraj.titleLabel?.font = .systemFont(ofSize: 15, weight: .semibold)
+        diktiraj.setTitleColor(.white, for: .normal)
+        diktiraj.setTitleColor(.white, for: .highlighted)
+        diktiraj.setTitleColor(.white, for: .disabled)
+        diktiraj.layer.cornerRadius = 9
+        diktiraj.layer.shadowOpacity = 0
+        diktiraj.widthAnchor.constraint(equalToConstant: 92).isActive = true
+        diktiraj.heightAnchor.constraint(equalToConstant: 32).isActive = true
+        dugmeDiktiraj = diktiraj
+
+        let nalepi = napraviNalepi()
+
+        status.font = .systemFont(ofSize: 11, weight: .regular)
         status.textColor = .secondaryLabel
-        status.textAlignment = .left
+        status.textAlignment = .right
         status.numberOfLines = 1
         status.adjustsFontSizeToFitWidth = true
-        status.minimumScaleFactor = 0.8
+        status.minimumScaleFactor = 0.75
         status.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         status.setContentHuggingPriority(.defaultLow, for: .horizontal)
 
@@ -390,17 +434,15 @@ final class KeyboardViewController: UIInputViewController {
         spinnerObrade.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
         spinnerObrade.setContentHuggingPriority(.required, for: .horizontal)
 
-        let nalepi = napraviNalepi()
-        dugmeNalepi = nalepi
-
         trakaStanja.axis = .horizontal
         trakaStanja.spacing = 8
         trakaStanja.alignment = .center
         trakaStanja.translatesAutoresizingMaskIntoConstraints = false
+        trakaStanja.addArrangedSubview(diktiraj)
+        trakaStanja.addArrangedSubview(nalepi)
         trakaStanja.addArrangedSubview(spinnerObrade)
         trakaStanja.addArrangedSubview(status)
-        trakaStanja.addArrangedSubview(nalepi)
-        trakaStanja.heightAnchor.constraint(equalToConstant: 38).isActive = true
+        trakaStanja.heightAnchor.constraint(equalToConstant: 34).isActive = true
 
         tastatura.axis = .vertical
         tastatura.spacing = 6
@@ -421,19 +463,19 @@ final class KeyboardViewController: UIInputViewController {
         ])
     }
 
-    /// Ručno lepljenje je samo rezerva — tekst se inače ubacuje sam. Zato se
-    /// dugme vidi tek kada prepis stvarno čeka u clipboard-u.
+    /// Zeleno dugme u traci iznad tastature. Tekst se inače ubacuje sam, ali
+    /// Nalepi ostaje tu za ručno lepljenje (i kao obično lepljenje clipboarda).
     private func napraviNalepi() -> Tipka {
-        let dugme = Tipka()
-        dugme.setTitle("Nalepi", for: .normal)
-        dugme.titleLabel?.font = .systemFont(ofSize: 13, weight: .semibold)
-        dugme.setTitleColor(.label, for: .normal)
-        dugme.postaviBoju(.systemFill, pritisnuta: .tertiarySystemFill)
-        dugme.layer.cornerRadius = 12
-        dugme.contentEdgeInsets = UIEdgeInsets(top: 3, left: 12, bottom: 3, right: 12)
-        dugme.accessibilityIdentifier = "nalepi"
-        dugme.addTarget(self, action: #selector(nalepi), for: .touchUpInside)
-        dugme.isHidden = true
+        let dugme = napraviDugme("Nalepi", id: "nalepi", akcija: #selector(nalepi))
+        dugme.titleLabel?.font = .systemFont(ofSize: 15, weight: .semibold)
+        dugme.setTitleColor(.white, for: .normal)
+        dugme.setTitleColor(.white, for: .highlighted)
+        dugme.setTitleColor(.white, for: .disabled)
+        dugme.layer.cornerRadius = 9
+        dugme.layer.shadowOpacity = 0
+        dugme.widthAnchor.constraint(equalToConstant: 80).isActive = true
+        dugme.heightAnchor.constraint(equalToConstant: 32).isActive = true
+        dugmeNalepi = dugme
         return dugme
     }
 
@@ -515,8 +557,8 @@ final class KeyboardViewController: UIInputViewController {
         tastatura.addArrangedSubview(redDonja(pocetna: "ABC", idPocetne: "abc"))
     }
 
-    /// Donji red kao na iOS tastaturi: 123/ABC, globus, razmak, mikrofon
-    /// (Diktiraj) i return.
+    /// Donji red kao na iOS tastaturi: 123/ABC, globus, razmak i return.
+    /// Diktiraj i Nalepi su u traci iznad tastature.
     private func redDonja(pocetna: String = "123", idPocetne: String = "123") -> UIStackView {
         let redTipki = red()
 
@@ -529,11 +571,6 @@ final class KeyboardViewController: UIInputViewController {
         redTipki.addArrangedSubview(globus)
 
         redTipki.addArrangedSubview(napraviDugme("razmak", id: "space", stil: .specijalno))
-
-        let mikrofon = napraviIkonu("mic", id: "diktiraj", akcija: #selector(diktiraj))
-        mikrofon.widthAnchor.constraint(equalToConstant: 42).isActive = true
-        dugmeDiktiraj = mikrofon
-        redTipki.addArrangedSubview(mikrofon)
 
         let povratak = napraviDugme("return", id: "return", stil: .specijalno)
         povratak.widthAnchor.constraint(equalToConstant: 88).isActive = true
@@ -767,7 +804,6 @@ final class KeyboardViewController: UIInputViewController {
         UserDefaults.standard.set(diktatPocetakVreme, forKey: diktatPocetakKey)
         UserDefaults.standard.set(true, forKey: cekaDiktatKey)
         prikaziStatus("Snimam…")
-        pustiZvukDiktata()
         // Ako aplikacija ne odgovori (ugašena je ili suspendovana), timeout
         // će je otvoriti umesto da tastatura ostane na „Snimam…“.
         pokreniTimeoutSesije()
@@ -780,15 +816,6 @@ final class KeyboardViewController: UIInputViewController {
     private var statusSvez: Bool {
         zadnjiStatusVreme > 0
             && Date().timeIntervalSince1970 - zadnjiStatusVreme <= 5
-    }
-
-    /// Blagi haptički odziv odmah na dodir. Zvuk pušta aplikacija kada
-    /// stvarno počne snimanje — tastatura ne sme da dira AVAudioSession, a
-    /// sistemski zvuk se ne čuje kada je telefon na tihom.
-    private func pustiZvukDiktata() {
-        let generator = UIImpactFeedbackGenerator(style: .light)
-        generator.prepare()
-        generator.impactOccurred()
     }
 
     private func posaljiKomandu(_ komanda: String) {
@@ -1588,7 +1615,7 @@ final class KeyboardViewController: UIInputViewController {
                 status.text = "Uključi Full Access"
                 status.textColor = .systemOrange
             } else if obradaSesije {
-                status.text = "Prepišujem…"
+                status.text = "Prepisujem…"
                 status.textColor = .secondaryLabel
             } else if snimaSesijom {
                 status.text = "Snimam…"
@@ -1601,36 +1628,55 @@ final class KeyboardViewController: UIInputViewController {
             }
         }
 
-        dugmeNalepi?.isHidden = !tekstSpreman || obradaSesije || snimaSesijom
-        dugmeNalepi?.isEnabled = hasFullAccess
+        azurirajDugmad()
+    }
 
-        guard let dugme = dugmeDiktiraj else { return }
+    /// Traka iznad tastature: Diktiraj je plav, crven dok snima i siv kada
+    /// ne može; Nalepi je zelen dok tekst može da se ubaci.
+    private func azurirajDugmad() {
+        if let nalepi = dugmeNalepi {
+            nalepi.isEnabled = hasFullAccess && !obradaSesije && !snimaSesijom
+            let osnovna: UIColor = nalepi.isEnabled ? .systemGreen : .systemGray3
+            let pritisnuta: UIColor = nalepi.isEnabled
+                ? UIColor(red: 0.20, green: 0.68, blue: 0.32, alpha: 1)
+                : .systemGray3
+            nalepi.postaviBoju(osnovna, pritisnuta: pritisnuta)
+            nalepi.accessibilityLabel = tekstSpreman ? "Nalepi diktat" : "Nalepi"
+        }
+
+        guard let diktiraj = dugmeDiktiraj else { return }
 
         if !hasFullAccess {
-            dugme.isEnabled = false
-            dugme.accessibilityLabel = "Diktiraj — potreban je Full Access"
-            postaviIkonu(dugme, "mic.slash")
-            dugme.tintColor = .secondaryLabel
+            diktiraj.isEnabled = false
+            diktiraj.setTitle("Diktiraj", for: .normal)
+            diktiraj.postaviBoju(.systemGray, pritisnuta: .systemGray)
+            diktiraj.accessibilityLabel = "Diktiraj — potreban je Full Access"
             return
         }
 
         if obradaSesije {
-            dugme.isEnabled = false
-            dugme.accessibilityLabel = "Prepišujem"
-            postaviIkonu(dugme, "mic")
-            dugme.tintColor = .secondaryLabel
+            diktiraj.isEnabled = false
+            diktiraj.setTitle("Obrada…", for: .normal)
+            diktiraj.postaviBoju(.systemGray, pritisnuta: .systemGray)
+            diktiraj.accessibilityLabel = "Prepisujem"
             return
         }
 
-        dugme.isEnabled = true
+        diktiraj.isEnabled = true
         if snimaSesijom {
-            dugme.accessibilityLabel = "Zaustavi snimanje"
-            postaviIkonu(dugme, "stop.fill", velicina: 18)
-            dugme.tintColor = .systemRed
+            diktiraj.setTitle("Stop", for: .normal)
+            diktiraj.postaviBoju(
+                .systemRed,
+                pritisnuta: UIColor(red: 0.78, green: 0.16, blue: 0.16, alpha: 1)
+            )
+            diktiraj.accessibilityLabel = "Zaustavi snimanje"
         } else {
-            dugme.accessibilityLabel = "Diktiraj"
-            postaviIkonu(dugme, "mic")
-            dugme.tintColor = .label
+            diktiraj.setTitle("Diktiraj", for: .normal)
+            diktiraj.postaviBoju(
+                .systemBlue,
+                pritisnuta: UIColor(red: 0.11, green: 0.42, blue: 0.86, alpha: 1)
+            )
+            diktiraj.accessibilityLabel = "Diktiraj"
         }
     }
 }
