@@ -3,6 +3,9 @@ import SwiftUI
 struct PogledPodesavanja: View {
     @EnvironmentObject var stanje: AppStanje
     @State private var kljucVidljiv = false
+    /// Pre prelaska na Groq tražimo potvrdu, jer tada snimak napušta uređaj.
+    @State private var potvrdaOblaka = false
+    @State private var rezimZaPotvrdu: String?
 
     private var verzija: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
@@ -128,7 +131,7 @@ struct PogledPodesavanja: View {
                 Toggle("Čuvaj istoriju", isOn: $stanje.podesavanja.cuvajIstoriju)
 
                 Picker("Trajanje sesije", selection: $stanje.podesavanja.trajanjeSesije) {
-                    ForEach(TrajanjeSesije.allCases) { opcija in
+                    ForEach(TrajanjeSesije.dostupna) { opcija in
                         Text(opcija.naziv).tag(opcija.rawValue)
                     }
                 }
@@ -137,6 +140,7 @@ struct PogledPodesavanja: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
 
+                #if !APPSTORE
                 Toggle("Vrati me u aplikaciju posle diktata", isOn: $stanje.podesavanja.vratiSePosleDiktata)
 
                 if stanje.podesavanja.vratiSePosleDiktata {
@@ -154,6 +158,7 @@ struct PogledPodesavanja: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+                #endif
             }
 
             Section(header: zaglavlje("Brzina")) {
@@ -161,7 +166,15 @@ struct PogledPodesavanja: View {
                     "Način",
                     selection: Binding(
                         get: { stanje.podesavanja.rezimBrzine },
-                        set: { stanje.postaviRezimBrzine($0) }
+                        set: { novi in
+                            if RezimBrzine.iz(novi) == .oblak,
+                               !stanje.podesavanja.prepisOblak {
+                                rezimZaPotvrdu = novi
+                                potvrdaOblaka = true
+                            } else {
+                                stanje.postaviRezimBrzine(novi)
+                            }
+                        }
                     )
                 ) {
                     ForEach(RezimBrzine.allCases) { rezim in
@@ -427,6 +440,7 @@ struct PogledPodesavanja: View {
                 kljucVidljiv = false
             }
 
+            #if !APPSTORE
             Section(header: zaglavlje("Ažuriranja")) {
                 Toggle("Proveri nove verzije", isOn: $stanje.podesavanja.proveravajAzuriranja)
 
@@ -476,10 +490,13 @@ struct PogledPodesavanja: View {
                     }
                 }
             }
+            #endif
 
             Section(header: zaglavlje("O aplikaciji")) {
                 LabeledContent("Verzija", value: verzija)
+                #if !APPSTORE
                 Link("GitHub projekat", destination: URL(string: "https://github.com/cedomirovic/diktator-ios")!)
+                #endif
                 Text("Snimak i tekst ostaju na uređaju. Model se preuzima sa Hugging Face-a.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
@@ -505,6 +522,19 @@ struct PogledPodesavanja: View {
             } else {
                 stanje.porukaAzuriranja = nil
             }
+        }
+        .alert("Snimak ide u Groq?", isPresented: $potvrdaOblaka) {
+            Button("Otkaži", role: .cancel) {
+                rezimZaPotvrdu = nil
+            }
+            Button("Nastavi") {
+                if let rezim = rezimZaPotvrdu {
+                    stanje.postaviRezimBrzine(rezim)
+                }
+                rezimZaPotvrdu = nil
+            }
+        } message: {
+            Text("U režimu Groq snimak se šalje servisu Groq radi prepisa i tada napušta uređaj. U režimima Brzo i Najtačnije sve ostaje na telefonu. Možeš se vratiti na lokalni prepis u svakom trenutku.")
         }
     }
 

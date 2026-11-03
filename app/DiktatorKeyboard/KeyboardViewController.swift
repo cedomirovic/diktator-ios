@@ -790,11 +790,22 @@ final class KeyboardViewController: UIInputViewController {
             Dnevnik.pisi(
                 "Diktiraj: nema žive sesije (sesija=\(sesijaAktivna), svez=\(statusSvez)) — otvaram app."
             )
+            #if APPSTORE
+            // App Store verzija ne otvara aplikaciju iz tastature; korisnik
+            // to radi sam, pa mu ovde kažemo šta treba da uradi.
+            snimaSesijom = false
+            obradaSesije = false
+            cekaStartSesije = false
+            UserDefaults.standard.set(false, forKey: cekaDiktatKey)
+            prikaziStatus("Otvori Diktator i uključi sesiju.")
+            azurirajPrikaz()
+            #else
             prikaziStatus("Otvaram Diktator…")
             diktatPocetakVreme = Date().timeIntervalSince1970
             UserDefaults.standard.set(diktatPocetakVreme, forKey: diktatPocetakKey)
             UserDefaults.standard.set(true, forKey: cekaDiktatKey)
             otvoriAplikaciju("diktator-ios://dictate")
+            #endif
             return
         }
 
@@ -841,6 +852,21 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private func otvoriAplikaciju(_ adresa: String) {
+        #if APPSTORE
+        // App Store verzija nikada ne otvara aplikaciju iz tastature (App
+        // Store Review 4.4.1). Umesto toga jasno traži da korisnik sam
+        // otvori Diktator i uključi sesiju.
+        _ = adresa
+        UserDefaults.standard.set(false, forKey: cekaDiktatKey)
+        ocistiCekanjeSesije()
+        snimaSesijom = false
+        obradaSesije = false
+        cekaStartSesije = false
+        timerSesijaTimeout?.invalidate()
+        timerSesijaTimeout = nil
+        prikaziStatus("Otvori Diktator i uključi sesiju.")
+        azurirajPrikaz()
+        #else
         guard let url = URL(string: adresa) else { return }
         Dnevnik.pisi("Otvaram \(adresa), Full Access=\(hasFullAccess)")
         NSLog(
@@ -876,6 +902,7 @@ final class KeyboardViewController: UIInputViewController {
                 }
             }
         }
+        #endif
     }
 
     private func pokreniTimeoutSesije() {
@@ -920,9 +947,14 @@ final class KeyboardViewController: UIInputViewController {
 
     /// iOS 18 je ukinuo stari `openURL:` put preko responder lanca, a iOS 26
     /// traži Full Access. Ovo je samo rezerva ako `extensionContext.open`
-    /// iz nekog razloga vrati false dok je Full Access uključen.
+    /// iz nekog razloga vrati false dok je Full Access uključen. App Store
+    /// verzija je ne koristi — tastatura tamo nikada ne otvara aplikaciju.
     @discardableResult
     private func otvoriPrekoResponderLanca(_ url: URL) -> Bool {
+        #if APPSTORE
+        _ = url
+        return false
+        #else
         // iOS 18+ put: pronađi UIApplication u responder lancu i koristi
         // `open(_:options:completionHandler:)`.
         var responder: UIResponder? = self
@@ -945,6 +977,7 @@ final class KeyboardViewController: UIInputViewController {
             responder = trenutni.next
         }
         return false
+        #endif
     }
 
     @objc private func nalepi() {

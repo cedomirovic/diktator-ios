@@ -58,12 +58,12 @@ if [[ ! -f "$SKRIPT/DiktatorKeyboard/PrivacyInfo.xcprivacy" ]]; then
   exit 1
 fi
 
-echo "== Arhiviranje (Release) =="
+echo "== Arhiviranje (AppStore) =="
 rm -rf "$ARHIVA" "$IZVOZ"
 xcodebuild \
   -project "$PROJEKAT" \
-  -scheme DiktatorIOS \
-  -configuration Release \
+  -scheme DiktatorIOS-AppStore \
+  -configuration AppStore \
   -destination 'generic/platform=iOS' \
   -archivePath "$ARHIVA" \
   -allowProvisioningUpdates \

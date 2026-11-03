@@ -176,10 +176,17 @@ struct PogledDiktat: View {
                 .buttonStyle(StilDugmeta(boja: Dizajn.crvena))
                 .accessibilityHint("Gasi sesiju diktata i oslobađa mikrofon.")
             } else {
+                #if APPSTORE
+                Text("Uključi sesiju da mikrofon u tastaturi snima dok je otvorena bilo koja aplikacija. Ako sesija nije uključena, Diktiraj u tastaturi će te zamoliti da otvoriš Diktator i uključiš je.")
+                    .font(.system(size: 14))
+                    .foregroundStyle(Dizajn.tekstSekundarni)
+                    .fixedSize(horizontal: false, vertical: true)
+                #else
                 Text("Uključi sesiju da mikrofon u tastaturi snima dok je otvorena bilo koja aplikacija. Ako sesija nije uključena ili je aplikacija ugašena, tastatura sama otvara Diktator i uključi je.")
                     .font(.system(size: 14))
                     .foregroundStyle(Dizajn.tekstSekundarni)
                     .fixedSize(horizontal: false, vertical: true)
+                #endif
 
                 Button("Uključi sesiju") {
                     stanje.ukljuciSesiju()
@@ -205,7 +212,11 @@ struct PogledDiktat: View {
         case .sat:
             return "Sesija traje najviše jedan sat i drži mikrofon u pripravnosti. Svaki diktat je produžava za novih sat vremena."
         case .petnaestMinuta:
+            #if APPSTORE
+            return "Sesija traje najviše 15 minuta i drži mikrofon u pripravnosti. Svaki diktat je produžava za novih 15 minuta, a posle isteka je uključiš ponovo u Diktatoru."
+            #else
             return "Sesija traje najviše 15 minuta i drži mikrofon u pripravnosti. Svaki diktat je produžava za novih 15 minuta."
+            #endif
         }
     }
 
@@ -406,12 +417,21 @@ struct PogledDiktat: View {
                 .font(.system(size: 17, weight: .semibold))
 
             korak("keyboard", "Otvori Diktator tastaturu", "U bilo kojoj aplikaciji prebaci na Diktator tastaturu.")
+            #if APPSTORE
+            korak("mic.fill", "Tapni Diktiraj i govori", "Dugme je u traci iznad tastature; sesija mora biti uključena u Diktatoru, a svaki diktat je produžava.")
+            korak("text.cursor", "Tekst se sam ubaci", "Tapni crveni Stop — tekst ide u polje u kome pišeš. Ako ne uspe, tapni Nalepi iznad tastature.")
+
+            Text("Ako sesija nije uključena, Diktiraj te zamoli da otvoriš Diktator i uključiš je.")
+                .font(.system(size: 12))
+                .foregroundStyle(Dizajn.tekstTercijarni)
+            #else
             korak("mic.fill", "Tapni Diktiraj i govori", "Dugme je u traci iznad tastature; sesija se uključuje sama, a svaki diktat je produžava.")
             korak("text.cursor", "Tekst se sam ubaci", "Tapni crveni Stop — tekst ide u polje u kome pišeš. Ako ne uspe, tapni Nalepi iznad tastature.")
 
             Text("Ako je Diktator ugašen, Diktiraj ga otvara i odmah snima.")
                 .font(.system(size: 12))
                 .foregroundStyle(Dizajn.tekstTercijarni)
+            #endif
         }
         .kartica()
     }

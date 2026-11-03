@@ -6,6 +6,15 @@ options:
     iOS: "17.0"
   createIntermediateGroups: true
   groupSortPosition: top
+  defaultConfig: Debug
+
+# `AppStore` je ista Release konfiguracija, ali sa uključenim `APPSTORE`
+# uslovom: tastatura tada nikada ne otvara aplikaciju, sesija traje najviše
+# 15 minuta, a GitHub provera verzija je isključena.
+configs:
+  Debug: debug
+  Release: release
+  AppStore: release
 
 settings:
   base:
@@ -19,6 +28,9 @@ settings:
     CURRENT_PROJECT_VERSION: "10"
     DEVELOPMENT_TEAM: LHQ4Q44425
     CLANG_CXX_LANGUAGE_STANDARD: "c++17"
+  configs:
+    AppStore:
+      SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) APPSTORE"
 
 targets:
   DiktatorIOS:
@@ -36,7 +48,7 @@ targets:
         UILaunchScreen: {}
         UIBackgroundModes:
           - audio
-        NSMicrophoneUsageDescription: "Diktator koristi mikrofon za diktat i, kada uključiš sesiju, drži ga u pripravnosti do 15 minuta. Snimak ostaje na uređaju."
+        NSMicrophoneUsageDescription: "Diktator koristi mikrofon da pretvori tvoj govor u tekst. Dok je sesija uključena, mikrofon je u pripravnosti da bi tastatura mogla da diktira u drugim aplikacijama. Snimak se obrađuje na uređaju i ne čuva se."
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
         ITSAppUsesNonExemptEncryption: false
@@ -154,3 +166,14 @@ schemes:
       config: Debug
     archive:
       config: Release
+
+  # Arhiva za App Store / TestFlight. Gradi se sa `APPSTORE` uslovom.
+  DiktatorIOS-AppStore:
+    build:
+      targets:
+        DiktatorIOS: all
+        DiktatorKeyboard: all
+    run:
+      config: Debug
+    archive:
+      config: AppStore

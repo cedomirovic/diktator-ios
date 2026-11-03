@@ -6,6 +6,21 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Status
 
+- **03.11.2026.** — **dva builda: lični i App Store**: dodat je `AppStore`
+  build (konfiguracija `AppStore` sa uslovom `APPSTORE` i šema
+  `DiktatorIOS-AppStore`), pa se isti kod gradi na dva načina. U App Store
+  buildu tastatura **nikada ne otvara aplikaciju** (App Store Review 4.4.1) —
+  umesto toga piše „Otvori Diktator i uključi sesiju.“; uklonjeni su i
+  rezervni put preko responder lanca i programsko zatvaranje `exit(0)` (Apple
+  ga ne odobrava). Sesija traje **najviše 15 minuta**, opcija **Bez isteka**
+  se ne nudi, a postojeće „bez“ se svodi na 15 minuta. GitHub provera novih
+  verzija i sekcija **Ažuriranja** su isključene, a iz Pomoći je uklonjen
+  tekst o profilu od 7 dana. Prelazak na Groq sada traži potvrdu da snimak
+  napušta uređaj (5.1.2). Lični build zadržava sve dosadašnje ponašanje.
+  `app/objavi-testflight.sh` arhivira šemu `DiktatorIOS-AppStore`, a
+  `info.plist` opis mikrofona više ne pominje „do 15 minuta“. Verzija ostaje
+  **0.2.0 (10)**.
+
 - **03.11.2026.** — **„Testiraj obaveštenje“ reaguje odmah**: poruka
   **Šaljem testno obaveštenje…** pojavi se čim se dodirne dugme, a samo
   obaveštenje stiže bez čekanja na proveru dozvole. `Azuriranja` sada pamti

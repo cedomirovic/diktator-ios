@@ -109,7 +109,7 @@ enum RezimBrzine: String, CaseIterable, Identifiable {
         case .tacno:
             return "Isto kao desktop Diktator: Large v3, pun audio kontekst i pretraga snopom. Najtačniji srpski, ali sporiji."
         case .oblak:
-            return "Groq prepiše kratak snimak za oko sekund, ali zvuk tada napušta uređaj."
+            return "Groq prepiše kratak snimak za oko sekund, ali zvuk tada napušta uređaj i šalje se servisu Groq (SAD). Uključuje se samo uz potvrdu, a lokalni prepis je uvek dostupan."
         }
     }
 
@@ -190,12 +190,41 @@ enum TrajanjeSesije: String, CaseIterable, Identifiable {
         case .sat:
             return "Sesija traje jedan sat i svaki diktat je produžava za novih sat vremena."
         case .petnaestMinuta:
+            #if APPSTORE
+            return "Sesija traje 15 minuta i svaki diktat je produžava. Posle isteka otvori Diktator i uključi je ponovo."
+            #else
             return "Sesija traje 15 minuta i svaki diktat je produžava. Posle isteka tastatura ponovo otvara Diktator."
+            #endif
         }
     }
 
+    /// Opcije koje se nude u Podešavanjima. App Store verzija nema sesiju bez
+    /// isteka — tamo mikrofon u pripravnosti sme da traje najviše 15 minuta.
+    static var dostupna: [TrajanjeSesije] {
+        #if APPSTORE
+        return [.petnaestMinuta]
+        #else
+        return allCases
+        #endif
+    }
+
+    static var podrazumevano: TrajanjeSesije {
+        #if APPSTORE
+        return .petnaestMinuta
+        #else
+        return .bezIsteka
+        #endif
+    }
+
     static func iz(_ id: String) -> TrajanjeSesije {
-        TrajanjeSesije(rawValue: id) ?? .bezIsteka
+        let izabrano = TrajanjeSesije(rawValue: id) ?? podrazumevano
+        #if APPSTORE
+        // I ako je iz starije verzije ostalo „bez isteka“, App Store build ga
+        // svodi na 15 minuta.
+        return izabrano == .bezIsteka ? .petnaestMinuta : izabrano
+        #else
+        return izabrano
+        #endif
     }
 }
 
@@ -212,9 +241,9 @@ struct Podesavanja: Codable, Equatable {
     var rezimPrepisa = RezimPrepisa.kvalitet.rawValue
     var oslobadjanjeModela = OslobadjanjeModela.pet.rawValue
     var cuvajIstoriju = true
-    /// Koliko dugo pozadinska sesija radi. Podrazumevano bez isteka, da se
-    /// Diktator ne bi otvarao pri svakom diktatu.
-    var trajanjeSesije = TrajanjeSesije.bezIsteka.rawValue
+    /// Koliko dugo pozadinska sesija radi. U App Store verziji to je uvek
+    /// 15 minuta, a u ličnoj verziji podrazumevano bez isteka.
+    var trajanjeSesije = TrajanjeSesije.podrazumevano.rawValue
     /// Kada je Diktator otvoren iz tastature samo zato što sesija nije bila
     /// uključena, posle prepisa se sam zatvori da bi iOS vratio korisnika u
     /// aplikaciju iz koje je došao.
@@ -266,11 +295,10 @@ struct Podesavanja: Codable, Equatable {
             oslobadjanjeModela = OslobadjanjeModela.pet.rawValue
         }
         cuvajIstoriju = try kontejner.decodeIfPresent(Bool.self, forKey: .cuvajIstoriju) ?? true
-        trajanjeSesije = try kontejner.decodeIfPresent(String.self, forKey: .trajanjeSesije)
-            ?? TrajanjeSesije.bezIsteka.rawValue
-        if TrajanjeSesije(rawValue: trajanjeSesije) == nil {
-            trajanjeSesije = TrajanjeSesije.bezIsteka.rawValue
-        }
+        trajanjeSesije = TrajanjeSesije.iz(
+            try kontejner.decodeIfPresent(String.self, forKey: .trajanjeSesije)
+                ?? TrajanjeSesije.podrazumevano.rawValue
+        ).rawValue
         vratiSePosleDiktata = try kontejner.decodeIfPresent(Bool.self, forKey: .vratiSePosleDiktata) ?? true
         proveravajAzuriranja = try kontejner.decodeIfPresent(Bool.self, forKey: .proveravajAzuriranja) ?? true
         doterivanje = try kontejner.decodeIfPresent(Bool.self, forKey: .doterivanje) ?? false

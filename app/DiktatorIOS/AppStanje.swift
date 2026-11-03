@@ -224,7 +224,9 @@ final class AppStanje: ObservableObject {
             UserDefaults.standard.set(true, forKey: kljucMigracije)
         }
 
+        #if !APPSTORE
         dostupnoAzuriranje = Azuriranja.kesirano()
+        #endif
         kljucDoterivanja = Kljuc.citaj(za: podesavanja.provajderDoterivanja) ?? ""
         kljucOblaka = Kljuc.citaj(za: "groq") ?? ""
 
@@ -467,6 +469,10 @@ final class AppStanje: ObservableObject {
     // MARK: - Ažuriranja
 
     func proveriAzuriranja(prisilno: Bool = false) {
+        #if APPSTORE
+        // App Store verziju ažurira App Store, pa nema provere GitHub-a.
+        return
+        #else
         // „Proveri sada“ radi i kada je automatska provera isključena.
         guard prisilno || podesavanja.proveravajAzuriranja else { return }
         guard !proveraAzuriranjaUToku else { return }
@@ -493,6 +499,7 @@ final class AppStanje: ObservableObject {
                 porukaAzuriranja = "Provera nije uspela. Proveri internet vezu i pokušaj ponovo."
             }
         }
+        #endif
     }
 
     func testirajNotifikaciju() {
@@ -920,6 +927,12 @@ final class AppStanje: ObservableObject {
     /// imenovanom pasteboard-u i u istoriji, pa tastatura posle povratka
     /// nalepi sama.
     private func vratiSeUAplikaciju(napomena: String?) {
+        #if APPSTORE
+        // App Store verzija nikada ne biva otvorena iz tastature, pa nema ni
+        // programskog zatvaranja aplikacije (Apple ga ne odobrava).
+        _ = napomena
+        return
+        #else
         guard pokrenutSaTastature,
               podesavanja.vratiSePosleDiktata,
               UIApplication.shared.applicationState == .active else { return }
@@ -945,6 +958,7 @@ final class AppStanje: ObservableObject {
             try? await Task.sleep(nanoseconds: 1_300_000_000)
             exit(0)
         }
+        #endif
     }
 
     /// Tekst ide u opšti clipboard zajedno sa tokenom i vremenom. Token
