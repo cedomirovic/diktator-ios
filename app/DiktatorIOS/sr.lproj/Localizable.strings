@@ -37,6 +37,7 @@
 "Danas" = "Danas";
 "Detalji" = "Detalji";
 "Diktat" = "Diktat";
+"Diktat nije uspeo — vrati se i pokušaj ponovo iz tastature." = "Diktat nije uspeo — vrati se i pokušaj ponovo iz tastature.";
 "Diktator" = "Diktator";
 "Diktator nema dozvolu za mikrofon. Otvori Podešavanja → Privatnost i bezbednost → Mikrofon." = "Diktator nema dozvolu za mikrofon. Otvori Podešavanja → Privatnost i bezbednost → Mikrofon.";
 "Diktator ostaje otvoren posle prepisa; vrati se strelicom ‹ u gornjem levom uglu, a pozadinska sesija ostaje uključena." = "Diktator ostaje otvoren posle prepisa; vrati se strelicom ‹ u gornjem levom uglu, a pozadinska sesija ostaje uključena.";
@@ -218,6 +219,7 @@
 "Režim prepisa" = "Režim prepisa";
 "Sakrij ključ" = "Sakrij ključ";
 "Savet za srpski" = "Savet za srpski";
+"Sačekaj trenutak dok se prepis završi." = "Sačekaj trenutak dok se prepis završi.";
 "Sačuvaj ključ" = "Sačuvaj ključ";
 "Sačuvaj rečnik" = "Sačuvaj rečnik";
 "Server je vratio HTTP %lld. Pokušaj ponovo." = "Server je vratio HTTP %lld. Pokušaj ponovo.";
@@ -227,7 +229,7 @@
 "Sesija drži mikrofon u pripravnosti dok je uključena i troši bateriju. Podrazumevano nema istek; u Podešavanjima → Diktat → Trajanje sesije možeš da je ograničiš na 1 sat ili 15 minuta." = "Sesija drži mikrofon u pripravnosti dok je uključena i troši bateriju. Podrazumevano nema istek; u Podešavanjima → Diktat → Trajanje sesije možeš da je ograničiš na 1 sat ili 15 minuta.";
 "Sesija drži mikrofon u pripravnosti najviše 15 minuta i troši bateriju. Kada istekne, otvori Diktator i uključi je ponovo. Sesiju možeš da završiš i ranije, dugmetom Završi sesiju." = "Sesija drži mikrofon u pripravnosti najviše 15 minuta i troši bateriju. Kada istekne, otvori Diktator i uključi je ponovo. Sesiju možeš da završiš i ranije, dugmetom Završi sesiju.";
 "Sesija je aktivna. Pređi u drugu aplikaciju i tapni Diktiraj na tastaturi." = "Sesija je aktivna. Pređi u drugu aplikaciju i tapni Diktiraj na tastaturi.";
-"Sesija je uključena. Vrati se strelicom ‹ u svoju aplikaciju — dalji diktati te neće prebacivati ovamo." = "Sesija je uključena. Vrati se strelicom ‹ u svoju aplikaciju — dalji diktati te neće prebacivati ovamo.";
+"Sesija je uključena — dalji diktati te neće prebacivati ovamo." = "Sesija je uključena — dalji diktati te neće prebacivati ovamo.";
 "Sesija je završena. Otvori Diktator i uključi sesiju ponovo." = "Sesija je završena. Otvori Diktator i uključi sesiju ponovo.";
 "Sesija podrazumevano nema istek i traje dok je ne završiš, pa se Diktator ne otvara pri svakom diktatu. U Podešavanjima možeš da je ograničiš na 1 sat ili 15 minuta. Kada se završi, prvi dodir na Diktiraj je ponovo uključi." = "Sesija podrazumevano nema istek i traje dok je ne završiš, pa se Diktator ne otvara pri svakom diktatu. U Podešavanjima možeš da je ograničiš na 1 sat ili 15 minuta. Kada se završi, prvi dodir na Diktiraj je ponovo uključi.";
 "Sesija traje 15 minuta i svaki diktat je produžava. Posle isteka otvori Diktator i uključi je ponovo." = "Sesija traje 15 minuta i svaki diktat je produžava. Posle isteka otvori Diktator i uključi je ponovo.";
@@ -242,8 +244,8 @@
 "Snimak je prekratak — drži mikrofon dok govoriš." = "Snimak je prekratak — drži mikrofon dok govoriš.";
 "Snimak nije mogao da se pripremi za prepis." = "Snimak nije mogao da se pripremi za prepis.";
 "Snimak se obrađuje lokalno. Aplikacija ne šalje zvuk na server. Model se preuzima sa Hugging Face-a." = "Snimak se obrađuje lokalno. Aplikacija ne šalje zvuk na server. Model se preuzima sa Hugging Face-a.";
-"Snimam — vrati se strelicom ‹ u svoju aplikaciju. Snimanje se nastavlja, a Stop je na tastaturi." = "Snimam — vrati se strelicom ‹ u svoju aplikaciju. Snimanje se nastavlja, a Stop je na tastaturi.";
 "Snimam…" = "Snimam…";
+"Snimanje ide dalje — Stop je na tastaturi." = "Snimanje ide dalje — Stop je na tastaturi.";
 "Solidan balans. Veći od Base, ali manji i brži od Turbo modela." = "Solidan balans. Veći od Base, ali manji i brži od Turbo modela.";
 "Spreman" = "Spreman";
 "Srpski" = "Srpski";
@@ -263,7 +265,7 @@
 "Tastatura sada može da snima u pozadini, bez otvaranja Diktatora. Preostalo: %lld:%@" = "Tastatura sada može da snima u pozadini, bez otvaranja Diktatora. Preostalo: %lld:%@";
 "Tastatura sada može da snima u pozadini, bez otvaranja Diktatora. Sesija nema istek i traje dok je ne završiš." = "Tastatura sada može da snima u pozadini, bez otvaranja Diktatora. Sesija nema istek i traje dok je ne završiš.";
 "Tekst je kopiran. Otvori tastaturu; ako se ne ubaci sam, tapni Nalepi iznad tastature." = "Tekst je kopiran. Otvori tastaturu; ako se ne ubaci sam, tapni Nalepi iznad tastature.";
-"Tekst je spreman. Vrati se strelicom ‹ — nalepiće se sam." = "Tekst je spreman. Vrati se strelicom ‹ — nalepiće se sam.";
+"Tekst je spreman i nalepiće se sam." = "Tekst je spreman i nalepiće se sam.";
 "Tekst je spreman. Vraćam te u tvoju aplikaciju…" = "Tekst je spreman. Vraćam te u tvoju aplikaciju…";
 "Tekst se sam ubaci" = "Tekst se sam ubaci";
 "Test veze" = "Test veze";
@@ -290,6 +292,7 @@
 "Veza radi. Model: %@." = "Veza radi. Model: %@.";
 "Veza radi: %@" = "Veza radi: %@";
 "Vrati me u aplikaciju posle diktata" = "Vrati me u aplikaciju posle diktata";
+"Vrati se u svoju aplikaciju" = "Vrati se u svoju aplikaciju";
 "Whisper nije uspeo da prepiše snimak." = "Whisper nije uspeo da prepiše snimak.";
 "Za najbolji srpski izaberi **Srpski**. Automatska detekcija je korisna kada smenjuješ srpski i engleski, ali na kratkim snimcima ume da pogreši." = "Za najbolji srpski izaberi **Srpski**. Automatska detekcija je korisna kada smenjuješ srpski i engleski, ali na kratkim snimcima ume da pogreši.";
 "Za najbolji srpski: Jezik = Srpski i Brzina = Najtačnije — Large v3." = "Za najbolji srpski: Jezik = Srpski i Brzina = Najtačnije — Large v3.";
@@ -312,3 +315,4 @@
 "Šalje samo gotov tekst izabranom servisu. Isključeno znači da ništa ne napušta uređaj." = "Šalje samo gotov tekst izabranom servisu. Isključeno znači da ništa ne napušta uređaj.";
 "Šaljem testno obaveštenje…" = "Šaljem testno obaveštenje…";
 "„%@“ je dodat u rečnik." = "„%@“ je dodat u rečnik.";
+"‹ je u gornjem levom uglu; možeš i da prevučeš prst udesno po donjoj ivici." = "‹ je u gornjem levom uglu; možeš i da prevučeš prst udesno po donjoj ivici.";

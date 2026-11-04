@@ -140,6 +140,10 @@ final class AppStanje: ObservableObject {
     @Published var poslednjiTekst = ""
     @Published var nivo: Float = 0
     @Published var poruka: String?
+    /// Traka „Vrati se u svoju aplikaciju“ — uključena je kada je diktat
+    /// pokrenut iz tastature, jer tada Diktator ostaje u prvom planu, a
+    /// snimanje i lepljenje se nastavljaju u aplikaciji iz koje se diktira.
+    @Published var prikaziPovratak = false
     @Published var podesavanja: Podesavanja = SkladistePodesavanja.ucitaj()
     @Published var istorija: [Zapis] = IstorijaSkladiste.ucitaj()
     @Published var statistika: Statistika = StatistikaSkladiste.ucitaj()
@@ -455,6 +459,7 @@ final class AppStanje: ObservableObject {
         sesijaKraj = nil
         sesijaPreostalo = 0
         sesijaBezIsteka = false
+        prikaziPovratak = false
         pisiIPCStanje()
         Dnevnik.pisi("Sesija završena.")
         NSLog("Diktator: sesija završena.")
@@ -553,6 +558,26 @@ final class AppStanje: ObservableObject {
         return dozvoljeno
     }
 
+    // MARK: - Povratak u aplikaciju
+
+    /// Objašnjenje ispod naslova trake, prilagođeno trenutnom stanju diktata.
+    var povratakOpis: String {
+        switch stanje {
+        case .snima:
+            return Prevod.t("Snimanje ide dalje — Stop je na tastaturi.")
+        case .priprema, .prepisuje, .doteruje:
+            return Prevod.t("Sačekaj trenutak dok se prepis završi.")
+        case .greska:
+            return Prevod.t("Diktat nije uspeo — vrati se i pokušaj ponovo iz tastature.")
+        case .mirno:
+            return Prevod.t("Tekst je spreman i nalepiće se sam.")
+        }
+    }
+
+    func ocistiPovratak() {
+        prikaziPovratak = false
+    }
+
     // MARK: - Snimanje i prepis
 
     func pocniSnimanje(saTastature: Bool = false) {
@@ -563,6 +588,7 @@ final class AppStanje: ObservableObject {
             produziSesiju()
         }
         pokrenutSaTastature = saTastature
+        prikaziPovratak = saTastature
         if case .greska = stanje {
             stanje = .mirno
         }
@@ -580,12 +606,10 @@ final class AppStanje: ObservableObject {
                 try snimac.pocni()
                 stanje = .snima
                 // Kada je snimanje pokrenuto iz tastature, aplikacija je u
-                // prvom planu samo dok se sesija ne uključi. Korisnik treba
-                // odmah da se vrati strelicom ‹ — snimanje se nastavlja u
-                // pozadini, a Stop je na tastaturi.
-                poruka = saTastature
-                    ? Prevod.t("Snimam — vrati se strelicom ‹ u svoju aplikaciju. Snimanje se nastavlja, a Stop je na tastaturi.")
-                    : nil
+                // prvom planu samo dok se sesija ne uključi. Povratak vodi
+                // traka „Vrati se u svoju aplikaciju“, pa poruka nije
+                // potrebna — snimanje se nastavlja u pozadini.
+                poruka = nil
                 pokreniTimerSnimanja()
                 pisiIPCStanje()
             } catch {
@@ -915,7 +939,8 @@ final class AppStanje: ObservableObject {
         if let napomena, !napomena.isEmpty {
             poruka = napomena
         } else if pokrenutSaTastature {
-            poruka = Prevod.t("Tekst je spreman. Vrati se strelicom ‹ — nalepiće se sam.")
+            // Povratak objašnjava traka na vrhu ekrana.
+            poruka = nil
         } else {
             poruka = Prevod.t("Tekst je kopiran. Otvori tastaturu; ako se ne ubaci sam, tapni Nalepi iznad tastature.")
         }
@@ -947,7 +972,7 @@ final class AppStanje: ObservableObject {
         // ponovo otvarao Diktator. Zato je kod takve sesije ne gasimo —
         // korisnik se ovamo vrati samo prvi put, strelicom ‹.
         if TrajanjeSesije.iz(podesavanja.trajanjeSesije).sekundi == nil {
-            poruka = Prevod.t("Sesija je uključena. Vrati se strelicom ‹ u svoju aplikaciju — dalji diktati te neće prebacivati ovamo.")
+            poruka = Prevod.t("Sesija je uključena — dalji diktati te neće prebacivati ovamo.")
             Dnevnik.pisi("Sesija bez isteka — aplikacija ostaje u pozadini.")
             return
         }

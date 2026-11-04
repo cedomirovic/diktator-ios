@@ -37,6 +37,7 @@
 "Danas" = "Today";
 "Detalji" = "Details";
 "Diktat" = "Dictate";
+"Diktat nije uspeo — vrati se i pokušaj ponovo iz tastature." = "Dictation failed — go back and try again from the keyboard.";
 "Diktator" = "Diktator";
 "Diktator nema dozvolu za mikrofon. Otvori Podešavanja → Privatnost i bezbednost → Mikrofon." = "Diktator does not have microphone permission. Open Settings → Privacy & Security → Microphone.";
 "Diktator ostaje otvoren posle prepisa; vrati se strelicom ‹ u gornjem levom uglu, a pozadinska sesija ostaje uključena." = "Diktator stays open after the transcript; go back with ‹ in the top-left corner and the background session keeps running.";
@@ -218,6 +219,7 @@
 "Režim prepisa" = "Transcription mode";
 "Sakrij ključ" = "Hide key";
 "Savet za srpski" = "Serbian tip";
+"Sačekaj trenutak dok se prepis završi." = "Wait a moment while the transcript finishes.";
 "Sačuvaj ključ" = "Save key";
 "Sačuvaj rečnik" = "Save vocabulary";
 "Server je vratio HTTP %lld. Pokušaj ponovo." = "The server returned HTTP %lld. Try again.";
@@ -227,7 +229,7 @@
 "Sesija drži mikrofon u pripravnosti dok je uključena i troši bateriju. Podrazumevano nema istek; u Podešavanjima → Diktat → Trajanje sesije možeš da je ograničiš na 1 sat ili 15 minuta." = "The session keeps the microphone ready while it is active and uses battery. There is no expiry by default; in Settings → Dictate → Session length you can limit it to 1 hour or 15 minutes.";
 "Sesija drži mikrofon u pripravnosti najviše 15 minuta i troši bateriju. Kada istekne, otvori Diktator i uključi je ponovo. Sesiju možeš da završiš i ranije, dugmetom Završi sesiju." = "The session keeps the microphone ready for up to 15 minutes and uses battery. When it expires, open Diktator and start it again. You can also end it earlier with the End session button.";
 "Sesija je aktivna. Pređi u drugu aplikaciju i tapni Diktiraj na tastaturi." = "The session is active. Switch to another app and tap Dictate on the keyboard.";
-"Sesija je uključena. Vrati se strelicom ‹ u svoju aplikaciju — dalji diktati te neće prebacivati ovamo." = "The session is active. Go back to your app with ‹ — further dictations will not bring you back here.";
+"Sesija je uključena — dalji diktati te neće prebacivati ovamo." = "The session is active — further dictations will not bring you back here.";
 "Sesija je završena. Otvori Diktator i uključi sesiju ponovo." = "The session has ended. Open Diktator and start it again.";
 "Sesija podrazumevano nema istek i traje dok je ne završiš, pa se Diktator ne otvara pri svakom diktatu. U Podešavanjima možeš da je ograničiš na 1 sat ili 15 minuta. Kada se završi, prvi dodir na Diktiraj je ponovo uključi." = "By default the session has no expiry and lasts until you end it, so Diktator does not open on every dictation. In Settings you can limit it to 1 hour or 15 minutes. When it ends, the next tap on Dictate starts it again.";
 "Sesija traje 15 minuta i svaki diktat je produžava. Posle isteka otvori Diktator i uključi je ponovo." = "The session lasts 15 minutes and every dictation extends it. When it expires, open Diktator and start it again.";
@@ -242,8 +244,8 @@
 "Snimak je prekratak — drži mikrofon dok govoriš." = "Recording is too short — hold the microphone while you speak.";
 "Snimak nije mogao da se pripremi za prepis." = "The recording could not be prepared for transcription.";
 "Snimak se obrađuje lokalno. Aplikacija ne šalje zvuk na server. Model se preuzima sa Hugging Face-a." = "Audio is processed on device. The app does not send audio to a server. The model is downloaded from Hugging Face.";
-"Snimam — vrati se strelicom ‹ u svoju aplikaciju. Snimanje se nastavlja, a Stop je na tastaturi." = "Recording — go back to your app with ‹. Recording continues and Stop is on the keyboard.";
 "Snimam…" = "Recording…";
+"Snimanje ide dalje — Stop je na tastaturi." = "Recording continues — Stop is on the keyboard.";
 "Solidan balans. Veći od Base, ali manji i brži od Turbo modela." = "A solid balance. Bigger than Base, but smaller and faster than Turbo.";
 "Spreman" = "Ready";
 "Srpski" = "Serbian";
@@ -263,7 +265,7 @@
 "Tastatura sada može da snima u pozadini, bez otvaranja Diktatora. Preostalo: %lld:%@" = "The keyboard can now record in the background without opening Diktator. Remaining: %lld:%@";
 "Tastatura sada može da snima u pozadini, bez otvaranja Diktatora. Sesija nema istek i traje dok je ne završiš." = "The keyboard can now record in the background without opening Diktator. The session has no expiry and lasts until you end it.";
 "Tekst je kopiran. Otvori tastaturu; ako se ne ubaci sam, tapni Nalepi iznad tastature." = "The text is copied. Open the keyboard; if it is not inserted automatically, tap Paste above the keyboard.";
-"Tekst je spreman. Vrati se strelicom ‹ — nalepiće se sam." = "Text is ready. Go back with ‹ — it will be pasted automatically.";
+"Tekst je spreman i nalepiće se sam." = "Your text is ready and will paste itself.";
 "Tekst je spreman. Vraćam te u tvoju aplikaciju…" = "Text is ready. Taking you back to your app…";
 "Tekst se sam ubaci" = "Text inserts itself";
 "Test veze" = "Test connection";
@@ -290,6 +292,7 @@
 "Veza radi. Model: %@." = "Connection works. Model: %@.";
 "Veza radi: %@" = "Connection works: %@";
 "Vrati me u aplikaciju posle diktata" = "Return me to my app after dictation";
+"Vrati se u svoju aplikaciju" = "Go back to your app";
 "Whisper nije uspeo da prepiše snimak." = "Whisper could not transcribe the recording.";
 "Za najbolji srpski izaberi **Srpski**. Automatska detekcija je korisna kada smenjuješ srpski i engleski, ali na kratkim snimcima ume da pogreši." = "For the best Serbian choose **Serbian**. Automatic detection helps when you switch between Serbian and English, but it can make mistakes on short recordings.";
 "Za najbolji srpski: Jezik = Srpski i Brzina = Najtačnije — Large v3." = "For the best Serbian: Language = Serbian and Speed = Most accurate — Large v3.";
@@ -312,3 +315,4 @@
 "Šalje samo gotov tekst izabranom servisu. Isključeno znači da ništa ne napušta uređaj." = "Sends only the finished text to the chosen service. When off, nothing leaves your device.";
 "Šaljem testno obaveštenje…" = "Sending test notification…";
 "„%@“ je dodat u rečnik." = "“%@” added to the vocabulary.";
+"‹ je u gornjem levom uglu; možeš i da prevučeš prst udesno po donjoj ivici." = "The ‹ is in the top-left corner; you can also swipe right along the bottom edge.";

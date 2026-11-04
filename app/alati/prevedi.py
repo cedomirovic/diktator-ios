@@ -189,7 +189,6 @@ PREVODI = {
 "Diktator nema dozvolu za mikrofon. Otvori Podešavanja → Privatnost i bezbednost → Mikrofon.": "Diktator does not have microphone permission. Open Settings → Privacy & Security → Microphone.",
 "Snimak nije mogao da se pripremi za prepis.": "The recording could not be prepared for transcription.",
 "%@ Lokalni model nije preuzet, pa nema rezervnog prepisa.": "%@ The local model is not downloaded, so there is no fallback transcription.",
-"Snimam — vrati se strelicom ‹ u svoju aplikaciju. Snimanje se nastavlja, a Stop je na tastaturi.": "Recording — go back to your app with ‹. Recording continues and Stop is on the keyboard.",
 "Prikaži ključ": "Show key",
 "Jeftin i brz servis za srpski i engleski. Traži API ključ.": "A cheap and fast service for Serbian and English. Requires an API key.",
 "Ključ praviš na platform.deepseek.com → API keys. Model: deepseek-chat.": "Create a key at platform.deepseek.com → API keys. Model: deepseek-chat.",
@@ -230,7 +229,6 @@ PREVODI = {
 "Sesija drži mikrofon u pripravnosti dok je uključena i troši bateriju. Podrazumevano nema istek; u Podešavanjima → Diktat → Trajanje sesije možeš da je ograničiš na 1 sat ili 15 minuta.": "The session keeps the microphone ready while it is active and uses battery. There is no expiry by default; in Settings → Dictate → Session length you can limit it to 1 hour or 15 minutes.",
 "Sesija drži mikrofon u pripravnosti najviše 15 minuta i troši bateriju. Kada istekne, otvori Diktator i uključi je ponovo. Sesiju možeš da završiš i ranije, dugmetom Završi sesiju.": "The session keeps the microphone ready for up to 15 minutes and uses battery. When it expires, open Diktator and start it again. You can also end it earlier with the End session button.",
 "Sesija je aktivna. Pređi u drugu aplikaciju i tapni Diktiraj na tastaturi.": "The session is active. Switch to another app and tap Dictate on the keyboard.",
-"Sesija je uključena. Vrati se strelicom ‹ u svoju aplikaciju — dalji diktati te neće prebacivati ovamo.": "The session is active. Go back to your app with ‹ — further dictations will not bring you back here.",
 "Sesija je završena. Otvori Diktator i uključi sesiju ponovo.": "The session has ended. Open Diktator and start it again.",
 "Sesija podrazumevano nema istek i traje dok je ne završiš, pa se Diktator ne otvara pri svakom diktatu. U Podešavanjima možeš da je ograničiš na 1 sat ili 15 minuta. Kada se završi, prvi dodir na Diktiraj je ponovo uključi.": "By default the session has no expiry and lasts until you end it, so Diktator does not open on every dictation. In Settings you can limit it to 1 hour or 15 minutes. When it ends, the next tap on Dictate starts it again.",
 "Sesija traje 15 minuta i svaki diktat je produžava. Posle isteka otvori Diktator i uključi je ponovo.": "The session lasts 15 minutes and every dictation extends it. When it expires, open Diktator and start it again.",
@@ -264,7 +262,6 @@ PREVODI = {
 "Tastatura sada može da snima u pozadini, bez otvaranja Diktatora. Preostalo: %lld:%@": "The keyboard can now record in the background without opening Diktator. Remaining: %lld:%@",
 "Tastatura sada može da snima u pozadini, bez otvaranja Diktatora. Sesija nema istek i traje dok je ne završiš.": "The keyboard can now record in the background without opening Diktator. The session has no expiry and lasts until you end it.",
 "Tekst je kopiran. Otvori tastaturu; ako se ne ubaci sam, tapni Nalepi iznad tastature.": "The text is copied. Open the keyboard; if it is not inserted automatically, tap Paste above the keyboard.",
-"Tekst je spreman. Vrati se strelicom ‹ — nalepiće se sam.": "Text is ready. Go back with ‹ — it will be pasted automatically.",
 "Tekst je spreman. Vraćam te u tvoju aplikaciju…": "Text is ready. Taking you back to your app…",
 "Tekst se sam ubaci": "Text inserts itself",
 "Test veze": "Test connection",
@@ -316,6 +313,13 @@ PREVODI = {
 "Isključena": "Off",
 "u memoriji": "in memory",
 "nije učitan": "not loaded",
+"Vrati se u svoju aplikaciju": "Go back to your app",
+"Snimanje ide dalje — Stop je na tastaturi.": "Recording continues — Stop is on the keyboard.",
+"Sačekaj trenutak dok se prepis završi.": "Wait a moment while the transcript finishes.",
+"Diktat nije uspeo — vrati se i pokušaj ponovo iz tastature.": "Dictation failed — go back and try again from the keyboard.",
+"Tekst je spreman i nalepiće se sam.": "Your text is ready and will paste itself.",
+"‹ je u gornjem levom uglu; možeš i da prevučeš prst udesno po donjoj ivici.": "The ‹ is in the top-left corner; you can also swipe right along the bottom edge.",
+"Sesija je uključena — dalji diktati te neće prebacivati ovamo.": "The session is active — further dictations will not bring you back here.",
 }
 
 TASTATURA = {

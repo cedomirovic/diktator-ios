@@ -3,6 +3,7 @@ import Foundation
 
 struct PogledDiktat: View {
     @EnvironmentObject var stanje: AppStanje
+    @Environment(\.scenePhase) private var fazaEkrana
     @State private var prikaziPodesavanja = false
     @State private var predlogRecnika: PredlogRecnika?
 
@@ -16,6 +17,15 @@ struct PogledDiktat: View {
             ScrollView {
                 VStack(spacing: 16) {
                     zaglavlje
+
+                    if stanje.prikaziPovratak {
+                        TrakaPovratka(
+                            naslov: Prevod.t("Vrati se u svoju aplikaciju"),
+                            opis: stanje.povratakOpis,
+                            savet: Prevod.t("‹ je u gornjem levom uglu; možeš i da prevučeš prst udesno po donjoj ivici.")
+                        )
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                    }
 
                     hero
 
@@ -55,6 +65,14 @@ struct PogledDiktat: View {
             }
             .background(Dizajn.pozadina)
             .toolbar(.hidden, for: .navigationBar)
+            .animation(.easeInOut(duration: 0.25), value: stanje.prikaziPovratak)
+            // Kada Diktator ode u pozadinu, korisnik se već vratio u svoju
+            // aplikaciju, pa traka više nije aktuelna.
+            .onChange(of: fazaEkrana) { _, nova in
+                if nova == .background {
+                    stanje.ocistiPovratak()
+                }
+            }
             .navigationDestination(isPresented: $prikaziPodesavanja) {
                 PogledPodesavanja()
             }
@@ -449,5 +467,73 @@ struct PogledDiktat: View {
             }
             Spacer(minLength: 0)
         }
+    }
+}
+
+// MARK: - Traka za povratak
+
+/// Podseća korisnika da se vrati u aplikaciju u kojoj je diktirao.
+///
+/// iOS ne daje način da aplikacija sama prebaci u drugu aplikaciju, pa je
+/// jedini povratak sistemska strelica ‹ (ili prevlačenje udesno po donjoj
+/// ivici). Umesto ćutanja, traka to pokazuje animiranom strelicom i kaže šta
+/// se dešava dalje — snimanje ide u pozadini, a tekst se lepi sam.
+private struct TrakaPovratka: View {
+    let naslov: String
+    let opis: String
+    let savet: String
+
+    @Environment(\.accessibilityReduceMotion) private var smanjiPokret
+    @State private var klizi = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 14) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .fill(Dizajn.akcenat.opacity(0.16))
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundStyle(Dizajn.akcenat)
+                        .offset(x: klizi ? -5 : 4)
+                }
+                .frame(width: 52, height: 52)
+                .scaleEffect(klizi ? 1.05 : 1)
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(naslov)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(Dizajn.tekst)
+                    Text(opis)
+                        .font(.system(size: 13))
+                        .foregroundStyle(Dizajn.tekstSekundarni)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 0)
+            }
+
+            Text(savet)
+                .font(.system(size: 12))
+                .foregroundStyle(Dizajn.tekstTercijarni)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Dizajn.akcenatMeki)
+        .clipShape(RoundedRectangle(cornerRadius: Dizajn.radijusKartice, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: Dizajn.radijusKartice, style: .continuous)
+                .stroke(Dizajn.akcenat.opacity(0.25), lineWidth: 1)
+        )
+        .animation(pokret, value: klizi)
+        .onAppear { klizi = true }
+        .accessibilityElement(children: .combine)
+    }
+
+    /// Strelica tiho „kuca“ ulevo, kao sistemska ‹ — osim kada je uključeno
+    /// smanjenje pokreta.
+    private var pokret: Animation? {
+        smanjiPokret ? nil : .easeInOut(duration: 0.9).repeatForever(autoreverses: true)
     }
 }
