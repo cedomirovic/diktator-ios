@@ -373,7 +373,7 @@ struct PogledPodesavanja: View {
                         .foregroundStyle(.secondary)
 
                     if let link = stanje.provajderDoterivanja.link {
-                        Link(stanje.provajderDoterivanja.linkNaslov ?? "Otvori", destination: link)
+                        Link(stanje.provajderDoterivanja.linkNaslov ?? Prevod.t("Otvori"), destination: link)
                             .font(.caption)
                     }
 

@@ -12,29 +12,29 @@ enum GreskaOblaka: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .nemaKljuca:
-            return "Groq API ključ nije unet."
+            return Prevod.t("Groq API ključ nije unet.")
         case .neispravanOdgovor:
-            return "Groq je vratio neočekivan odgovor."
+            return Prevod.t("Groq je vratio neočekivan odgovor.")
         case .status(let kod, let detalj):
             let osnova: String
             switch kod {
             case 400:
-                osnova = "Groq ne prihvata zahtev (HTTP 400)."
+                osnova = Prevod.t("Groq ne prihvata zahtev (HTTP 400).")
             case 401, 403:
-                osnova = "Groq je odbio ključ (HTTP \(kod))."
+                osnova = Prevod.t("Groq je odbio ključ (HTTP %lld).", kod)
             case 404:
-                osnova = "Groq ne poznaje model ili putanju (HTTP 404)."
+                osnova = Prevod.t("Groq ne poznaje model ili putanju (HTTP 404).")
             case 413:
-                osnova = "Snimak je predugačak za Groq (HTTP 413)."
+                osnova = Prevod.t("Snimak je predugačak za Groq (HTTP 413).")
             case 429:
-                osnova = "Groq traži pauzu — previše zahteva (HTTP 429)."
+                osnova = Prevod.t("Groq traži pauzu — previše zahteva (HTTP 429).")
             default:
-                osnova = "Groq je vratio HTTP \(kod)."
+                osnova = Prevod.t("Groq je vratio HTTP %lld.", kod)
             }
             guard let detalj, !detalj.isEmpty else { return osnova }
             return "\(osnova) \(detalj)"
         case .prazan:
-            return "Groq nije prepoznao govor."
+            return Prevod.t("Groq nije prepoznao govor.")
         }
     }
 }
@@ -113,7 +113,7 @@ struct PrepisOblak {
     static func savetZaKljuc(_ kljuc: String) -> String? {
         let ociscen = kljuc.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !ociscen.isEmpty else {
-            return "Groq API ključ nije unet."
+            return Prevod.t("Groq API ključ nije unet.")
         }
         if !ociscen.hasPrefix("gsk_") {
             return "Groq ključ počinje sa gsk_ — izgleda da je iskopiran pogrešan ključ."

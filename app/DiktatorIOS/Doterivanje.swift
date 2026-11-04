@@ -13,15 +13,15 @@ enum GreskaDoterivanja: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .nemaKljuca(let naziv):
-            return "\(naziv) API ključ nije unet."
+            return Prevod.t("%@ API ključ nije unet.", naziv)
         case .neispravnaAdresa:
-            return "Adresa servisa za doterivanje nije ispravna."
+            return Prevod.t("Adresa servisa za doterivanje nije ispravna.")
         case .nebezbednaAdresa:
-            return "Adresa servisa mora da koristi https://. http:// je dozvoljen samo za localhost (Ollama)."
+            return Prevod.t("Adresa servisa mora da koristi https://. http:// je dozvoljen samo za localhost (Ollama).")
         case .odgovor(let poruka):
             return poruka
         case .prazan(let naziv):
-            return "\(naziv) je vratio prazan tekst."
+            return Prevod.t("%@ je vratio prazan tekst.", naziv)
         }
     }
 }

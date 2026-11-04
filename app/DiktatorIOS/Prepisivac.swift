@@ -10,11 +10,11 @@ enum GreskaPrepisa: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .modelNijePreuzet:
-            return "Model još nije preuzet. Otvori Podešavanja i izaberi ili preuzmi model."
+            return Prevod.t("Model još nije preuzet. Otvori Podešavanja i izaberi ili preuzmi model.")
         case .modelNeMoeDaSeUcita:
-            return "Model nije mogao da se učita. Proveri da li je fajl kompletan."
+            return Prevod.t("Model nije mogao da se učita. Proveri da li je fajl kompletan.")
         case .dekodiranje:
-            return "Whisper nije uspeo da prepiše snimak."
+            return Prevod.t("Whisper nije uspeo da prepiše snimak.")
         }
     }
 }

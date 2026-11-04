@@ -136,9 +136,9 @@ enum GreskaPreuzimanja: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .neispravanFajl: return "Preuzeti model nije kompletan. Pokušaj ponovo."
-        case .neispravanStatus(let kod): return "Server je vratio HTTP \(kod). Pokušaj ponovo."
-        case .nebezbednaAdresa: return "Preuzimanje mora da ide preko https:// veze."
+        case .neispravanFajl: return Prevod.t("Preuzeti model nije kompletan. Pokušaj ponovo.")
+        case .neispravanStatus(let kod): return Prevod.t("Server je vratio HTTP %lld. Pokušaj ponovo.", kod)
+        case .nebezbednaAdresa: return Prevod.t("Preuzimanje mora da ide preko https:// veze.")
         }
     }
 }

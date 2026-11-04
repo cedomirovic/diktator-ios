@@ -85,9 +85,9 @@ struct PogledStatistika: View {
     }
 
     private func kartica(
-        naslov: String,
+        naslov: LocalizedStringKey,
         vrednost: String,
-        jedinica: String,
+        jedinica: LocalizedStringKey,
         ikona: String
     ) -> some View {
         VStack(alignment: .leading, spacing: 8) {
