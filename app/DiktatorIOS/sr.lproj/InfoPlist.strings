@@ -1,0 +1,4 @@
+/* Generisano skriptom app/alati/prevedi.py — ne uređivati ručno. */
+
+"NSLocalNetworkUsageDescription" = "Diktator koristi lokalnu mrežu samo ako izabereš Ollama ili lokalni LLM servis.";
+"NSMicrophoneUsageDescription" = "Diktator koristi mikrofon da pretvori tvoj govor u tekst. Dok je sesija uključena, mikrofon je u pripravnosti da bi tastatura mogla da diktira u drugim aplikacijama. Snimak se obrađuje na uređaju i ne čuva se.";

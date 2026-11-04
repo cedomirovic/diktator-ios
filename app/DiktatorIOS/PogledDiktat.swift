@@ -208,20 +208,20 @@ struct PogledDiktat: View {
     private var opisTrajanjaSesije: String {
         switch TrajanjeSesije.iz(stanje.podesavanja.trajanjeSesije) {
         case .bezIsteka:
-            return "Sesija bez isteka drži mikrofon u pripravnosti dok je ne završiš. Kada je završiš, tastatura ponovo otvara Diktator."
+            return Prevod.t("Sesija bez isteka drži mikrofon u pripravnosti dok je ne završiš. Kada je završiš, tastatura ponovo otvara Diktator.")
         case .sat:
-            return "Sesija traje najviše jedan sat i drži mikrofon u pripravnosti. Svaki diktat je produžava za novih sat vremena."
+            return Prevod.t("Sesija traje najviše jedan sat i drži mikrofon u pripravnosti. Svaki diktat je produžava za novih sat vremena.")
         case .petnaestMinuta:
             #if APPSTORE
-            return "Sesija traje najviše 15 minuta i drži mikrofon u pripravnosti. Svaki diktat je produžava za novih 15 minuta, a posle isteka je uključiš ponovo u Diktatoru."
+            return Prevod.t("Sesija traje najviše 15 minuta i drži mikrofon u pripravnosti. Svaki diktat je produžava za novih 15 minuta, a posle isteka je uključiš ponovo u Diktatoru.")
             #else
-            return "Sesija traje najviše 15 minuta i drži mikrofon u pripravnosti. Svaki diktat je produžava za novih 15 minuta."
+            return Prevod.t("Sesija traje najviše 15 minuta i drži mikrofon u pripravnosti. Svaki diktat je produžava za novih 15 minuta.")
             #endif
         }
     }
 
     private func oznakaStanja(_ aktivna: Bool) -> some View {
-        Text(aktivna ? "Aktivna" : "Isključena")
+        Text(Prevod.t(aktivna ? "Aktivna" : "Isključena"))
             .font(.system(size: 12, weight: .semibold))
             .foregroundStyle(aktivna ? Dizajn.zelena : Dizajn.tekstTercijarni)
             .padding(.horizontal, 10)
@@ -436,7 +436,7 @@ struct PogledDiktat: View {
         .kartica()
     }
 
-    private func korak(_ simbol: String, _ naslov: String, _ opis: String) -> some View {
+    private func korak(_ simbol: String, _ naslov: LocalizedStringKey, _ opis: LocalizedStringKey) -> some View {
         HStack(alignment: .top, spacing: 12) {
             IkonaUKrugu(simbol: simbol, boja: Dizajn.akcenat, velicina: 38)
             VStack(alignment: .leading, spacing: 2) {

@@ -25,8 +25,16 @@ nije tajna i sve može u git.
 | Age rating | 4+ |
 | Made for Kids | No |
 
-Ako App Store Connect traži engleski subtitle, koristi:
-`Serbian dictation, on device`.
+## Languages
+
+- **Primary:** English (U.S.) — `CFBundleDevelopmentRegion = en`.
+- **Secondary:** Serbian (Latin) — `sr.lproj`.
+- Interfejs se prevodi preko `en.lproj` / `sr.lproj`
+  (`Localizable.strings` i `InfoPlist.strings`); srpski prevod je identitet, a
+  neprevedeni ključ uvek ostaje srpski.
+- U App Store Connect-u dodaj **Serbian (Latin)** kao dodatni jezik i popuni
+  srpski opis ispod. Engleski je primarni, pa Review Notes i metadata idu na
+  engleskom.
 
 ## Promotional text (170)
 
@@ -63,8 +71,9 @@ FEATURES
 
 PRIVACY
 Audio is transcribed on device and discarded. The app has no account and no
-telemetry. Network is used only to download models, check for a new version
-and, if you explicitly enable them, the optional cloud services above.
+telemetry. Network is used only to download models and, if you explicitly enable them,
+the optional cloud services above. The App Store build does not check GitHub
+for updates.
 
 The keyboard needs Full Access to read the clipboard when you tap Paste and to
 open Diktator from the Dictate button. Without Full Access it still types
@@ -90,7 +99,7 @@ MOGUĆNOSTI
 • Srpski i engleski, uključujući č, ć, ž, š, đ
 • Lokalni prepis preko Whisper-a (whisper.cpp)
 • Automatsko lepljenje u svaku aplikaciju, uz ručno Nalepi kao rezervu
-• Pozadinska sesija bez isteka (opciono 1 sat ili 15 minuta)
+• Pozadinska sesija od 15 minuta, produžava se svakim diktatom
 • Istorija, rečnik i statistika
 • Opcioni prepis u oblaku preko Groq-a (~1 s)
 • Opciono doterivanje teksta preko Gemini, OpenAI, Claude, DeepSeek ili Ollama
@@ -99,8 +108,8 @@ MOGUĆNOSTI
 
 PRIVATNOST
 Zvuk se prepisuje na uređaju i odbacuje. Aplikacija nema nalog ni telemetriju.
-Mreža se koristi samo za preuzimanje modela, proveru nove verzije i, ako ih sam
-uključiš, opcione servise u oblaku.
+Mreža se koristi samo za preuzimanje modela i, ako ih sam uključiš, opcione
+servise u oblaku. App Store verzija ne proverava GitHub.
 
 Tastatura traži Full Access da bi pročitala clipboard kada tapneš Nalepi i da bi
 otvorila Diktator dodirom na Diktiraj. Bez Full Access-a i dalje normalno kuca.
@@ -174,10 +183,10 @@ usable on its own. The extension never records audio — iOS does not allow
 microphones in app extensions. Audio is captured only by the main app.
 
 No third-party analytics or advertising SDKs. No data is sent to the
-developer. Network access is used for model download (huggingface.co), an
-optional update check (api.github.com) and the optional, user-configured
-cloud transcription/refinement services. Those are off by default and require
-the user's own API key.
+developer. Network access is used for model download (huggingface.co) and the
+optional, user-configured cloud transcription/refinement services. Those are
+off by default and require the user's own API key. This App Store build does
+not check GitHub for updates and never asks for notification permission.
 ```
 
 ## Screenshots

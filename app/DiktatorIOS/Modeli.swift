@@ -10,27 +10,27 @@ enum StanjeAplikacije: Equatable {
 
     var naslov: String {
         switch self {
-        case .mirno: return "Spreman"
-        case .snima: return "Snimam…"
-        case .priprema: return "Pripremam model…"
-        case .prepisuje: return "Prepisujem…"
-        case .doteruje: return "Doterujem…"
-        case .greska: return "Greška"
+        case .mirno: return Prevod.t("Spreman")
+        case .snima: return Prevod.t("Snimam…")
+        case .priprema: return Prevod.t("Pripremam model…")
+        case .prepisuje: return Prevod.t("Prepisujem…")
+        case .doteruje: return Prevod.t("Doterujem…")
+        case .greska: return Prevod.t("Greška")
         }
     }
 
     var detalj: String {
         switch self {
         case .mirno:
-            return "Tapni mikrofon i pričaj. Tekst se posle diktiranja sam ubaci u aplikaciju u kojoj kucaš."
+            return Prevod.t("Tapni mikrofon i pričaj. Tekst se posle diktiranja sam ubaci u aplikaciju u kojoj kucaš.")
         case .snima:
-            return "Govori sada. Tapni ponovo da završiš."
+            return Prevod.t("Govori sada. Tapni ponovo da završiš.")
         case .priprema:
-            return "Model se učitava u memoriju, sačekaj trenutak."
+            return Prevod.t("Model se učitava u memoriju, sačekaj trenutak.")
         case .prepisuje:
-            return "Pretvaram govor u tekst."
+            return Prevod.t("Pretvaram govor u tekst.")
         case .doteruje:
-            return "Popravljam interpunkciju i imena preko izabranog servisa."
+            return Prevod.t("Popravljam interpunkciju i imena preko izabranog servisa.")
         case .greska(let poruka):
             return poruka
         }
@@ -66,17 +66,17 @@ enum RezimPrepisa: String, CaseIterable, Identifiable {
 
     var naziv: String {
         switch self {
-        case .kvalitet: return "Najbolji kvalitet"
-        case .stedljivo: return "Manje memorije"
+        case .kvalitet: return Prevod.t("Najbolji kvalitet")
+        case .stedljivo: return Prevod.t("Manje memorije")
         }
     }
 
     var opis: String {
         switch self {
         case .kvalitet:
-            return "Beam search sa 5 kandidata — tačniji, troši više RAM-a."
+            return Prevod.t("Beam search sa 5 kandidata — tačniji, troši više RAM-a.")
         case .stedljivo:
-            return "Greedy dekodiranje — brže i manje RAM-a, uz moguće sitne razlike."
+            return Prevod.t("Greedy dekodiranje — brže i manje RAM-a, uz moguće sitne razlike.")
         }
     }
 
@@ -96,20 +96,20 @@ enum RezimBrzine: String, CaseIterable, Identifiable {
 
     var naziv: String {
         switch self {
-        case .brzo: return "Brzo — Turbo, na uređaju"
-        case .tacno: return "Najtačnije — Large v3"
-        case .oblak: return "Najbrže — Groq (oblak)"
+        case .brzo: return Prevod.t("Brzo — Turbo, na uređaju")
+        case .tacno: return Prevod.t("Najtačnije — Large v3")
+        case .oblak: return Prevod.t("Najbrže — Groq (oblak)")
         }
     }
 
     var opis: String {
         switch self {
         case .brzo:
-            return "Turbo model, kraći audio kontekst i najbrža obrada. Nekoliko puta brže, uz moguće greške u imenima i završecima."
+            return Prevod.t("Turbo model, kraći audio kontekst i najbrža obrada. Nekoliko puta brže, uz moguće greške u imenima i završecima.")
         case .tacno:
-            return "Isto kao desktop Diktator: Large v3, pun audio kontekst i pretraga snopom. Najtačniji srpski, ali sporiji."
+            return Prevod.t("Isto kao desktop Diktator: Large v3, pun audio kontekst i pretraga snopom. Najtačniji srpski, ali sporiji.")
         case .oblak:
-            return "Groq prepiše kratak snimak za oko sekund, ali zvuk tada napušta uređaj i šalje se servisu Groq (SAD). Uključuje se samo uz potvrdu, a lokalni prepis je uvek dostupan."
+            return Prevod.t("Groq prepiše kratak snimak za oko sekund, ali zvuk tada napušta uređaj i šalje se servisu Groq (SAD). Uključuje se samo uz potvrdu, a lokalni prepis je uvek dostupan.")
         }
     }
 
@@ -131,11 +131,11 @@ enum OslobadjanjeModela: String, CaseIterable, Identifiable {
 
     var naziv: String {
         switch self {
-        case .odmah: return "Odmah posle prepisa"
-        case .jedan: return "Posle 1 minuta"
-        case .pet: return "Posle 5 minuta"
-        case .petnaest: return "Posle 15 minuta"
-        case .trideset: return "Posle 30 minuta"
+        case .odmah: return Prevod.t("Odmah posle prepisa")
+        case .jedan: return Prevod.t("Posle 1 minuta")
+        case .pet: return Prevod.t("Posle 5 minuta")
+        case .petnaest: return Prevod.t("Posle 15 minuta")
+        case .trideset: return Prevod.t("Posle 30 minuta")
         case .nikad: return "Nikad"
         }
     }
@@ -168,9 +168,9 @@ enum TrajanjeSesije: String, CaseIterable, Identifiable {
 
     var naziv: String {
         switch self {
-        case .bezIsteka: return "Bez isteka"
-        case .sat: return "1 sat"
-        case .petnaestMinuta: return "15 minuta"
+        case .bezIsteka: return Prevod.t("Bez isteka")
+        case .sat: return Prevod.t("1 sat")
+        case .petnaestMinuta: return Prevod.t("15 minuta")
         }
     }
 
@@ -186,14 +186,14 @@ enum TrajanjeSesije: String, CaseIterable, Identifiable {
     var opis: String {
         switch self {
         case .bezIsteka:
-            return "Tastatura diktira u bilo kojoj aplikaciji i Diktator se ne otvara. Mikrofon ostaje u pripravnosti dok god je sesija uključena, pa baterija troši malo više. Preporučeno."
+            return Prevod.t("Tastatura diktira u bilo kojoj aplikaciji i Diktator se ne otvara. Mikrofon ostaje u pripravnosti dok god je sesija uključena, pa baterija troši malo više. Preporučeno.")
         case .sat:
-            return "Sesija traje jedan sat i svaki diktat je produžava za novih sat vremena."
+            return Prevod.t("Sesija traje jedan sat i svaki diktat je produžava za novih sat vremena.")
         case .petnaestMinuta:
             #if APPSTORE
-            return "Sesija traje 15 minuta i svaki diktat je produžava. Posle isteka otvori Diktator i uključi je ponovo."
+            return Prevod.t("Sesija traje 15 minuta i svaki diktat je produžava. Posle isteka otvori Diktator i uključi je ponovo.")
             #else
-            return "Sesija traje 15 minuta i svaki diktat je produžava. Posle isteka tastatura ponovo otvara Diktator."
+            return Prevod.t("Sesija traje 15 minuta i svaki diktat je produžava. Posle isteka tastatura ponovo otvara Diktator.")
             #endif
         }
     }

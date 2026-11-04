@@ -128,7 +128,7 @@ struct PogledStatistika: View {
                         .foregroundStyle(Dizajn.tekstSekundarni)
                 }
                 Spacer()
-                Oznaka(tekst: "\(s.nedeljaReci.formatted()) reči")
+                Oznaka(tekst: Prevod.t("%@ reči", s.nedeljaReci.formatted()))
             }
 
             HStack(alignment: .bottom, spacing: 8) {
@@ -177,9 +177,9 @@ struct PogledStatistika: View {
             Divider().overlay(Dizajn.ivica)
             RedPodatka(naslov: "Prosečan diktat", vrednost: Statistika.vreme(s.prosecanDiktatSekundi))
             Divider().overlay(Dizajn.ivica)
-            RedPodatka(naslov: "Ovaj mesec", vrednost: "\(s.mesecReci.formatted()) reči")
+            RedPodatka(naslov: "Ovaj mesec", vrednost: Prevod.t("%@ reči", s.mesecReci.formatted()))
             Divider().overlay(Dizajn.ivica)
-            RedPodatka(naslov: "Najduži niz", vrednost: "\(s.najduziNiz) \(s.najduziNiz == 1 ? "dan" : "dana")")
+            RedPodatka(naslov: "Najduži niz", vrednost: s.najduziNiz == 1 ? Prevod.t("1 dan") : Prevod.t("%lld dana", s.najduziNiz))
             if let prvi = s.prviDatum {
                 Divider().overlay(Dizajn.ivica)
                 RedPodatka(

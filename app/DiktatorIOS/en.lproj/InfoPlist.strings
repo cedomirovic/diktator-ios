@@ -1,0 +1,4 @@
+/* Generisano skriptom app/alati/prevedi.py — ne uređivati ručno. */
+
+"NSLocalNetworkUsageDescription" = "Diktator uses the local network only if you choose Ollama or a local LLM service.";
+"NSMicrophoneUsageDescription" = "Diktator uses the microphone to turn your speech into text. While the session is active, the microphone stays ready so the keyboard can dictate in other apps. The recording is processed on device and is not stored.";

@@ -47,10 +47,11 @@ Istoriju, rečnik i statistiku možeš obrisati i u Podešavanjima.</p>
 <ul>
   <li><strong>Preuzimanje modela</strong> — sa <code>huggingface.co</code>; ako
     preuzimanje prekineš, delimičan fajl se briše.</li>
-  <li><strong>Provera nove verzije</strong> — javni GitHub API
-    (<code>api.github.com</code>). Šalje se samo zahtev za najnovijim
-    izdanjem; ne šalje se nikakav sadržaj diktata. Možeš je isključiti u
-    Podešavanjima.</li>
+  <li><strong>Provera nove verzije</strong> — u ličnoj verziji preko javnog
+    GitHub API-ja (<code>api.github.com</code>). App Store verzija se ažurira
+    preko App Store-a i ne proverava GitHub. Šalje se samo zahtev za
+    najnovijim izdanjem; ne šalje se nikakav sadržaj diktata. U ličnoj verziji
+    proveru možeš isključiti u Podešavanjima.</li>
   <li><strong>Opcioni prepis u oblaku (Groq)</strong> — ako ga sam uključiš,
     snimak se šalje na <code>api.groq.com</code> radi bržeg prepisa. Tada zvuk
     napušta uređaj.</li>
@@ -114,9 +115,11 @@ can also clear history, vocabulary and statistics in Settings.</p>
 <ul>
   <li><strong>Model download</strong> from <code>huggingface.co</code>; an
     interrupted download is deleted.</li>
-  <li><strong>Update check</strong> against the public GitHub API
-    (<code>api.github.com</code>). Only a request for the latest release is
-    sent — never dictation content. You can turn it off in Settings.</li>
+  <li><strong>Update check</strong> in the personal build only, against the
+    public GitHub API (<code>api.github.com</code>). The App Store build is
+    updated through the App Store and does not check GitHub. Only a request
+    for the latest release is sent — never dictation content. In the personal
+    build you can turn it off in Settings.</li>
   <li><strong>Optional cloud transcription (Groq)</strong> — if you enable it,
     the audio is sent to <code>api.groq.com</code> for faster transcription. In
     that mode audio leaves the device.</li>

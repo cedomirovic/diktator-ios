@@ -23,11 +23,13 @@ settings:
     TARGETED_DEVICE_FAMILY: "1,2"
     CODE_SIGN_STYLE: Automatic
     CODE_SIGN_IDENTITY: "Apple Development"
-    DEVELOPMENT_LANGUAGE: sr
+    DEVELOPMENT_LANGUAGE: en
     MARKETING_VERSION: "0.2.0"
     CURRENT_PROJECT_VERSION: "10"
     DEVELOPMENT_TEAM: LHQ4Q44425
     CLANG_CXX_LANGUAGE_STANDARD: "c++17"
+    # Izvlači tekstove za prevod iz SwiftUI i NSLocalizedString.
+    SWIFT_EMIT_LOC_STRINGS: YES
   configs:
     AppStore:
       SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) APPSTORE"

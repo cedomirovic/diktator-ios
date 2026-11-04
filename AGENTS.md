@@ -6,6 +6,19 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Status
 
+- **04.11.2026.** — **engleski je primarni jezik, srpski drugi**: dodat je
+  `Prevod.swift` u aplikaciju i tastaturu (`Prevod.t`), a svi tekstovi koji se
+  sklapaju u običan `String` prolaze kroz njega. Dodati su
+  `en.lproj`/`sr.lproj` fajlovi `Localizable.strings` i `InfoPlist.strings`
+  (prevodi se generišu skriptom `app/alati/prevedi.py`), a
+  `DEVELOPMENT_LANGUAGE` je sada **en**. Srpski prevod je identitet, pa
+  neprevedena stavka ostaje srpska. Localizovane su i sistemske poruke za
+  mikrofon i lokalnu mrežu, zaglavlja sekcija u Podešavanjima i naslovi
+  tastature (**Diktiraj**, **Nalepi**, **razmak**). Provereno u simulatoru na
+  engleskom (svi tabovi i oba builda) i na srpskom; App Store build i dalje
+  nudi samo sesiju od 15 minuta, bez sekcije **Ažuriranja**. Verzija ostaje
+  **0.2.0 (10)**.
+
 - **03.11.2026.** — **dva builda: lični i App Store**: dodat je `AppStore`
   build (konfiguracija `AppStore` sa uslovom `APPSTORE` i šema
   `DiktatorIOS-AppStore`), pa se isti kod gradi na dva načina. U App Store

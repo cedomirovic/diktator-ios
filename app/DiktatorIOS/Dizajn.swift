@@ -67,8 +67,8 @@ extension View {
 /// Veliki naslov ekrana sa sivim podnaslovom, kao „Istorija / Vaše prethodne
 /// diktacije na jednom mestu.“ u dizajnu.
 struct NaslovEkrana: View {
-    let naslov: String
-    var podnaslov: String?
+    let naslov: LocalizedStringKey
+    var podnaslov: LocalizedStringKey?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -89,8 +89,8 @@ struct NaslovEkrana: View {
 
 /// Naslov grupe unutar ekrana (npr. „Ponašanje aplikacije“).
 struct NaslovSekcije: View {
-    let naslov: String
-    var podnaslov: String?
+    let naslov: LocalizedStringKey
+    var podnaslov: LocalizedStringKey?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
@@ -139,7 +139,7 @@ struct Oznaka: View {
 
 /// Red sa natpisom levo i vrednošću desno (detalji statistike).
 struct RedPodatka: View {
-    let naslov: String
+    let naslov: LocalizedStringKey
     let vrednost: String
 
     var body: some View {

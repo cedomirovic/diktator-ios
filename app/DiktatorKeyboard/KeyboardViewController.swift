@@ -409,7 +409,7 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private func postaviGlavni() {
-        let diktiraj = napraviDugme("Diktiraj", id: "diktiraj", akcija: #selector(diktiraj))
+        let diktiraj = napraviDugme(Prevod.t("Diktiraj"), id: "diktiraj", akcija: #selector(diktiraj))
         diktiraj.titleLabel?.font = .systemFont(ofSize: 15, weight: .semibold)
         diktiraj.setTitleColor(.white, for: .normal)
         diktiraj.setTitleColor(.white, for: .highlighted)
@@ -468,7 +468,7 @@ final class KeyboardViewController: UIInputViewController {
     /// Zeleno dugme u traci iznad tastature. Tekst se inače ubacuje sam, ali
     /// Nalepi ostaje tu za ručno lepljenje (i kao obično lepljenje clipboarda).
     private func napraviNalepi() -> Tipka {
-        let dugme = napraviDugme("Nalepi", id: "nalepi", akcija: #selector(nalepi))
+        let dugme = napraviDugme(Prevod.t("Nalepi"), id: "nalepi", akcija: #selector(nalepi))
         dugme.titleLabel?.font = .systemFont(ofSize: 15, weight: .semibold)
         dugme.setTitleColor(.white, for: .normal)
         dugme.setTitleColor(.white, for: .highlighted)
@@ -572,7 +572,7 @@ final class KeyboardViewController: UIInputViewController {
         globus.widthAnchor.constraint(equalToConstant: 42).isActive = true
         redTipki.addArrangedSubview(globus)
 
-        redTipki.addArrangedSubview(napraviDugme("razmak", id: "space", stil: .specijalno))
+        redTipki.addArrangedSubview(napraviDugme(Prevod.t("razmak"), id: "space", stil: .specijalno))
 
         let povratak = napraviDugme("return", id: "return", stil: .specijalno)
         povratak.widthAnchor.constraint(equalToConstant: 88).isActive = true
@@ -682,13 +682,13 @@ final class KeyboardViewController: UIInputViewController {
         postaviIkonu(dugme, ime, velicina: velicina)
         switch id {
         case "shift":
-            dugme.accessibilityLabel = "Velika slova"
+            dugme.accessibilityLabel = Prevod.t("Velika slova")
         case "delete":
-            dugme.accessibilityLabel = "Obriši"
+            dugme.accessibilityLabel = Prevod.t("Obriši")
         case "globe":
-            dugme.accessibilityLabel = "Sledeća tastatura"
+            dugme.accessibilityLabel = Prevod.t("Sledeća tastatura")
         case "diktiraj":
-            dugme.accessibilityLabel = "Diktiraj"
+            dugme.accessibilityLabel = Prevod.t("Diktiraj")
         default:
             break
         }
@@ -759,7 +759,7 @@ final class KeyboardViewController: UIInputViewController {
 
     @objc private func diktiraj() {
         guard hasFullAccess else {
-            prikaziStatus("Uključi Full Access.")
+            prikaziStatus(Prevod.t("Uključi Full Access."))
             return
         }
 
@@ -772,14 +772,14 @@ final class KeyboardViewController: UIInputViewController {
             posaljiKomandu("stop")
             snimaSesijom = false
             obradaSesije = true
-            prikaziStatus("Obrada…")
+            prikaziStatus(Prevod.t("Obrada…"))
             pokreniTimeoutSesije()
             azurirajPrikaz()
             return
         }
 
         if obradaSesije {
-            prikaziStatus("Sačekaj da se završi prepis.")
+            prikaziStatus(Prevod.t("Sačekaj da se završi prepis."))
             return
         }
 
@@ -797,10 +797,10 @@ final class KeyboardViewController: UIInputViewController {
             obradaSesije = false
             cekaStartSesije = false
             UserDefaults.standard.set(false, forKey: cekaDiktatKey)
-            prikaziStatus("Otvori Diktator i uključi sesiju.")
+            prikaziStatus(Prevod.t("Otvori Diktator i uključi sesiju."))
             azurirajPrikaz()
             #else
-            prikaziStatus("Otvaram Diktator…")
+            prikaziStatus(Prevod.t("Otvaram Diktator…"))
             diktatPocetakVreme = Date().timeIntervalSince1970
             UserDefaults.standard.set(diktatPocetakVreme, forKey: diktatPocetakKey)
             UserDefaults.standard.set(true, forKey: cekaDiktatKey)
@@ -816,7 +816,7 @@ final class KeyboardViewController: UIInputViewController {
         diktatPocetakVreme = Date().timeIntervalSince1970
         UserDefaults.standard.set(diktatPocetakVreme, forKey: diktatPocetakKey)
         UserDefaults.standard.set(true, forKey: cekaDiktatKey)
-        prikaziStatus("Snimam…")
+        prikaziStatus(Prevod.t("Snimam…"))
         // Ako aplikacija ne odgovori (ugašena je ili suspendovana), timeout
         // će je otvoriti umesto da tastatura ostane na „Snimam…“.
         pokreniTimeoutSesije()
@@ -864,7 +864,7 @@ final class KeyboardViewController: UIInputViewController {
         cekaStartSesije = false
         timerSesijaTimeout?.invalidate()
         timerSesijaTimeout = nil
-        prikaziStatus("Otvori Diktator i uključi sesiju.")
+        prikaziStatus(Prevod.t("Otvori Diktator i uključi sesiju."))
         azurirajPrikaz()
         #else
         guard let url = URL(string: adresa) else { return }
@@ -879,7 +879,7 @@ final class KeyboardViewController: UIInputViewController {
             if !otvoriPrekoResponderLanca(url) {
                 UserDefaults.standard.set(false, forKey: cekaDiktatKey)
                 ocistiCekanjeSesije()
-                prikaziStatus("Otvori app ručno.")
+                prikaziStatus(Prevod.t("Otvori app ručno."))
             }
             return
         }
@@ -894,11 +894,11 @@ final class KeyboardViewController: UIInputViewController {
             NSLog("Diktator tastatura: extensionContext.open nije uspeo, pokušavam fallback.")
             DispatchQueue.main.async {
                 if self.otvoriPrekoResponderLanca(url) {
-                    self.prikaziStatus("Otvaram…")
+                    self.prikaziStatus(Prevod.t("Otvaram…"))
                 } else {
                     UserDefaults.standard.set(false, forKey: self.cekaDiktatKey)
                     self.ocistiCekanjeSesije()
-                    self.prikaziStatus("Otvori app ručno.")
+                    self.prikaziStatus(Prevod.t("Otvori app ručno."))
                 }
             }
         }
@@ -917,7 +917,7 @@ final class KeyboardViewController: UIInputViewController {
             if UserDefaults.standard.bool(forKey: self.cekaSesijuKey) {
                 self.ocistiCekanjeSesije()
                 NSLog("Diktator tastatura: sesija nije odgovorila, otvaram app.")
-                self.prikaziStatus("Otvaram…")
+                self.prikaziStatus(Prevod.t("Otvaram…"))
                 self.otvoriAplikaciju("diktator-ios://dictate")
                 return
             }
@@ -929,7 +929,7 @@ final class KeyboardViewController: UIInputViewController {
                 self.snimaSesijom = false
                 self.obradaSesije = false
                 NSLog("Diktator tastatura: start nije odgovorio, otvaram app.")
-                self.prikaziStatus("Nema odgovora — otvaram app.")
+                self.prikaziStatus(Prevod.t("Nema odgovora — otvaram app."))
                 self.otvoriAplikaciju("diktator-ios://dictate")
                 return
             }
@@ -939,7 +939,7 @@ final class KeyboardViewController: UIInputViewController {
             if self.obradaSesije && !UserDefaults.standard.bool(forKey: self.cekaDiktatKey) {
                 self.obradaSesije = false
                 NSLog("Diktator tastatura: stop nije odgovorio, otvaram app.")
-                self.prikaziStatus("Nema odgovora — otvaram app.")
+                self.prikaziStatus(Prevod.t("Nema odgovora — otvaram app."))
                 self.otvoriAplikaciju("diktator-ios://dictate")
             }
         }
@@ -986,7 +986,7 @@ final class KeyboardViewController: UIInputViewController {
 
     private func nalepiSaServera() {
         guard hasFullAccess else {
-            prikaziStatus("Uključi Full Access.")
+            prikaziStatus(Prevod.t("Uključi Full Access."))
             return
         }
         guard let url = URL(string: "http://127.0.0.1:8765/tekst") else {
@@ -997,7 +997,7 @@ final class KeyboardViewController: UIInputViewController {
         // Isti ključ koji računa i aplikacija.
         let serverToken = TajnaServera.token
 
-        prikaziStatus("Nalepi…")
+        prikaziStatus(Prevod.t("Nalepi…"))
         var zahtev = URLRequest(url: url)
         zahtev.timeoutInterval = 2
         zahtev.httpMethod = "GET"
@@ -1032,13 +1032,13 @@ final class KeyboardViewController: UIInputViewController {
         UserDefaults.standard.set(false, forKey: cekaDiktatKey)
         timerAutoNalepi?.invalidate()
         timerAutoNalepi = nil
-        prikaziStatus("Nalepljeno.")
+        prikaziStatus(Prevod.t("Nalepljeno."))
         azurirajPrikaz()
     }
 
     private func nalepiIzRezerve() {
         guard hasFullAccess else {
-            prikaziStatus("Uključi Full Access.")
+            prikaziStatus(Prevod.t("Uključi Full Access."))
             return
         }
 
@@ -1071,7 +1071,7 @@ final class KeyboardViewController: UIInputViewController {
 
         guard !tekst.isEmpty else {
             Dnevnik.pisi("Nalepi: clipboard je prazan.")
-            prikaziStatus("Clipboard je prazan.")
+            prikaziStatus(Prevod.t("Clipboard je prazan."))
             return
         }
 
@@ -1139,7 +1139,7 @@ final class KeyboardViewController: UIInputViewController {
             UserDefaults.standard.set(false, forKey: cekaDiktatKey)
             timerAutoNalepi?.invalidate()
             timerAutoNalepi = nil
-            prikaziStatus("Prepis nije stigao — tapni Diktiraj.")
+            prikaziStatus(Prevod.t("Prepis nije stigao — tapni Diktiraj."))
         }
 
         // Stariji statusi nemaju sesijaDo. Ako su zastareli, ne verujemo im.
@@ -1225,7 +1225,7 @@ final class KeyboardViewController: UIInputViewController {
                 tekstSpreman = true
                 autoNalepiAkoTreba()
                 if UserDefaults.standard.bool(forKey: cekaDiktatKey) {
-                    prikaziStatus("Spremno je, nalepi.")
+                    prikaziStatus(Prevod.t("Spremno je, nalepi."))
                 }
             }
         case "greska":
@@ -1238,7 +1238,7 @@ final class KeyboardViewController: UIInputViewController {
             timerAutoNalepi = nil
             timerSesijaTimeout?.invalidate()
             timerSesijaTimeout = nil
-            prikaziStatus("Greška — otvori Diktator.")
+            prikaziStatus(Prevod.t("Greška — otvori Diktator."))
         default:
             break
         }
@@ -1264,7 +1264,7 @@ final class KeyboardViewController: UIInputViewController {
         if UserDefaults.standard.bool(forKey: cekaSesijuKey) && !cekanjeSesijeTraje {
             ocistiCekanjeSesije()
             UserDefaults.standard.set(false, forKey: cekaDiktatKey)
-            prikaziStatus("Sesija nije počela — tapni Diktiraj.")
+            prikaziStatus(Prevod.t("Sesija nije počela — tapni Diktiraj."))
         }
         azurirajPrikaz()
     }
@@ -1354,7 +1354,7 @@ final class KeyboardViewController: UIInputViewController {
         Dnevnik.pisi("Tekst notifikacija: duzina=\(tekst.count)")
         autoNalepiAkoTreba()
         if UserDefaults.standard.bool(forKey: cekaDiktatKey) {
-            prikaziStatus("Spremno je, nalepi.")
+            prikaziStatus(Prevod.t("Spremno je, nalepi."))
         }
         azurirajPrikaz()
     }
@@ -1557,7 +1557,7 @@ final class KeyboardViewController: UIInputViewController {
         cekaStartSesije = false
         snimaSesijom = false
         obradaSesije = false
-        prikaziStatus("Nalepljeno automatski.")
+        prikaziStatus(Prevod.t("Nalepljeno automatski."))
         NSLog("Diktator tastatura: automatski nalepljen tekst (%@).", token)
     }
 
@@ -1704,7 +1704,7 @@ final class KeyboardViewController: UIInputViewController {
 
         if !hasFullAccess {
             diktiraj.isEnabled = false
-            diktiraj.setTitle("Diktiraj", for: .normal)
+            diktiraj.setTitle(Prevod.t("Diktiraj"), for: .normal)
             diktiraj.postaviBoju(.systemGray, pritisnuta: .systemGray)
             diktiraj.accessibilityLabel = "Diktiraj — potreban je Full Access"
             return
@@ -1712,7 +1712,7 @@ final class KeyboardViewController: UIInputViewController {
 
         if obradaSesije {
             diktiraj.isEnabled = false
-            diktiraj.setTitle("Obrada…", for: .normal)
+            diktiraj.setTitle(Prevod.t("Obrada…"), for: .normal)
             diktiraj.postaviBoju(.systemGray, pritisnuta: .systemGray)
             diktiraj.accessibilityLabel = "Prepisujem"
             return
@@ -1720,14 +1720,14 @@ final class KeyboardViewController: UIInputViewController {
 
         diktiraj.isEnabled = true
         if snimaSesijom {
-            diktiraj.setTitle("Stop", for: .normal)
+            diktiraj.setTitle(Prevod.t("Stop"), for: .normal)
             diktiraj.postaviBoju(
                 .systemRed,
                 pritisnuta: UIColor(red: 0.78, green: 0.16, blue: 0.16, alpha: 1)
             )
             diktiraj.accessibilityLabel = "Zaustavi snimanje"
         } else {
-            diktiraj.setTitle("Diktiraj", for: .normal)
+            diktiraj.setTitle(Prevod.t("Diktiraj"), for: .normal)
             diktiraj.postaviBoju(
                 .systemBlue,
                 pritisnuta: UIColor(red: 0.11, green: 0.42, blue: 0.86, alpha: 1)

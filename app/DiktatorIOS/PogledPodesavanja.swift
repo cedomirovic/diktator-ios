@@ -81,7 +81,7 @@ struct PogledPodesavanja: View {
 
                     Spacer()
 
-                    Text(stanje.modelUMemoriji ? "u memoriji" : "nije učitan")
+                    Text(Prevod.t(stanje.modelUMemoriji ? "u memoriji" : "nije učitan"))
                         .font(.caption)
                         .foregroundStyle(stanje.modelUMemoriji ? Color.green : Color.secondary)
                 }
@@ -539,7 +539,7 @@ struct PogledPodesavanja: View {
     }
 
     /// Zaglavlje grupe u stilu desktop dizajna: bold, bez velikih slova.
-    private func zaglavlje(_ naslov: String) -> some View {
+    private func zaglavlje(_ naslov: LocalizedStringKey) -> some View {
         Text(naslov)
             .font(.system(size: 17, weight: .semibold))
             .foregroundStyle(Dizajn.tekst)
@@ -552,9 +552,11 @@ struct PogledPodesavanja: View {
     private var stvarnaObrada: String {
         let model = stanje.modelZaPrepis?.naziv ?? "nijedan model"
         let rezim = RezimPrepisa.iz(stanje.podesavanja.rezimPrepisa) == .kvalitet
-            ? "pretraga snopom"
+            ? Prevod.t("pretraga snopom")
             : "greedy"
-        let kontekst = stanje.punAudioKontekst ? "pun audio kontekst" : "skraćen audio kontekst"
-        return "Prepisaće: \(model), \(rezim), \(kontekst)."
+        let kontekst = stanje.punAudioKontekst
+            ? Prevod.t("pun audio kontekst")
+            : Prevod.t("skraćen audio kontekst")
+        return Prevod.t("Prepisaće: %@, %@, %@.", model, rezim, kontekst)
     }
 }

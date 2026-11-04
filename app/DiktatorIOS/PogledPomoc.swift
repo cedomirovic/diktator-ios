@@ -115,12 +115,12 @@ struct PogledPomoc: View {
         .kartica()
     }
 
-    private func tekstKartica(naslov: String, pasusi: [String]) -> some View {
+    private func tekstKartica(naslov: LocalizedStringKey, pasusi: [LocalizedStringKey]) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(naslov)
                 .font(.system(size: 17, weight: .semibold))
 
-            ForEach(pasusi, id: \.self) { pasus in
+            ForEach(Array(pasusi.enumerated()), id: \.offset) { _, pasus in
                 Text(pasus)
                     .font(.system(size: 14))
                     .foregroundStyle(Dizajn.tekstSekundarni)
@@ -130,8 +130,8 @@ struct PogledPomoc: View {
         .kartica()
     }
 
-    private var ogranicenjaPasusi: [String] {
-        var pasusi = [
+    private var ogranicenjaPasusi: [LocalizedStringKey] {
+        var pasusi: [LocalizedStringKey] = [
             "Tastatura ne može direktno da snima — Apple to zabranjuje. Zato snima glavna aplikacija u pozadinskoj sesiji, a tastatura samo šalje start/stop."
         ]
         #if APPSTORE
@@ -176,7 +176,7 @@ struct PogledPomoc: View {
         .kartica()
     }
 
-    private func korak(_ broj: Int, _ tekst: String) -> some View {
+    private func korak(_ broj: Int, _ tekst: LocalizedStringKey) -> some View {
         HStack(alignment: .top, spacing: 10) {
             Text("\(broj)")
                 .font(.system(size: 13, weight: .bold))

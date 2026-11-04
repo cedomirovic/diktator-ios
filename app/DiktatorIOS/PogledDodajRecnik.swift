@@ -289,11 +289,11 @@ struct PogledDodajRecnik: View {
         let broj = pojmoviZaDodavanje.count
         switch broj {
         case 0:
-            return "Dodaj u rečnik"
+            return Prevod.t("Dodaj u rečnik")
         case 1:
-            return "Dodaj 1 pojam u rečnik"
+            return Prevod.t("Dodaj 1 pojam u rečnik")
         default:
-            return "Dodaj \(broj) pojmova u rečnik"
+            return Prevod.t("Dodaj %lld pojmova u rečnik", broj)
         }
     }
 
@@ -302,9 +302,9 @@ struct PogledDodajRecnik: View {
         guard !pojmovi.isEmpty else { return }
         let dodatih = stanje.dodajURecnik(pojmovi)
         if dodatih == 1, let pojam = pojmovi.first {
-            stanje.poruka = "„\(pojam)“ je dodat u rečnik."
+            stanje.poruka = Prevod.t("„%@“ je dodat u rečnik.", pojam)
         } else {
-            stanje.poruka = "U rečnik je dodato \(dodatih) pojmova."
+            stanje.poruka = Prevod.t("U rečnik je dodato %lld pojmova.", dodatih)
         }
         dismiss()
     }

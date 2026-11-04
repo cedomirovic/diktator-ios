@@ -32,7 +32,7 @@ enum Modeli {
         PonudaModela(
             id: "ggml-tiny.bin",
             naziv: "Tiny",
-            opis: "Najmanji i najbrži. Dobar za brze probe, ali češće pogreši imena.",
+            opis: Prevod.t("Najmanji i najbrži. Dobar za brze probe, ali češće pogreši imena."),
             velicina: 77_691_713,
             preporucen: false,
             url: adresa("ggml-tiny.bin")
@@ -40,7 +40,7 @@ enum Modeli {
         PonudaModela(
             id: "ggml-base.bin",
             naziv: "Base",
-            opis: "Mali i brz. Osnovni kvalitet, slabiji od Small i Turbo modela.",
+            opis: Prevod.t("Mali i brz. Osnovni kvalitet, slabiji od Small i Turbo modela."),
             velicina: 147_951_465,
             preporucen: false,
             url: adresa("ggml-base.bin")
@@ -48,7 +48,7 @@ enum Modeli {
         PonudaModela(
             id: "ggml-small.bin",
             naziv: "Small",
-            opis: "Solidan balans. Veći od Base, ali manji i brži od Turbo modela.",
+            opis: Prevod.t("Solidan balans. Veći od Base, ali manji i brži od Turbo modela."),
             velicina: 487_601_967,
             preporucen: false,
             url: adresa("ggml-small.bin")
@@ -56,7 +56,7 @@ enum Modeli {
         PonudaModela(
             id: "ggml-large-v3-turbo-q5_0.bin",
             naziv: "Large v3 Turbo",
-            opis: "Brz i troši manje memorije. Za srpski ume da pogreši više od Large v3.",
+            opis: Prevod.t("Brz i troši manje memorije. Za srpski ume da pogreši više od Large v3."),
             velicina: 574_041_195,
             preporucen: false,
             url: adresa("ggml-large-v3-turbo-q5_0.bin")
@@ -64,7 +64,7 @@ enum Modeli {
         PonudaModela(
             id: "ggml-large-v3-q5_0.bin",
             naziv: "Large v3",
-            opis: "Preporučeno za srpski. Najbolji kvalitet, traži više RAM-a (~1,0 GB).",
+            opis: Prevod.t("Preporučeno za srpski. Najbolji kvalitet, traži više RAM-a (~1,0 GB)."),
             velicina: 1_081_140_203,
             preporucen: true,
             url: adresa("ggml-large-v3-q5_0.bin")

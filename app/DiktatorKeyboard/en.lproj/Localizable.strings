@@ -1,0 +1,25 @@
+/* Generisano skriptom app/alati/prevedi.py — ne uređivati ručno. */
+
+"Clipboard je prazan." = "Clipboard is empty.";
+"Diktiraj" = "Dictate";
+"Greška — otvori Diktator." = "Error — open Diktator.";
+"Nalepi" = "Paste";
+"Nalepi…" = "Pasting…";
+"Nalepljeno automatski." = "Pasted automatically.";
+"Nalepljeno." = "Pasted.";
+"Nema odgovora — otvaram app." = "No response — opening app.";
+"Obrada…" = "Processing…";
+"Otvaram Diktator…" = "Opening Diktator…";
+"Otvaram…" = "Opening…";
+"Otvori Diktator i uključi sesiju." = "Open Diktator and start the session.";
+"Otvori app ručno." = "Open the app manually.";
+"Prepis nije stigao — tapni Diktiraj." = "Transcript did not arrive — tap Dictate.";
+"Sačekaj da se završi prepis." = "Wait for transcription to finish.";
+"Sesija nije počela — tapni Diktiraj." = "Session did not start — tap Dictate.";
+"Sledeća tastatura" = "Next keyboard";
+"Snimam…" = "Recording…";
+"Spremno je, nalepi." = "Ready, paste it.";
+"Stop" = "Stop";
+"Uključi Full Access." = "Enable Full Access.";
+"Velika slova" = "Shift";
+"razmak" = "space";

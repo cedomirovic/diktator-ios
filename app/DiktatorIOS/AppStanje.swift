@@ -297,7 +297,7 @@ final class AppStanje: ObservableObject {
             // Ne uključujemo je sami, nego pokažemo dugme i uputstvo.
             izabraniTab = 0
             if !sesijaAktivna {
-                poruka = "Tapni Uključi sesiju, pa se vrati u aplikaciju i tapni Diktiraj na tastaturi."
+                poruka = Prevod.t("Tapni Uključi sesiju, pa se vrati u aplikaciju i tapni Diktiraj na tastaturi.")
             }
         case "sesija":
             izabraniTab = 0
@@ -349,7 +349,7 @@ final class AppStanje: ObservableObject {
         }
         let model = modelZaPrepis
         guard (model?.preuzet == true) || oblakSpreman else {
-            stanje = .greska("Model nije preuzet. Otvori Podešavanja i preuzmi model.")
+            stanje = .greska(Prevod.t("Model nije preuzet. Otvori Podešavanja i preuzmi model."))
             Dnevnik.pisi("ukljuciSesijuAsync odbijeno: model nije preuzet")
             pisiIPCStanje()
             return false
@@ -393,7 +393,7 @@ final class AppStanje: ObservableObject {
             "Diktator: sesija uključena, trajanje: %@",
             TrajanjeSesije.iz(podesavanja.trajanjeSesije).naziv
         )
-        poruka = "Sesija je aktivna. Pređi u drugu aplikaciju i tapni Diktiraj na tastaturi."
+        poruka = Prevod.t("Sesija je aktivna. Pređi u drugu aplikaciju i tapni Diktiraj na tastaturi.")
         return true
     }
 
@@ -458,7 +458,7 @@ final class AppStanje: ObservableObject {
         pisiIPCStanje()
         Dnevnik.pisi("Sesija završena.")
         NSLog("Diktator: sesija završena.")
-        poruka = "Sesija je završena. Otvori Diktator i uključi sesiju ponovo."
+        poruka = Prevod.t("Sesija je završena. Otvori Diktator i uključi sesiju ponovo.")
         oslobodiModelPosle()
     }
 
@@ -490,13 +490,13 @@ final class AppStanje: ObservableObject {
             switch await Azuriranja.proveri(prisilno: prisilno) {
             case .dostupno(let azuriranje):
                 dostupnoAzuriranje = azuriranje
-                porukaAzuriranja = "Dostupna je verzija \(azuriranje.verzija)."
+                porukaAzuriranja = Prevod.t("Dostupna je verzija %@.", azuriranje.verzija)
                 await Azuriranja.posaljiNotifikaciju(azuriranje)
             case .nema:
                 dostupnoAzuriranje = nil
-                porukaAzuriranja = "Nema nove verzije. Trenutna je \(Azuriranja.trenutnaVerzija)."
+                porukaAzuriranja = Prevod.t("Nema nove verzije. Trenutna je %@.", Azuriranja.trenutnaVerzija)
             case .greska:
-                porukaAzuriranja = "Provera nije uspela. Proveri internet vezu i pokušaj ponovo."
+                porukaAzuriranja = Prevod.t("Provera nije uspela. Proveri internet vezu i pokušaj ponovo.")
             }
         }
         #endif
@@ -507,18 +507,18 @@ final class AppStanje: ObservableObject {
         proveraObavestenjaUToku = true
         // Odmah javljamo da je dodir primljen; sistemsko obaveštenje stiže
         // čim ga iOS prikaže.
-        porukaObavestenja = "Šaljem testno obaveštenje…"
+        porukaObavestenja = Prevod.t("Šaljem testno obaveštenje…")
         Task { @MainActor in
             defer { proveraObavestenjaUToku = false }
             switch await Azuriranja.posaljiTestnuNotifikaciju() {
             case .poslato:
-                porukaObavestenja = "Testno obaveštenje je poslato — treba da se pojavi odmah."
+                porukaObavestenja = Prevod.t("Testno obaveštenje je poslato — treba da se pojavi odmah.")
                 obavestenjaOdbijena = false
             case .odbijeno:
-                porukaObavestenja = "Obaveštenja su isključena za Diktator u iOS Podešavanjima."
+                porukaObavestenja = Prevod.t("Obaveštenja su isključena za Diktator u iOS Podešavanjima.")
                 obavestenjaOdbijena = true
             case .greska:
-                porukaObavestenja = "Obaveštenje nije poslato. Pokušaj ponovo."
+                porukaObavestenja = Prevod.t("Obaveštenje nije poslato. Pokušaj ponovo.")
                 obavestenjaOdbijena = false
             }
         }
@@ -529,7 +529,7 @@ final class AppStanje: ObservableObject {
             let status = await Azuriranja.statusDozvole()
             obavestenjaOdbijena = (status == .denied)
             if status == .denied {
-                porukaObavestenja = "Obaveštenja su isključena za Diktator u iOS Podešavanjima."
+                porukaObavestenja = Prevod.t("Obaveštenja su isključena za Diktator u iOS Podešavanjima.")
             }
         }
     }
@@ -603,7 +603,7 @@ final class AppStanje: ObservableObject {
         )
 
         guard trajanje >= 0.6 else {
-            stanje = .greska("Snimak je prekratak — drži mikrofon dok govoriš.")
+            stanje = .greska(Prevod.t("Snimak je prekratak — drži mikrofon dok govoriš."))
             pisiIPCStanje()
             oslobodiModelPosle()
             return
@@ -621,7 +621,7 @@ final class AppStanje: ObservableObject {
         }
         Dnevnik.pisi("Posle skracivanja tisina: uzorci=\(ocisceni.count)")
         guard !ocisceni.isEmpty else {
-            stanje = .greska("Nisam čuo govor. Pokušaj ponovo.")
+            stanje = .greska(Prevod.t("Nisam čuo govor. Pokušaj ponovo."))
             pisiIPCStanje()
             oslobodiModelPosle()
             return
@@ -660,7 +660,7 @@ final class AppStanje: ObservableObject {
 
         guard let model = modelZaPrepis, model.preuzet else {
             zavrsiZadatakUPozadini()
-            stanje = .greska("Model nije preuzet. Otvori Podešavanja i preuzmi model.")
+            stanje = .greska(Prevod.t("Model nije preuzet. Otvori Podešavanja i preuzmi model."))
             pisiIPCStanje()
             return
         }
@@ -794,7 +794,7 @@ final class AppStanje: ObservableObject {
         Dnevnik.pisi("Prepis tekst: duzina=\(sredjen.count)")
         guard !sredjen.isEmpty else {
             zavrsiZadatakUPozadini()
-            stanje = .greska("Nisam prepoznao govor. Pokušaj ponovo, malo glasnije.")
+            stanje = .greska(Prevod.t("Nisam prepoznao govor. Pokušaj ponovo, malo glasnije."))
             pisiIPCStanje()
             oslobodiModelPosle()
             return
@@ -866,7 +866,7 @@ final class AppStanje: ObservableObject {
         let sredjen = Tekst.sredi(tekst)
         guard !sredjen.isEmpty else {
             zavrsiZadatakUPozadini()
-            stanje = .greska("Doterivanje je vratilo prazan tekst.")
+            stanje = .greska(Prevod.t("Doterivanje je vratilo prazan tekst."))
             pisiIPCStanje()
             oslobodiModelPosle()
             return
@@ -909,9 +909,9 @@ final class AppStanje: ObservableObject {
         if let napomena, !napomena.isEmpty {
             poruka = napomena
         } else if pokrenutSaTastature {
-            poruka = "Tekst je spreman. Vrati se strelicom ‹ — nalepiće se sam."
+            poruka = Prevod.t("Tekst je spreman. Vrati se strelicom ‹ — nalepiće se sam.")
         } else {
-            poruka = "Tekst je kopiran. Otvori tastaturu; ako se ne ubaci sam, tapni Nalepi iznad tastature."
+            poruka = Prevod.t("Tekst je kopiran. Otvori tastaturu; ako se ne ubaci sam, tapni Nalepi iznad tastature.")
         }
         zavrsiZadatakUPozadini()
         oslobodiModelPosle()
@@ -941,12 +941,12 @@ final class AppStanje: ObservableObject {
         // ponovo otvarao Diktator. Zato je kod takve sesije ne gasimo —
         // korisnik se ovamo vrati samo prvi put, strelicom ‹.
         if TrajanjeSesije.iz(podesavanja.trajanjeSesije).sekundi == nil {
-            poruka = "Sesija je uključena. Vrati se strelicom ‹ u svoju aplikaciju — dalji diktati te neće prebacivati ovamo."
+            poruka = Prevod.t("Sesija je uključena. Vrati se strelicom ‹ u svoju aplikaciju — dalji diktati te neće prebacivati ovamo.")
             Dnevnik.pisi("Sesija bez isteka — aplikacija ostaje u pozadini.")
             return
         }
 
-        let potvrda = "Tekst je spreman. Vraćam te u tvoju aplikaciju…"
+        let potvrda = Prevod.t("Tekst je spreman. Vraćam te u tvoju aplikaciju…")
         if let napomena, !napomena.isEmpty {
             poruka = "\(napomena) \(potvrda)"
         } else {
@@ -1257,7 +1257,7 @@ final class AppStanje: ObservableObject {
         if model.preuzet {
             podesavanja.model = model.id
             SkladistePodesavanja.sacuvaj(podesavanja)
-            poruka = "Model \(model.naziv) je već preuzet i izabran."
+            poruka = Prevod.t("Model %@ je već preuzet i izabran.", model.naziv)
             return
         }
 
@@ -1282,7 +1282,7 @@ final class AppStanje: ObservableObject {
                     self.podesavanja.model = model.id
                     SkladistePodesavanja.sacuvaj(self.podesavanja)
                     self.napredakPreuzimanja = 1
-                    self.poruka = "Model \(model.naziv) je preuzet."
+                    self.poruka = Prevod.t("Model %@ je preuzet.", model.naziv)
                 case .failure(let greska):
                     self.napredakPreuzimanja = nil
                     self.poruka = greska.localizedDescription
@@ -1304,7 +1304,7 @@ final class AppStanje: ObservableObject {
             }
             SkladistePodesavanja.sacuvaj(podesavanja)
             prepisivac.oslobodi()
-            poruka = "Izabran je model \(model.naziv)."
+            poruka = Prevod.t("Izabran je model %@.", model.naziv)
         } else {
             preuzmiModel(model)
         }
@@ -1428,7 +1428,7 @@ final class AppStanje: ObservableObject {
             .isEmpty
 
         if ociscen.isEmpty, !postojao {
-            potvrdaKljucaDoterivanja = "Polje je prazno — unesi ključ pa tapni Sačuvaj."
+            potvrdaKljucaDoterivanja = Prevod.t("Polje je prazno — unesi ključ pa tapni Sačuvaj.")
             potvrdaKljucaDoterivanjaGreska = true
             UINotificationFeedbackGenerator().notificationOccurred(.warning)
             return false
@@ -1488,7 +1488,7 @@ final class AppStanje: ObservableObject {
                     jezik: jezik
                 )
                 testiraDoterivanje = false
-                porukaDoterivanja = "Veza radi: \(rezultat.prefix(100))"
+                porukaDoterivanja = Prevod.t("Veza radi: %@", String(rezultat.prefix(100)))
             } catch {
                 testiraDoterivanje = false
                 porukaDoterivanja = "Test nije uspeo: \(error.localizedDescription)"
@@ -1517,7 +1517,7 @@ final class AppStanje: ObservableObject {
             .isEmpty
 
         if ociscen.isEmpty, !postojao {
-            potvrdaKljucaOblaka = "Polje je prazno — unesi Groq ključ pa tapni Sačuvaj."
+            potvrdaKljucaOblaka = Prevod.t("Polje je prazno — unesi Groq ključ pa tapni Sačuvaj.")
             potvrdaKljucaOblakaGreska = true
             UINotificationFeedbackGenerator().notificationOccurred(.warning)
             return false
@@ -1558,7 +1558,7 @@ final class AppStanje: ObservableObject {
             do {
                 try await PrepisOblak.proveriKljuc(kljuc)
                 testiraOblak = false
-                porukaOblaka = "Veza radi. Model: \(modelOblaka)."
+                porukaOblaka = Prevod.t("Veza radi. Model: %@.", modelOblaka)
                 Dnevnik.pisi("Oblak test: OK")
             } catch {
                 testiraOblak = false
@@ -1584,7 +1584,7 @@ final class AppStanje: ObservableObject {
 
     func sacuvajRecnik() {
         Recnik.sacuvaj(recnik)
-        poruka = "Rečnik je sačuvan."
+        poruka = Prevod.t("Rečnik je sačuvan.")
     }
 
     /// Dodaje pojmove u rečnik, preskače duplikate (bez obzira na velika i
@@ -1619,19 +1619,19 @@ final class AppStanje: ObservableObject {
     func obrisiIstoriju() {
         istorija = []
         IstorijaSkladiste.sacuvaj([])
-        poruka = "Istorija je obrisana."
+        poruka = Prevod.t("Istorija je obrisana.")
     }
 
     func obrisiStatistiku() {
         statistika = Statistika()
         StatistikaSkladiste.sacuvaj(statistika)
-        poruka = "Statistika je obrisana."
+        poruka = Prevod.t("Statistika je obrisana.")
     }
 
     func kopiraj(_ tekst: String) {
         guard !tekst.isEmpty else { return }
         UIPasteboard.general.string = tekst
-        poruka = "Kopirano u clipboard."
+        poruka = Prevod.t("Kopirano u clipboard.")
     }
 
     func kopirajPoslednji() {
@@ -1640,7 +1640,7 @@ final class AppStanje: ObservableObject {
 
     func proveriModel() {
         guard !modelJePreuzet, !modelSePreuzima, poruka == nil else { return }
-        poruka = "Model nije preuzet. Otvori Podešavanja i preuzmi Large v3."
+        poruka = Prevod.t("Model nije preuzet. Otvori Podešavanja i preuzmi Large v3.")
     }
 }
 
