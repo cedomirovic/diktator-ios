@@ -56,8 +56,8 @@ gasi, a app može biti uklonjena.
 2. **Napravi app record**:
    - Bundle ID: `com.cedomirovic.diktator.ios`
    - Ime: **Diktator**
-   - Primarni jezik: **English (U.S.)** (srpski trenutno nije ponuđen za
-     metadata; UI aplikacije može ostati srpski)
+   - Primarni jezik: **English (U.S.)**; dodaj **Serbian (Latin)** kao
+     dodatni jezik (UI je lokalizovan na oba)
    - Kategorija: **Productivity**
    - Cena: **Free**
 3. **Potpisivanje za distribuciju**:
@@ -79,25 +79,30 @@ gasi, a app može biti uklonjena.
 7. **Review Notes** — vidi poseban odeljak ispod.
 8. **Submit for Review** i izaberi release (ručno ili automatski).
 
-Ručni archive iz Terminala:
+Ručni archive za App Store iz Terminala (šema `DiktatorIOS-AppStore`, koja
+uključuje `APPSTORE` uslov):
 
 ```bash
 xcodebuild -project app/DiktatorIOS.xcodeproj \
-  -scheme DiktatorIOS \
-  -configuration Release \
+  -scheme DiktatorIOS-AppStore \
+  -configuration AppStore \
   -destination 'generic/platform=iOS' \
   -archivePath build/DiktatorIOS.xcarchive \
   -allowProvisioningUpdates archive
 ```
 
 Posle toga otvori `build/DiktatorIOS.xcarchive` u Xcode Organizer-u i uploaduj.
+Lični build se i dalje pravi šemom `DiktatorIOS` / konfiguracijom `Release`.
 
 ## Specifično za Diktator iOS
 
 ### Full Access i tastatura
 
-- Tastatura traži **Allow Full Access** da bi čitala clipboard i otvorila
-  matičnu aplikaciju dodirom na **Diktiraj** na iOS 26+.
+- Tastatura traži **Allow Full Access** da bi čitala clipboard, ubacila tekst
+  i, u ličnom buildu, otvorila matičnu aplikaciju dodirom na **Diktiraj** na
+  iOS 26+.
+- **App Store build nikada ne otvara aplikaciju**: ako sesija nije uključena,
+  **Diktiraj** samo prikaže „Otvori Diktator i uključi sesiju.“
 - Bez Full Access-a tastatura i dalje **kuca** (QWERTY, `čćžšđ`, brojevi), pa
   ispunjava Apple zahtev da bude funkcionalna bez Full Access-a.
 - U Review Notes objasni da se clipboard čita **samo** kada korisnik tapne
@@ -106,15 +111,14 @@ Posle toga otvori `build/DiktatorIOS.xcarchive` u Xcode Organizer-u i uploaduj.
 ### Guideline 4.4.1
 
 Apple traži da keyboard extension ne pokreće „druge aplikacije osim Settings“.
-Otvaranje **sopstvene** aplikacije je u praksi prolazilo (npr. „Dictator
-Offline Voice to Text“ je na App Store-u sa istim principom), ali to je deo
-koji treba jasno objasniti u Review Notes.
+Zato **App Store build uopšte ne otvara aplikaciju** iz tastature: ako sesija
+nije uključena, **Diktiraj** prikaže „Otvori Diktator i uključi sesiju.“
+Otvaranje postoji samo u **ličnom buildu**, koji nije namenjen App Store-u.
 
-Ako App Review ipak odbije:
-
-- ukloni otvaranje aplikacije iz tastature;
-- **Diktiraj** neka samo prikaže uputstvo „Otvori Diktator iz app switcher-a“;
-- otvaranje prebaci na **Control Center**, **Shortcut** ili **Action Button**.
+Sesija u App Store buildu traje najviše **15 minuta** i produžava se svakim
+diktatom; **Bez isteka** se ne nudi. Ako App Review traži još strožu verziju,
+otvaranje se već može ukloniti bez promene koda — dovoljno je da se i lični
+build arhivira sa `APPSTORE` uslovom.
 
 ### Mikrofon
 
@@ -208,9 +212,10 @@ Connect traži:
 | `iPhone-17-Pro-Max-*.png` | 1320 × 2868 (6.9") |
 | `iPad-Pro-13-inch-M5-*.png` | 2064 × 2752 (13") |
 
-Brojevi u imenu su tabovi: `0` Diktat, `1` Istorija, `3` Podešavanja, `4`
-Pomoć. Skripta pravi snimke iz simulatora; za lepši prvi kadar pokreni
-diktat na uređaju i snimi ekran ručno.
+Brojevi u imenu su tabovi: `0` Dictate, `1` History, `3` Settings, `4` Help.
+Skripta gradi **App Store** šemu, pa snimci prikazuju ono što se šalje na
+reviziju (bez sekcije Ažuriranja, sesija od 15 minuta). Za lepši prvi kadar
+pokreni diktat na uređaju i snimi ekran ručno.
 
 Snimak **tastature u drugoj aplikaciji** skripta ne može da napravi — custom
 tastatura se u simulatoru dodaje ručno (Settings → General → Keyboard →

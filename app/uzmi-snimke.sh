@@ -17,7 +17,7 @@ set -euo pipefail
 SKRIPT="$(cd "$(dirname "$0")" && pwd)"
 KOREN="$(dirname "$SKRIPT")"
 IZLAZ="$KOREN/docs/slike/app-store"
-DERIVED="$KOREN/build/sim-snimke"
+DERIVED="$KOREN/build/appstore-snimke"
 
 uredjaji=("${@}")
 if [[ ${#uredjaji[@]} -eq 0 ]]; then
@@ -37,15 +37,18 @@ for IME in "${uredjaji[@]}"; do
   xcrun simctl boot "$UDID" 2>/dev/null || true
   xcrun simctl bootstatus "$UDID" -b >/dev/null
 
+  # Snimci moraju da prikažu App Store build: bez sekcije Ažuriranja i sa
+  # sesijom od 15 minuta. Zato se gradi šema DiktatorIOS-AppStore.
   xcodebuild \
     -project "$SKRIPT/DiktatorIOS.xcodeproj" \
-    -scheme DiktatorIOS \
-    -configuration Debug \
+    -scheme DiktatorIOS-AppStore \
+    -configuration AppStore \
     -destination "platform=iOS Simulator,id=$UDID" \
     -derivedDataPath "$DERIVED" \
+    ARCHS=arm64 ONLY_ACTIVE_ARCH=YES \
     build >/dev/null
 
-  APP="$DERIVED/Build/Products/Debug-iphonesimulator/DiktatorIOS.app"
+  APP="$DERIVED/Build/Products/AppStore-iphonesimulator/DiktatorIOS.app"
   xcrun simctl install "$UDID" "$APP"
   xcrun simctl launch "$UDID" com.cedomirovic.diktator.ios >/dev/null
   # Prvo pokretanje na iPad-u ume da potraje; bez ovoga snimak bude prazan.

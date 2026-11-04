@@ -80,7 +80,7 @@ open Diktator from the Dictate button. Without Full Access it still types
 normally.
 ```
 
-## Description (SR, ako se dodaje lokalizacija)
+## Description (SR, secondary)
 
 ```
 Diktator pretvara govor u tekst na iPhone-u i iPad-u — na srpskom i engleskom —
@@ -200,12 +200,16 @@ Obavezno za App Store Connect:
 
 Poželjni kadrovi (5–6):
 
-1. Glavni ekran sa velikim dugmetom **Diktiraj**.
-2. Rezultat u drugoj aplikaciji (Poruke) sa tekstom.
-3. Podešavanja → Brzina (Brzo / Najtačnije / Groq).
+1. Glavni ekran sa velikim dugmetom **Dictate**.
+2. Rezultat u drugoj aplikaciji (Messages) sa tekstom.
+3. Podešavanja → **Speed** (Fast / Most accurate / Groq).
 4. Istorija.
 5. Statistika.
 6. Pomoć ili Rečnik.
+
+Snimci su na engleskom, jer je to primarni jezik. `app/uzmi-snimke.sh` gradi
+**App Store** šemu, pa na snimcima nema sekcije **Ažuriranja** i vidi se
+sesija od 15 minuta.
 
 `app/uzmi-snimke.sh` pravi snimke iz simulatora u
 `docs/slike/app-store/`. Snimak tastature u drugoj aplikaciji mora ručno, jer
