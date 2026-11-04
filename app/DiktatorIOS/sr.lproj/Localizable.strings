@@ -1,6 +1,7 @@
 /* Generisano skriptom app/alati/prevedi.py — ne uređivati ručno. */
 
 "%@ API ključ nije unet." = "%@ API ključ nije unet.";
+"%@ Lokalni model nije preuzet, pa nema rezervnog prepisa." = "%@ Lokalni model nije preuzet, pa nema rezervnog prepisa.";
 "%@ je vratio prazan tekst." = "%@ je vratio prazan tekst.";
 "%@ reči" = "%@ reči";
 "%lld" = "%lld";
@@ -241,6 +242,7 @@
 "Snimak je prekratak — drži mikrofon dok govoriš." = "Snimak je prekratak — drži mikrofon dok govoriš.";
 "Snimak nije mogao da se pripremi za prepis." = "Snimak nije mogao da se pripremi za prepis.";
 "Snimak se obrađuje lokalno. Aplikacija ne šalje zvuk na server. Model se preuzima sa Hugging Face-a." = "Snimak se obrađuje lokalno. Aplikacija ne šalje zvuk na server. Model se preuzima sa Hugging Face-a.";
+"Snimam — vrati se strelicom ‹ u svoju aplikaciju. Snimanje se nastavlja, a Stop je na tastaturi." = "Snimam — vrati se strelicom ‹ u svoju aplikaciju. Snimanje se nastavlja, a Stop je na tastaturi.";
 "Snimam…" = "Snimam…";
 "Solidan balans. Veći od Base, ali manji i brži od Turbo modela." = "Solidan balans. Veći od Base, ali manji i brži od Turbo modela.";
 "Spreman" = "Spreman";

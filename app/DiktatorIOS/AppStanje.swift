@@ -546,7 +546,7 @@ final class AppStanje: ObservableObject {
         let dozvoljeno = await Snimac.traziDozvolu()
         if !dozvoljeno {
             stanje = .greska(
-                "Diktator nema dozvolu za mikrofon. Otvori Podešavanja → Privatnost i bezbednost → Mikrofon."
+                Prevod.t("Diktator nema dozvolu za mikrofon. Otvori Podešavanja → Privatnost i bezbednost → Mikrofon.")
             )
             pisiIPCStanje()
         }
@@ -579,7 +579,13 @@ final class AppStanje: ObservableObject {
                 try? await Task.sleep(nanoseconds: 200_000_000)
                 try snimac.pocni()
                 stanje = .snima
-                poruka = nil
+                // Kada je snimanje pokrenuto iz tastature, aplikacija je u
+                // prvom planu samo dok se sesija ne uključi. Korisnik treba
+                // odmah da se vrati strelicom ‹ — snimanje se nastavlja u
+                // pozadini, a Stop je na tastaturi.
+                poruka = saTastature
+                    ? Prevod.t("Snimam — vrati se strelicom ‹ u svoju aplikaciju. Snimanje se nastavlja, a Stop je na tastaturi.")
+                    : nil
                 pokreniTimerSnimanja()
                 pisiIPCStanje()
             } catch {
@@ -713,7 +719,7 @@ final class AppStanje: ObservableObject {
                 guard let lokalni = self.modelZaPrepis, lokalni.preuzet else {
                     self.zavrsiZadatakUPozadini()
                     self.stanje = .greska(
-                        "\(error.localizedDescription) Lokalni model nije preuzet, pa nema rezervnog prepisa."
+                        Prevod.t("%@ Lokalni model nije preuzet, pa nema rezervnog prepisa.", error.localizedDescription)
                     )
                     self.pisiIPCStanje()
                     return

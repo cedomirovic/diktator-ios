@@ -188,6 +188,8 @@ PREVODI = {
 "Nema dostupnog mikrofona.": "No microphone available.",
 "Diktator nema dozvolu za mikrofon. Otvori Podešavanja → Privatnost i bezbednost → Mikrofon.": "Diktator does not have microphone permission. Open Settings → Privacy & Security → Microphone.",
 "Snimak nije mogao da se pripremi za prepis.": "The recording could not be prepared for transcription.",
+"%@ Lokalni model nije preuzet, pa nema rezervnog prepisa.": "%@ The local model is not downloaded, so there is no fallback transcription.",
+"Snimam — vrati se strelicom ‹ u svoju aplikaciju. Snimanje se nastavlja, a Stop je na tastaturi.": "Recording — go back to your app with ‹. Recording continues and Stop is on the keyboard.",
 "Prikaži ključ": "Show key",
 "Jeftin i brz servis za srpski i engleski. Traži API ključ.": "A cheap and fast service for Serbian and English. Requires an API key.",
 "Ključ praviš na platform.deepseek.com → API keys. Model: deepseek-chat.": "Create a key at platform.deepseek.com → API keys. Model: deepseek-chat.",
