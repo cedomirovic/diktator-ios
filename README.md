@@ -33,10 +33,14 @@ clipboard, istorija, rečnik i puna tastatura. Tastatura na iOS 26+ traži
 **Uključi Full Access**.
 
 Nova pozadinska sesija omogućava da tastatura snima dok je otvorena bilo koja
-aplikacija. Prvi dodir na **Diktiraj** otvara Diktator da uključi sesiju i
-odmah počinje snimanje; posle toga tastatura ostaje u host aplikaciji i šalje
-`start`/`stop`. Sesija je podrazumevano **bez isteka** (Podešavanja → Diktat →
-**Trajanje sesije** može da je ograniči na 1 sat ili 15 minuta).
+aplikacija. U ličnom buildu prvi dodir na **Diktiraj** otvara Diktator da
+uključi sesiju i odmah počinje snimanje; u App Store buildu tastatura ne
+otvara aplikaciju (Apple to zabranjuje, pravilo 4.4.1), nego ispiše **Otvori
+Diktator i uključi sesiju** — korisnik sam otvori Diktator, tapne
+**Uključi sesiju** i vrati se. Posle toga tastatura ostaje u host aplikaciji i
+šalje `start`/`stop`. U ličnom buildu sesija je podrazumevano **bez isteka**
+(Podešavanja → Diktat → **Trajanje sesije** može da je ograniči na 1 sat ili
+15 minuta), a u App Store buildu traje najviše 15 minuta.
 Status i komande idu preko imenovanih pasteboard-a i Darwin notifikacija, a
 gotov tekst preko clipboarda.
 

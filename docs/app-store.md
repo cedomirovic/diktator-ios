@@ -15,7 +15,7 @@ nije tajna i sve može u git.
 | Polje | Vrednost |
 |---|---|
 | Name | Diktator |
-| Subtitle (30) | Diktat na srpskom, lokalno |
+| Subtitle (30) | Serbian dictation, on device |
 | Primary language | English (U.S.) |
 | Bundle ID | com.cedomirovic.diktator.ios |
 | SKU | `diktator-ios-001` |
@@ -38,9 +38,18 @@ nije tajna i sve može u git.
 
 ## Promotional text (170)
 
+Engleski (primarni):
+
+```
+Dictate in Serbian or English and the text lands in any app. Transcription runs
+on your iPhone; cloud services only if you turn them on.
+```
+
+Srpski:
+
 ```
 Diktiraj na srpskom ili engleskom i tekst se sam ubaci u bilo koju aplikaciju.
-Sve se obrađuje na tvom iPhone-u — bez naloga i bez slanja snimka.
+Prepis ide na tvom iPhone-u; servisi u oblaku samo ako ih sam uključiš.
 ```
 
 ## Description (EN, primary)
@@ -49,8 +58,9 @@ Sve se obrađuje na tvom iPhone-u — bez naloga i bez slanja snimka.
 Diktator turns speech into text on your iPhone and iPad — in Serbian and
 English — and inserts it into whatever app you are typing in.
 
-Everything runs on your device with Whisper. No account, no ads, no analytics,
-and your recordings are not stored.
+Transcription runs on your device, so no account is needed and your recordings
+are never stored. There are no ads and no analytics. Cloud services are off by
+default and work only if you turn them on with your own API key.
 
 HOW IT WORKS
 1. Add the Diktator keyboard in iOS Settings and allow Full Access.
@@ -75,9 +85,9 @@ telemetry. Network is used only to download models and, if you explicitly enable
 the optional cloud services above. The App Store build does not check GitHub
 for updates.
 
-The keyboard needs Full Access to read the clipboard when you tap Paste and to
-open Diktator from the Dictate button. Without Full Access it still types
-normally.
+The keyboard needs Full Access for two things only: to read the clipboard when
+you tap Paste, and to fetch the finished transcript from the app over a local
+server on 127.0.0.1. Without Full Access it still types normally.
 ```
 
 ## Description (SR, secondary)
@@ -86,8 +96,9 @@ normally.
 Diktator pretvara govor u tekst na iPhone-u i iPad-u — na srpskom i engleskom —
 i ubacuje ga u aplikaciju u kojoj upravo kucaš.
 
-Sve se obrađuje na tvom uređaju, preko Whisper modela. Nema naloga, reklama ni
-analitike, a snimci se ne čuvaju.
+Prepis ide na tvom uređaju, pa nalog nije potreban, a snimci se ne čuvaju. Nema
+reklama ni analitike. Servisi u oblaku su isključeni dok ih sam ne uključiš,
+sa svojim API ključem.
 
 KAKO RADI
 1. Dodaj tastaturu Diktator u iOS Podešavanjima i uključi Full Access.
@@ -111,20 +122,21 @@ Zvuk se prepisuje na uređaju i odbacuje. Aplikacija nema nalog ni telemetriju.
 Mreža se koristi samo za preuzimanje modela i, ako ih sam uključiš, opcione
 servise u oblaku. App Store verzija ne proverava GitHub.
 
-Tastatura traži Full Access da bi pročitala clipboard kada tapneš Nalepi i da bi
-otvorila Diktator dodirom na Diktiraj. Bez Full Access-a i dalje normalno kuca.
+Tastatura traži Full Access za dve stvari: da pročita clipboard kada tapneš
+Nalepi i da preuzme gotov prepis iz aplikacije preko lokalnog servera na
+127.0.0.1. Bez Full Access-a i dalje normalno kuca.
 ```
 
 ## Keywords (100, EN)
 
 ```
-dictation,speech to text,voice typing,serbian,transcription,offline,whisper,keyboard,voice
+dictation,speech to text,voice typing,serbian,transcription,offline,keyboard,voice,notes
 ```
 
 ## Keywords (SR)
 
 ```
-diktiranje,glas u tekst,srpski,prepis,offline,tastatura,whisper,transkripcija
+diktiranje,glas u tekst,srpski,prepis,offline,tastatura,transkripcija,beleške
 ```
 
 ## URLs
@@ -144,6 +156,13 @@ diktiranje,glas u tekst,srpski,prepis,offline,tastatura,whisper,transkripcija
 - `PrivacyInfo.xcprivacy` je dodat u oba targeta: nema tracking-a, nema
   prikupljanja, prijavljeni su `UserDefaults` (`CA92.1`) i file timestamp
   (`C617.1`).
+- Zašto ipak „Data Not Collected“ kada postoje Groq i LLM servisi: podatke
+  šalje sam korisnik, svom nalogu, svojim ključem, i to samo ako uključi
+  servis i da izričitu dozvolu. Programer ne dobija kopiju, nema svog servera
+  i ne može da poveže podatke sa korisnikom. Ovo isto napisati u Notes.
+- **Age rating:** ne prepisivati 4+ iz ovog dokumenta. Popuniti aktuelni
+  upitnik u App Store Connect-u i iskreno prijaviti da tekst može da ide
+  servisima trećih strana (Groq, Gemini, OpenAI, Claude, DeepSeek, Ollama).
 
 ## Export compliance
 
@@ -157,36 +176,68 @@ diktiranje,glas u tekst,srpski,prepis,offline,tastatura,whisper,transkripcija
 ## Review Notes (lepi u App Store Connect)
 
 ```
-Diktator is an on-device dictation app for Serbian and English. Everything
-runs locally with whisper.cpp; no account is required.
+Diktator is a dictation app for Serbian and English. Speech is transcribed on
+the device with the open-source whisper.cpp engine, and the text is inserted
+into whatever app the user is typing in. No account is required.
 
-HOW TO TEST QUICKLY (2–3 minutes)
-1. Launch Diktator and open Settings → Model. Download "Base" (~142 MB) or
-   "Turbo" (~547 MB). Base is enough to review the flow.
-2. iOS Settings → General → Keyboard → Keyboards → Add New Keyboard →
-   Diktator, then enable "Allow Full Access".
-3. Open Notes or Messages, switch to the Diktator keyboard, tap "Dictate".
-4. Speak any sentence and tap "Stop". The transcript appears in the field
-   automatically. "Paste" is the manual fallback.
-5. If the app was closed, tapping "Dictate" opens Diktator, which enables a
-   15-minute background session and starts recording immediately.
+HOW TO TEST QUICKLY (2-3 minutes)
+1. Launch Diktator and open Settings > Model. Download "Base" (~142 MB) or
+   "Turbo" (~547 MB). Base is enough to review the flow. Test audio is not
+   needed; any sentence works, and English is detected automatically.
+2. iOS Settings > General > Keyboard > Keyboards > Add New Keyboard >
+   Diktator, then tap it and enable "Allow Full Access".
+3. In Diktator, tap "Enable session". The app then records in the background
+   for at most 15 minutes; this is what makes dictation from the keyboard
+   possible, because iOS does not allow an app extension to use the
+   microphone.
+4. Open Notes or Messages, switch to the Diktator keyboard and tap "Dictate".
+   Speak a sentence and tap "Stop". The transcript appears in the field
+   automatically; "Paste" is the manual fallback.
+5. When the 15 minutes run out, the keyboard only shows the message "Open
+   Diktator and enable a session". The keyboard never opens another app. The
+   user opens Diktator with the app switcher, taps "Enable session" again,
+   and returns with the back arrow in the status bar.
 
 KEYBOARD AND FULL ACCESS
-The keyboard needs Full Access for two things only:
-- reading the clipboard when the user taps "Paste" (UIPasteboard in a
-  keyboard extension returns stale data without Full Access);
-- opening its own containing app from the "Dictate" button (iOS 26 requires
-  Full Access for extensionContext.open).
+The keyboard asks for Full Access for two things only:
+- reading the clipboard when the user taps "Paste" (a keyboard extension gets
+  stale clipboard data without Full Access);
+- fetching the finished transcript from the app over a local server bound to
+  127.0.0.1:8765, guarded by a secret token derived on the device. A keyboard
+  extension needs Full Access to use the network at all, and this local server
+  is how the text reaches the field without the user copying anything.
 Without Full Access the keyboard still types normally (QWERTY, numbers,
-Serbian characters), which satisfies the requirement that a keyboard must be
-usable on its own. The extension never records audio — iOS does not allow
-microphones in app extensions. Audio is captured only by the main app.
+Serbian characters including c, c, z, s, dj), which satisfies the requirement
+that a keyboard must be usable on its own. The extension never records audio -
+iOS does not allow microphones in app extensions. Audio is captured only by
+the main app, and only while the user has enabled a session or is dictating in
+the app.
 
-No third-party analytics or advertising SDKs. No data is sent to the
-developer. Network access is used for model download (huggingface.co) and the
-optional, user-configured cloud transcription/refinement services. Those are
-off by default and require the user's own API key. This App Store build does
-not check GitHub for updates and never asks for notification permission.
+PRIVACY
+Audio is transcribed on the device and then discarded from memory; recordings
+are never written to storage. No third-party analytics, advertising or crash
+SDKs. No data is sent to the developer, and there is no developer server.
+
+The app offers two optional cloud features, both off by default, both using a
+key the user creates with the provider:
+- cloud transcription with Groq (sends the recording);
+- text cleanup with Gemini, OpenAI, Claude, DeepSeek or any OpenAI-compatible
+  endpoint (sends only the finished text).
+Before the first use of each service the app names the service and the data,
+and asks for explicit permission; the answer is stored per service and can be
+withdrawn in Settings, after which nothing more is sent. Because the developer
+receives no copy of anything, the App Privacy answer is "Data Not Collected".
+
+This App Store build does not check GitHub for updates, does not ask for
+notification permission and never opens another app from the keyboard. The
+keyboard session lasts at most 15 minutes and is renewed only when the user
+asks for it.
+
+MEMORY
+The recommended Serbian model (Large v3, ~1.0 GB) is meant for devices with
+enough RAM. The app offers smaller models (Base, Small) and the description
+states the download size before any download starts. Models are downloaded
+from huggingface.co; an interrupted download is deleted and can be restarted.
 ```
 
 ## Screenshots
