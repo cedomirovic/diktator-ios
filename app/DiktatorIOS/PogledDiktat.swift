@@ -86,7 +86,9 @@ struct PogledDiktat: View {
         HStack(alignment: .top, spacing: 12) {
             NaslovEkrana(
                 naslov: "Diktator",
-                podnaslov: "Glas pretvara u tekst — sve ostaje na uređaju."
+                podnaslov: stanje.koristiServiseUOblaku
+                    ? "Glas pretvara u tekst. Lokalno, uz opcione servise koje sam uključiš."
+                    : "Glas pretvara u tekst — sve ostaje na uređaju."
             )
 
             Button {

@@ -6,6 +6,15 @@ struct PogledPodesavanja: View {
     /// Pre prelaska na Groq tražimo potvrdu, jer tada snimak napušta uređaj.
     @State private var potvrdaOblaka = false
     @State private var rezimZaPotvrdu: String?
+    /// Doterivanje šalje tekst servisu, pa pre uključivanja tražimo dozvolu
+    /// za konkretan servis.
+    @State private var cekaDozvolu: CekaDozvolu?
+
+    /// Radnja koja čeka korisnikovu dozvolu za slanje teksta servisu.
+    private enum CekaDozvolu: Equatable {
+        case ukljuci
+        case promeni(String)
+    }
 
     private var verzija: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
@@ -168,7 +177,8 @@ struct PogledPodesavanja: View {
                         get: { stanje.podesavanja.rezimBrzine },
                         set: { novi in
                             if RezimBrzine.iz(novi) == .oblak,
-                               !stanje.podesavanja.prepisOblak {
+                               !stanje.podesavanja.prepisOblak,
+                               !stanje.jeOdobren(PrepisOblak.idServisa) {
                                 rezimZaPotvrdu = novi
                                 potvrdaOblaka = true
                             } else {
@@ -190,6 +200,23 @@ struct PogledPodesavanja: View {
                     Text(stvarnaObrada)
                         .font(.caption)
                         .foregroundStyle(Dizajn.tekstTercijarni)
+                }
+
+                if stanje.podesavanja.prepisOblak, stanje.jeOdobren(PrepisOblak.idServisa) {
+                    HStack {
+                        Label("Dozvola za slanje snimka Groq-u je data", systemImage: "checkmark.shield.fill")
+                            .font(.caption)
+                            .foregroundStyle(.green)
+                        Spacer()
+                        Button("Povuci") {
+                            withAnimation(.easeInOut(duration: 0.15)) {
+                                stanje.povuciOdobrenje(PrepisOblak.idServisa)
+                                stanje.postaviRezimBrzine(RezimBrzine.tacno.rawValue)
+                            }
+                        }
+                        .font(.caption)
+                        .buttonStyle(.borderless)
+                    }
                 }
 
                 if stanje.podesavanja.prepisOblak {
@@ -298,9 +325,27 @@ struct PogledPodesavanja: View {
             }
 
             Section(header: zaglavlje("Doterivanje")) {
-                Toggle("Popravi interpunkciju i imena", isOn: $stanje.podesavanja.doterivanje)
+                Toggle(
+                    "Popravi interpunkciju i imena",
+                    isOn: Binding(
+                        get: { stanje.podesavanja.doterivanje },
+                        set: { ukljuci in
+                            guard ukljuci else {
+                                stanje.postaviDoterivanje(false)
+                                return
+                            }
+                            // Tekst ide servisu, pa prvo tražimo izričitu
+                            // dozvolu za baš taj servis.
+                            if stanje.jeOdobren(stanje.podesavanja.provajderDoterivanja) {
+                                stanje.postaviDoterivanje(true)
+                            } else {
+                                cekaDozvolu = .ukljuci
+                            }
+                        }
+                    )
+                )
 
-                Text("Šalje samo gotov tekst izabranom servisu. Isključeno znači da ništa ne napušta uređaj.")
+                Text("Šalje samo gotov tekst izabranom servisu, nikada zvuk. Isključeno znači da ništa ne napušta uređaj.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
 
@@ -309,7 +354,14 @@ struct PogledPodesavanja: View {
                         "Servis",
                         selection: Binding(
                             get: { stanje.podesavanja.provajderDoterivanja },
-                            set: { stanje.izaberiProvajdera($0) }
+                            set: { novi in
+                                guard novi != stanje.podesavanja.provajderDoterivanja else { return }
+                                if stanje.jeOdobren(novi) {
+                                    stanje.izaberiProvajdera(novi)
+                                } else {
+                                    cekaDozvolu = .promeni(novi)
+                                }
+                            }
                         )
                     ) {
                         ForEach(ProvajderiDoterivanja.svi) { provajder in
@@ -320,6 +372,27 @@ struct PogledPodesavanja: View {
                     Text(stanje.provajderDoterivanja.opis)
                         .font(.caption)
                         .foregroundStyle(.secondary)
+
+                    if stanje.jeOdobren(stanje.provajderDoterivanja.id) {
+                        HStack {
+                            Label("Dozvola za slanje teksta je data", systemImage: "checkmark.shield.fill")
+                                .font(.caption)
+                                .foregroundStyle(.green)
+                            Spacer()
+                            Button("Povuci") {
+                                withAnimation(.easeInOut(duration: 0.15)) {
+                                    stanje.povuciOdobrenje(stanje.provajderDoterivanja.id)
+                                    stanje.postaviDoterivanje(false)
+                                }
+                            }
+                            .font(.caption)
+                            .buttonStyle(.borderless)
+                        }
+                    } else {
+                        Label("Dozvola još nije data — tekst se ne šalje.", systemImage: "shield")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
 
                     if stanje.provajderDoterivanja.prikazujeKljuc {
                         HStack {
@@ -497,7 +570,9 @@ struct PogledPodesavanja: View {
                 #if !APPSTORE
                 Link("GitHub projekat", destination: URL(string: "https://github.com/cedomirovic/diktator-ios")!)
                 #endif
-                Text("Snimak i tekst ostaju na uređaju. Model se preuzima sa Hugging Face-a.")
+                Text(stanje.koristiServiseUOblaku
+                    ? "Snimak i tekst ostaju na uređaju osim kada uključiš Groq ili doterivanje — tada se šalju izabranom servisu. Model se preuzima sa Hugging Face-a."
+                    : "Snimak i tekst ostaju na uređaju. Model se preuzima sa Hugging Face-a.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }
@@ -523,18 +598,65 @@ struct PogledPodesavanja: View {
                 stanje.porukaAzuriranja = nil
             }
         }
+        .alert(
+            Text(Prevod.t("Tekst ide u %@?", servisZaDozvolu?.naziv ?? "")),
+            isPresented: Binding(
+                get: { cekaDozvolu != nil },
+                set: { akoOstaje in
+                    if !akoOstaje { cekaDozvolu = nil }
+                }
+            )
+        ) {
+            Button("Otkaži", role: .cancel) {
+                cekaDozvolu = nil
+            }
+            Button("Dozvoli") {
+                primeniDozvolu()
+            }
+        } message: {
+            Text("Šalje se samo gotov tekst, nikada zvuk. Dozvola važi samo za taj servis i možeš je povući ovde u Podešavanjima.")
+        }
         .alert("Snimak ide u Groq?", isPresented: $potvrdaOblaka) {
             Button("Otkaži", role: .cancel) {
                 rezimZaPotvrdu = nil
             }
             Button("Nastavi") {
                 if let rezim = rezimZaPotvrdu {
+                    stanje.odobri(PrepisOblak.idServisa)
                     stanje.postaviRezimBrzine(rezim)
                 }
                 rezimZaPotvrdu = nil
             }
         } message: {
             Text("U režimu Groq snimak se šalje servisu Groq radi prepisa i tada napušta uređaj. U režimima Brzo i Najtačnije sve ostaje na telefonu. Možeš se vratiti na lokalni prepis u svakom trenutku.")
+        }
+    }
+
+    /// Servis na koji se odnosi dozvola koja trenutno čeka odgovor.
+    private var servisZaDozvolu: ProvajderDoterivanja? {
+        switch cekaDozvolu {
+        case .ukljuci:
+            return stanje.provajderDoterivanja
+        case .promeni(let id):
+            return ProvajderiDoterivanja.nadji(id)
+        case nil:
+            return nil
+        }
+    }
+
+    /// Primena odgovora „Dozvoli“ iz dijaloga za doterivanje.
+    private func primeniDozvolu() {
+        guard let ceka = cekaDozvolu else { return }
+        cekaDozvolu = nil
+        switch ceka {
+        case .ukljuci:
+            stanje.odobri(stanje.podesavanja.provajderDoterivanja)
+            stanje.postaviDoterivanje(true)
+        case .promeni(let id):
+            // Samo prelazak na drugi servis ne uključuje doterivanje — ono
+            // ostaje u stanju u kom je bilo.
+            stanje.odobri(id)
+            stanje.izaberiProvajdera(id)
         }
     }
 

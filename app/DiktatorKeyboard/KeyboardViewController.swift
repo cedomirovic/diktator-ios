@@ -568,9 +568,14 @@ final class KeyboardViewController: UIInputViewController {
         pocetnaTipka.widthAnchor.constraint(equalToConstant: 46).isActive = true
         redTipki.addArrangedSubview(pocetnaTipka)
 
-        let globus = napraviIkonu("globe", id: "globe")
-        globus.widthAnchor.constraint(equalToConstant: 42).isActive = true
-        redTipki.addArrangedSubview(globus)
+        // Globus samo kada sistem kaže da je tastatura za prebacivanje
+        // potrebna; na iPad-u sa hardverskom tastaturom bi se inače duplirao
+        // sa sistemskim.
+        if needsInputModeSwitchKey {
+            let globus = napraviIkonu("globe", id: "globe")
+            globus.widthAnchor.constraint(equalToConstant: 42).isActive = true
+            redTipki.addArrangedSubview(globus)
+        }
 
         redTipki.addArrangedSubview(napraviDugme(Prevod.t("razmak"), id: "space", stil: .specijalno))
 
@@ -1437,24 +1442,10 @@ final class KeyboardViewController: UIInputViewController {
             return
         }
 
-        let predmet = UIPasteboard.general.items.first
-        let token = stringIz(predmet?[DiktatorClipboard.token])
-        let vreme = stringIz(predmet?[DiktatorClipboard.vreme]).flatMap(Double.init)
-        let tekst = stringIz(predmet?[DiktatorClipboard.tekst])
-        if let token, let vreme, let tekst,
-           !tekst.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-           pocetak == 0 || vreme >= pocetak - 1 {
-            let starost = Date().timeIntervalSince1970 - vreme
-            if starost >= 0, starost <= 180 {
-                Dnevnik.pisi("AutoNalepi: clipboard duzina=\(tekst.count)")
-                nalepiAutomatski(tekst, token: token, izvor: "clipboard")
-                return
-            }
-        }
-
-        // Imenovani pasteboard i opšti clipboard umeju da vrate keširanu
-        // vrednost u keyboard extension-u. Zato je lokalni server glavni
-        // izvor: on uvek vraća stvarni tekst, token i vreme.
+        // Opšti clipboard se ovde namerno ne čita: tastatura ga dira samo
+        // kada korisnik tapne Nalepi. Automatsko lepljenje koristi sopstveni
+        // imenovani pasteboard i lokalni server, pa politika privatnosti
+        // ostaje tačna.
         pokusajServer()
     }
 

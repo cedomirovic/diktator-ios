@@ -27,6 +27,11 @@ enum Dnevnik {
         return folder.appendingPathComponent("diktator-dnevnik.txt")
     }()
 
+    /// Dnevnik ne sme da raste bez granice. Kada pređe 200 KB, zadržava se
+    /// samo poslednjih 100 KB, od početka celog reda.
+    private static let najvecaVelicina = 200_000
+    private static let zadrzano = 100_000
+
     static func pisi(_ tekst: String) {
         let red = "\(Date().formatted(date: .numeric, time: .standard)) \(tekst)\n"
         guard let podaci = red.data(using: .utf8) else { return }
@@ -38,6 +43,21 @@ enum Dnevnik {
         } else {
             try? podaci.write(to: putanja)
         }
+        skratiAkoTreba()
+    }
+
+    /// Skraćuje dnevnik da ne zauzima prostor na uređaju.
+    private static func skratiAkoTreba() {
+        let atributi = try? FileManager.default.attributesOfItem(atPath: putanja.path)
+        let velicina = (atributi?[.size] as? NSNumber)?.intValue ?? 0
+        guard velicina > najvecaVelicina,
+              let podaci = try? Data(contentsOf: putanja) else { return }
+
+        var ostatak = podaci.suffix(zadrzano)
+        if let noviRed = ostatak.firstIndex(of: 0x0A) {
+            ostatak = ostatak[ostatak.index(after: noviRed)...]
+        }
+        try? Data(ostatak).write(to: putanja)
     }
 }
 
@@ -289,6 +309,19 @@ final class AppStanje: ObservableObject {
         Dnevnik.pisi("URL \(url.absoluteString), sesija=\(sesijaAktivna)")
 
         switch url.host?.lowercased() {
+        case "tab":
+            // diktator-ios://tab/3 — otvara konkretan tab. Koristi se za
+            // snimke za App Store i za brze prečice. Ne dira mikrofon, pa
+            // ostaje i u App Store buildu.
+            if let broj = Int(url.path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))),
+               (0...4).contains(broj) {
+                izabraniTab = broj
+            }
+#if !APPSTORE
+        // Linkovi koji pokreću snimanje postoje samo u ličnom buildu.
+        // U App Store buildu ih nema: svaka aplikacija može da otvori
+        // diktator-ios://dictate, a Apple traži da snimanje počinje samo na
+        // korisnikov dodir (i da snimak ne ode u oblak bez potvrde).
         case "dictate":
             izabraniTab = 0
             Task { @MainActor in
@@ -296,13 +329,6 @@ final class AppStanje: ObservableObject {
                     guard await ukljuciSesijuAsync() else { return }
                 }
                 pocniSnimanje(saTastature: true)
-            }
-        case "tab":
-            // diktator-ios://tab/3 — otvara konkretan tab. Koristi se za
-            // snimke za App Store i za brze prečice.
-            if let broj = Int(url.path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))),
-               (0...4).contains(broj) {
-                izabraniTab = broj
             }
         case "sesija-prikaz":
             // Tastatura je otvorila aplikaciju jer sesija nije uključena.
@@ -324,6 +350,7 @@ final class AppStanje: ObservableObject {
             if stanje.jeSnimanje {
                 zaustaviSnimanje()
             }
+#endif
         default:
             break
         }
@@ -586,6 +613,33 @@ final class AppStanje: ObservableObject {
         prikaziPovratak = false
     }
 
+    // MARK: - Dozvole za servise
+
+    /// Da li je korisnik izričito dozvolio da podaci idu tom servisu.
+    /// Dozvola važi samo za taj servis i pamti se dok je korisnik ne povuče.
+    func jeOdobren(_ id: String) -> Bool {
+        podesavanja.odobreniServisi.contains(id)
+    }
+
+    func odobri(_ id: String) {
+        guard !jeOdobren(id) else { return }
+        podesavanja.odobreniServisi.append(id)
+        SkladistePodesavanja.sacuvaj(podesavanja)
+        Dnevnik.pisi("Dozvola data servisu \(id)")
+    }
+
+    func povuciOdobrenje(_ id: String) {
+        guard jeOdobren(id) else { return }
+        podesavanja.odobreniServisi.removeAll { $0 == id }
+        SkladistePodesavanja.sacuvaj(podesavanja)
+        Dnevnik.pisi("Dozvola povučena za servis \(id)")
+    }
+
+    func postaviDoterivanje(_ ukljuceno: Bool) {
+        podesavanja.doterivanje = ukljuceno
+        SkladistePodesavanja.sacuvaj(podesavanja)
+    }
+
     // MARK: - Snimanje i prepis
 
     func pocniSnimanje(saTastature: Bool = false) {
@@ -681,7 +735,11 @@ final class AppStanje: ObservableObject {
         pisiIPCStanje()
         pocniZadatakUPozadini()
 
-        if podesavanja.prepisOblak, !kljucOblaka.isEmpty {
+        // Bez izričite dozvole za Groq snimak ne napušta uređaj, čak i ako je
+        // režim ostao sačuvan od ranije.
+        let bezDozvoleZaGroq =
+            podesavanja.prepisOblak && !kljucOblaka.isEmpty && !jeOdobren(PrepisOblak.idServisa)
+        if podesavanja.prepisOblak, !kljucOblaka.isEmpty, jeOdobren(PrepisOblak.idServisa) {
             Dnevnik.pisi("Prepis u oblaku (Groq), jezik=\(jezik)")
             pokreniOblakPrepis(
                 uzorci: ocisceni,
@@ -715,7 +773,9 @@ final class AppStanje: ObservableObject {
             punKontekst: punKontekst,
             useGPU: useGPU,
             model: model,
-            napomena: nil
+            napomena: bezDozvoleZaGroq
+                ? Prevod.t("Groq je preskočen — nema dozvole za slanje snimka.")
+                : nil
         )
     }
 
@@ -844,6 +904,20 @@ final class AppStanje: ObservableObject {
 
         guard podesavanja.doterivanje else {
             dovrsiPrepis(sredjen, trajanje: trajanje, jezik: jezik, napomena: napomena)
+            return
+        }
+
+        // Doterivanje šalje tekst servisu, pa bez izričite dozvole za taj
+        // servis ostaje samo lokalni prepis.
+        guard jeOdobren(provajder.id) else {
+            dovrsiPrepis(
+                sredjen,
+                trajanje: trajanje,
+                jezik: jezik,
+                napomena: [napomena, Prevod.t("Doterivanje je preskočeno — nema dozvole za %@.", provajder.naziv)]
+                    .compactMap { $0 }
+                    .joined(separator: " ")
+            )
             return
         }
 
@@ -1540,6 +1614,12 @@ final class AppStanje: ObservableObject {
     var modelOblaka: String {
         let upisan = podesavanja.modelOblaka.trimmingCharacters(in: .whitespacesAndNewlines)
         return upisan.isEmpty ? PrepisOblak.podrazumevaniModel : upisan
+    }
+
+    /// Da li je uključen ijedan servis koji podatke šalje van uređaja.
+    /// Koristi se za tekstove koji tvrde da sve ostaje na telefonu.
+    var koristiServiseUOblaku: Bool {
+        oblakSpreman || podesavanja.doterivanje
     }
 
     var oblakSpreman: Bool {

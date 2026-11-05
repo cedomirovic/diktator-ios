@@ -48,8 +48,13 @@
 "Dostupna je verzija %@." = "Dostupna je verzija %@.";
 "Dostupno ažuriranje" = "Dostupno ažuriranje";
 "Doterivanje" = "Doterivanje";
+"Doterivanje je preskočeno — nema dozvole za %@." = "Doterivanje je preskočeno — nema dozvole za %@.";
 "Doterivanje je vratilo prazan tekst." = "Doterivanje je vratilo prazan tekst.";
 "Doterujem…" = "Doterujem…";
+"Dozvola još nije data — tekst se ne šalje." = "Dozvola još nije data — tekst se ne šalje.";
+"Dozvola za slanje snimka Groq-u je data" = "Dozvola za slanje snimka Groq-u je data";
+"Dozvola za slanje teksta je data" = "Dozvola za slanje teksta je data";
+"Dozvoli" = "Dozvoli";
 "Dugme je u traci iznad tastature; sesija mora biti uključena u Diktatoru, a svaki diktat je produžava." = "Dugme je u traci iznad tastature; sesija mora biti uključena u Diktatoru, a svaki diktat je produžava.";
 "Dugme je u traci iznad tastature; sesija se uključuje sama, a svaki diktat je produžava." = "Dugme je u traci iznad tastature; sesija se uključuje sama, a svaki diktat je produžava.";
 "Duplikati se automatski preskaču." = "Duplikati se automatski preskaču.";
@@ -68,6 +73,7 @@
 "Groq API ključ" = "Groq API ključ";
 "Groq API ključ nije unet." = "Groq API ključ nije unet.";
 "Groq je odbio ključ (HTTP %lld)." = "Groq je odbio ključ (HTTP %lld).";
+"Groq je preskočen — nema dozvole za slanje snimka." = "Groq je preskočen — nema dozvole za slanje snimka.";
 "Groq je vratio HTTP %lld." = "Groq je vratio HTTP %lld.";
 "Groq je vratio neočekivan odgovor." = "Groq je vratio neočekivan odgovor.";
 "Groq ne poznaje model ili putanju (HTTP 404)." = "Groq ne poznaje model ili putanju (HTTP 404).";
@@ -182,6 +188,7 @@
 "Posle 30 minuta" = "Posle 30 minuta";
 "Posle 5 minuta" = "Posle 5 minuta";
 "Poslednji tekst" = "Poslednji tekst";
+"Povuci" = "Povuci";
 "Pošalji model uređaja, verziju iOS-a i kratak opis problema." = "Pošalji model uređaja, verziju iOS-a i kratak opis problema.";
 "Predlozi" = "Predlozi";
 "Pregled napretka i načina korišćenja aplikacije." = "Pregled napretka i načina korišćenja aplikacije.";
@@ -265,6 +272,7 @@
 "Tastatura ne može direktno da snima — Apple to zabranjuje. Zato snima glavna aplikacija u pozadinskoj sesiji, a tastatura samo šalje start/stop." = "Tastatura ne može direktno da snima — Apple to zabranjuje. Zato snima glavna aplikacija u pozadinskoj sesiji, a tastatura samo šalje start/stop.";
 "Tastatura sada može da snima u pozadini, bez otvaranja Diktatora. Preostalo: %lld:%@" = "Tastatura sada može da snima u pozadini, bez otvaranja Diktatora. Preostalo: %lld:%@";
 "Tastatura sada može da snima u pozadini, bez otvaranja Diktatora. Sesija nema istek i traje dok je ne završiš." = "Tastatura sada može da snima u pozadini, bez otvaranja Diktatora. Sesija nema istek i traje dok je ne završiš.";
+"Tekst ide u %@?" = "Tekst ide u %@?";
 "Tekst je kopiran. Otvori tastaturu; ako se ne ubaci sam, tapni Nalepi iznad tastature." = "Tekst je kopiran. Otvori tastaturu; ako se ne ubaci sam, tapni Nalepi iznad tastature.";
 "Tekst je spreman i nalepiće se sam." = "Tekst je spreman i nalepiće se sam.";
 "Tekst je spreman. Vraćam te u tvoju aplikaciju…" = "Tekst je spreman. Vraćam te u tvoju aplikaciju…";
@@ -314,6 +322,7 @@
 "u memoriji" = "u memoriji";
 "vremena" = "vremena";
 "Čuvaj istoriju" = "Čuvaj istoriju";
-"Šalje samo gotov tekst izabranom servisu. Isključeno znači da ništa ne napušta uređaj." = "Šalje samo gotov tekst izabranom servisu. Isključeno znači da ništa ne napušta uređaj.";
+"Šalje samo gotov tekst izabranom servisu, nikada zvuk. Isključeno znači da ništa ne napušta uređaj." = "Šalje samo gotov tekst izabranom servisu, nikada zvuk. Isključeno znači da ništa ne napušta uređaj.";
+"Šalje se samo gotov tekst, nikada zvuk. Dozvola važi samo za taj servis i možeš je povući ovde u Podešavanjima." = "Šalje se samo gotov tekst, nikada zvuk. Dozvola važi samo za taj servis i možeš je povući ovde u Podešavanjima.";
 "Šaljem testno obaveštenje…" = "Šaljem testno obaveštenje…";
 "„%@“ je dodat u rečnik." = "„%@“ je dodat u rečnik.";

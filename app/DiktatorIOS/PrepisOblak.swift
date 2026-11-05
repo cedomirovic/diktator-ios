@@ -40,6 +40,8 @@ enum GreskaOblaka: LocalizedError {
 }
 
 struct PrepisOblak {
+    /// Identifikator dozvole za slanje snimka Groq-u.
+    static let idServisa = "groq"
     static let adresa = URL(string: "https://api.groq.com/openai/v1/audio/transcriptions")!
     static let adresaModela = URL(string: "https://api.groq.com/openai/v1/models")!
     static let podrazumevaniModel = "whisper-large-v3-turbo"

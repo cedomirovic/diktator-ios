@@ -48,8 +48,13 @@
 "Dostupna je verzija %@." = "Version %@ is available.";
 "Dostupno ažuriranje" = "Update available";
 "Doterivanje" = "Refinement";
+"Doterivanje je preskočeno — nema dozvole za %@." = "Refinement was skipped — no permission for %@.";
 "Doterivanje je vratilo prazan tekst." = "Refinement returned empty text.";
 "Doterujem…" = "Refining…";
+"Dozvola još nije data — tekst se ne šalje." = "Permission not granted yet — no text is sent.";
+"Dozvola za slanje snimka Groq-u je data" = "Permission to send audio to Groq is granted";
+"Dozvola za slanje teksta je data" = "Permission to send text is granted";
+"Dozvoli" = "Allow";
 "Dugme je u traci iznad tastature; sesija mora biti uključena u Diktatoru, a svaki diktat je produžava." = "The button is in the strip above the keyboard; the session must be started in Diktator and every dictation extends it.";
 "Dugme je u traci iznad tastature; sesija se uključuje sama, a svaki diktat je produžava." = "The button is in the strip above the keyboard; the session starts automatically and every dictation extends it.";
 "Duplikati se automatski preskaču." = "Duplicates are skipped automatically.";
@@ -68,6 +73,7 @@
 "Groq API ključ" = "Groq API key";
 "Groq API ključ nije unet." = "Groq API key is not entered.";
 "Groq je odbio ključ (HTTP %lld)." = "Groq rejected the key (HTTP %lld).";
+"Groq je preskočen — nema dozvole za slanje snimka." = "Groq was skipped — no permission to send the recording.";
 "Groq je vratio HTTP %lld." = "Groq returned HTTP %lld.";
 "Groq je vratio neočekivan odgovor." = "Groq returned an unexpected response.";
 "Groq ne poznaje model ili putanju (HTTP 404)." = "Groq does not recognise the model or path (HTTP 404).";
@@ -182,6 +188,7 @@
 "Posle 30 minuta" = "After 30 minutes";
 "Posle 5 minuta" = "After 5 minutes";
 "Poslednji tekst" = "Last text";
+"Povuci" = "Withdraw";
 "Pošalji model uređaja, verziju iOS-a i kratak opis problema." = "Send your device model, iOS version and a short description of the problem.";
 "Predlozi" = "Suggestions";
 "Pregled napretka i načina korišćenja aplikacije." = "An overview of your progress and how you use the app.";
@@ -265,6 +272,7 @@
 "Tastatura ne može direktno da snima — Apple to zabranjuje. Zato snima glavna aplikacija u pozadinskoj sesiji, a tastatura samo šalje start/stop." = "The keyboard cannot record directly — Apple does not allow it. The main app records in a background session and the keyboard only sends start/stop.";
 "Tastatura sada može da snima u pozadini, bez otvaranja Diktatora. Preostalo: %lld:%@" = "The keyboard can now record in the background without opening Diktator. Remaining: %lld:%@";
 "Tastatura sada može da snima u pozadini, bez otvaranja Diktatora. Sesija nema istek i traje dok je ne završiš." = "The keyboard can now record in the background without opening Diktator. The session has no expiry and lasts until you end it.";
+"Tekst ide u %@?" = "Text goes to %@?";
 "Tekst je kopiran. Otvori tastaturu; ako se ne ubaci sam, tapni Nalepi iznad tastature." = "The text is copied. Open the keyboard; if it is not inserted automatically, tap Paste above the keyboard.";
 "Tekst je spreman i nalepiće se sam." = "Your text is ready and will paste itself.";
 "Tekst je spreman. Vraćam te u tvoju aplikaciju…" = "Text is ready. Taking you back to your app…";
@@ -314,6 +322,7 @@
 "u memoriji" = "in memory";
 "vremena" = "time";
 "Čuvaj istoriju" = "Keep history";
-"Šalje samo gotov tekst izabranom servisu. Isključeno znači da ništa ne napušta uređaj." = "Sends only the finished text to the chosen service. When off, nothing leaves your device.";
+"Šalje samo gotov tekst izabranom servisu, nikada zvuk. Isključeno znači da ništa ne napušta uređaj." = "Sends only the finished text to the chosen service, never audio. When off, nothing leaves your device.";
+"Šalje se samo gotov tekst, nikada zvuk. Dozvola važi samo za taj servis i možeš je povući ovde u Podešavanjima." = "Only the finished text is sent, never audio. This permission applies to that service only and you can withdraw it here in Settings.";
 "Šaljem testno obaveštenje…" = "Sending test notification…";
 "„%@“ je dodat u rečnik." = "“%@” added to the vocabulary.";

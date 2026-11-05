@@ -256,6 +256,10 @@ struct Podesavanja: Codable, Equatable {
     var prepisOblak = false
     var modelOblaka = PrepisOblak.podrazumevaniModel
     var rezimBrzine = RezimBrzine.tacno.rawValue
+    /// Servisi za koje je korisnik izričito dozvolio slanje podataka
+    /// („groq“, „gemini“, „openai“…). Apple traži da se pre prvog slanja
+    /// navede servis i podaci, pa se odgovor pamti po servisu i može povući.
+    var odobreniServisi: [String] = []
 
     init() {}
 
@@ -275,6 +279,7 @@ struct Podesavanja: Codable, Equatable {
         case prepisOblak
         case modelOblaka
         case rezimBrzine
+        case odobreniServisi
     }
 
     init(from decoder: Decoder) throws {
@@ -319,5 +324,6 @@ struct Podesavanja: Codable, Equatable {
         if RezimBrzine(rawValue: rezimBrzine) == nil {
             rezimBrzine = RezimBrzine.tacno.rawValue
         }
+        odobreniServisi = try kontejner.decodeIfPresent([String].self, forKey: .odobreniServisi) ?? []
     }
 }

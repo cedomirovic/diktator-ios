@@ -40,8 +40,10 @@ kojoj kucaš. Aplikacija nema nalog, analitiku ni reklame.</p>
   <li><strong>API ključevi</strong> za opcione servise čuvaju se u Apple
     <em>Keychain</em>-u sa zaštitom <code>WhenUnlockedThisDeviceOnly</code>.</li>
 </ul>
-<p>Ovi podaci se ne napuštaju uređaj i brišu se zajedno sa aplikacijom.
-Istoriju, rečnik i statistiku možeš obrisati i u Podešavanjima.</p>
+<p>Ovi podaci ne napuštaju uređaj i brišu se zajedno sa aplikacijom.
+Istoriju, rečnik i statistiku možeš obrisati i u Podešavanjima. Izuzetak su
+opcioni servisi ispod: kada ih sam uključiš, njima odlazi snimak ili gotov
+tekst, ali nikada istorija, rečnik, statistika ni ključ.</p>
 
 <h2>Kada aplikacija koristi mrežu</h2>
 <ul>
@@ -62,9 +64,11 @@ Istoriju, rečnik i statistiku možeš obrisati i u Podešavanjima.</p>
   <li><strong>Lokalna mreža</strong> — samo ako izabereš Ollama ili lokalni
     servis na svom računaru.</li>
 </ul>
-<p>Ovi servisi su opcioni i podrazumevano isključeni. Kada ih uključiš, na
-njih se primenjuju njihove politike privatnosti. Programer Diktatora ne
-dobija kopiju snimka, teksta ni ključa.</p>
+<p>Ovi servisi su opcioni i podrazumevano isključeni. Pre prvog uključivanja
+aplikacija imenuje servis i traži izričitu dozvolu; dozvola važi samo za taj
+servis i možeš je povući u Podešavanjima, posle čega se ništa više ne šalje.
+Kada ih uključiš, na njih se primenjuju njihove politike privatnosti. Programer
+Diktatora ne dobija kopiju snimka, teksta ni ključa.</p>
 
 <h2>Šta se ne prikuplja</h2>
 <p>Nema analitike, praćenja, reklama, profila korisnika ni telemetrije. Ne
@@ -73,10 +77,16 @@ oglašavanje niti sadržaj diktata.</p>
 
 <h2>Tastatura</h2>
 <p>Tastatura traži <strong>Full Access</strong> da bi pročitala tekst iz
-clipboarda kada tapneš <strong>Nalepi</strong> i da bi otvorila Diktator
-dugmetom <strong>Diktiraj</strong>. Clipboard se čita samo na tvoj dodir.
-Tastatura ne šalje podatke nikome i radi i bez Full Access-a (tada samo kuca,
-bez lepljenja i bez otvaranja aplikacije).</p>
+clipboarda kada tapneš <strong>Nalepi</strong> i da bi preuzela gotov prepis iz
+aplikacije preko lokalnog servera na <code>127.0.0.1</code> (samo uz tajni
+ključ). U ličnoj verziji Full Access služi i za otvaranje Diktatora dugmetom
+<strong>Diktiraj</strong>; App Store verzija tastature nikada ne otvara
+aplikaciju.</p>
+<p>Clipboard se čita samo na tvoj dodir. Automatsko lepljenje posle diktata
+koristi sopstveni imenovani clipboard, ne tvoj. Aplikacija posle diktata
+upisuje gotov tekst u opšti clipboard, da bi ručno <strong>Nalepi</strong>
+radilo i kada aplikacija nije u pozadini; taj upis ne čita ništa iz
+clipboarda.</p>
 
 <h2>Deca</h2>
 <p>Aplikacija nije namenjena deci mlađoj od 13 godina i ne prikuplja njihove
@@ -109,7 +119,10 @@ are typing in. There is no account, no analytics and no advertising.</p>
     <em>Keychain</em> with <code>WhenUnlockedThisDeviceOnly</code> protection.</li>
 </ul>
 <p>This data never leaves the device and is deleted together with the app. You
-can also clear history, vocabulary and statistics in Settings.</p>
+can also clear history, vocabulary and statistics in Settings. The only
+exception is the optional services below: when you enable them, the recording
+or the finished text is sent, but never your history, vocabulary, statistics or
+keys.</p>
 
 <h2>When the app uses the network</h2>
 <ul>
@@ -130,9 +143,12 @@ can also clear history, vocabulary and statistics in Settings.</p>
   <li><strong>Local network</strong> — only if you choose Ollama or a local
     service running on your own computer.</li>
 </ul>
-<p>These services are optional and off by default. When enabled, their own
-privacy policies apply. The developer of Diktator receives no copy of your
-audio, text or keys.</p>
+<p>These services are optional and off by default. Before the first one is
+enabled, the app names the service and asks for explicit permission; the
+permission applies to that service only and you can withdraw it in Settings,
+after which nothing more is sent. When enabled, their own privacy policies
+apply. The developer of Diktator receives no copy of your audio, text or
+keys.</p>
 
 <h2>What is not collected</h2>
 <p>No analytics, tracking, advertising, user profiles or telemetry. We do not
@@ -141,9 +157,16 @@ dictation content.</p>
 
 <h2>Keyboard</h2>
 <p>The keyboard requests <strong>Full Access</strong> to read the clipboard when
-you tap <strong>Paste</strong> and to open Diktator from the
-<strong>Dictate</strong> button. The clipboard is read only on your tap. The
-keyboard sends nothing anywhere and still types without Full Access.</p>
+you tap <strong>Paste</strong> and to fetch the finished transcript from the app
+over a local server on <code>127.0.0.1</code> (guarded by a secret key). In the
+personal build Full Access is also used to open Diktator from the
+<strong>Dictate</strong> button; the App Store build never opens the app from
+the keyboard.</p>
+<p>The clipboard is read only on your tap. Automatic pasting after a dictation
+uses the app's own named pasteboard, not yours. After a dictation the app
+writes the finished text into the general clipboard so that manual
+<strong>Paste</strong> works even when the app is not running; that write reads
+nothing from the clipboard.</p>
 
 <h2>Children</h2>
 <p>The app is not directed to children under 13 and does not collect their
