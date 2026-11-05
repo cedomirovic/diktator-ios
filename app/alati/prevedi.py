@@ -318,7 +318,8 @@ PREVODI = {
 "Sačekaj trenutak dok se prepis završi.": "Wait a moment while the transcript finishes.",
 "Diktat nije uspeo — vrati se i pokušaj ponovo iz tastature.": "Dictation failed — go back and try again from the keyboard.",
 "Tekst je spreman i nalepiće se sam.": "Your text is ready and will paste itself.",
-"‹ je u gornjem levom uglu; možeš i da prevučeš prst udesno po donjoj ivici.": "The ‹ is in the top-left corner; you can also swipe right along the bottom edge.",
+"ili tapni ‹ u gornjem levom uglu ekrana": "or tap ‹ in the top-left corner of the screen",
+"Prevuci prstom udesno po donjoj ivici ekrana": "Swipe right along the bottom edge of the screen",
 "Sesija je uključena — dalji diktati te neće prebacivati ovamo.": "The session is active — further dictations will not bring you back here.",
 }
 

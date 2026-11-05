@@ -200,6 +200,7 @@
 "Preuzmi Ollama" = "Download Ollama";
 "Preuzmi Turbo (~547 MB)" = "Download Turbo (~547 MB)";
 "Preuzmi verziju %@" = "Download version %@";
+"Prevuci prstom udesno po donjoj ivici ekrana" = "Swipe right along the bottom edge of the screen";
 "Pređi u bilo koju aplikaciju i otvori Diktator tastaturu." = "Switch to any app and open the Diktator keyboard.";
 "Prikaži ključ" = "Show key";
 "Prilagodi Diktator svom načinu rada." = "Adjust Diktator to the way you work.";
@@ -300,6 +301,7 @@
 "Završi sesiju" = "End session";
 "dan" = "day";
 "dana" = "days";
+"ili tapni ‹ u gornjem levom uglu ekrana" = "or tap ‹ in the top-left corner of the screen";
 "nije učitan" = "not loaded";
 "npr. Nemanja, Pitchi, Beograd" = "e.g. Nemanja, Pitchi, Belgrade";
 "pretraga snopom" = "beam search";
@@ -315,4 +317,3 @@
 "Šalje samo gotov tekst izabranom servisu. Isključeno znači da ništa ne napušta uređaj." = "Sends only the finished text to the chosen service. When off, nothing leaves your device.";
 "Šaljem testno obaveštenje…" = "Sending test notification…";
 "„%@“ je dodat u rečnik." = "“%@” added to the vocabulary.";
-"‹ je u gornjem levom uglu; možeš i da prevučeš prst udesno po donjoj ivici." = "The ‹ is in the top-left corner; you can also swipe right along the bottom edge.";

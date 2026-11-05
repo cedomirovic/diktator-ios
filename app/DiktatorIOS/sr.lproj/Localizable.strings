@@ -200,6 +200,7 @@
 "Preuzmi Ollama" = "Preuzmi Ollama";
 "Preuzmi Turbo (~547 MB)" = "Preuzmi Turbo (~547 MB)";
 "Preuzmi verziju %@" = "Preuzmi verziju %@";
+"Prevuci prstom udesno po donjoj ivici ekrana" = "Prevuci prstom udesno po donjoj ivici ekrana";
 "Pređi u bilo koju aplikaciju i otvori Diktator tastaturu." = "Pređi u bilo koju aplikaciju i otvori Diktator tastaturu.";
 "Prikaži ključ" = "Prikaži ključ";
 "Prilagodi Diktator svom načinu rada." = "Prilagodi Diktator svom načinu rada.";
@@ -300,6 +301,7 @@
 "Završi sesiju" = "Završi sesiju";
 "dan" = "dan";
 "dana" = "dana";
+"ili tapni ‹ u gornjem levom uglu ekrana" = "ili tapni ‹ u gornjem levom uglu ekrana";
 "nije učitan" = "nije učitan";
 "npr. Nemanja, Pitchi, Beograd" = "npr. Nemanja, Pitchi, Beograd";
 "pretraga snopom" = "pretraga snopom";
@@ -315,4 +317,3 @@
 "Šalje samo gotov tekst izabranom servisu. Isključeno znači da ništa ne napušta uređaj." = "Šalje samo gotov tekst izabranom servisu. Isključeno znači da ništa ne napušta uređaj.";
 "Šaljem testno obaveštenje…" = "Šaljem testno obaveštenje…";
 "„%@“ je dodat u rečnik." = "„%@“ je dodat u rečnik.";
-"‹ je u gornjem levom uglu; možeš i da prevučeš prst udesno po donjoj ivici." = "‹ je u gornjem levom uglu; možeš i da prevučeš prst udesno po donjoj ivici.";
