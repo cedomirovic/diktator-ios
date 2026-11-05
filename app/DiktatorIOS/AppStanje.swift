@@ -206,6 +206,14 @@ final class AppStanje: ObservableObject {
            (0...4).contains(broj) {
             izabraniTab = broj
         }
+        #if DEBUG
+        // `-DiktatorPovratak 1` prikaže traku „Vrati se u svoju aplikaciju“
+        // odmah pri pokretanju. Služi za snimke ekrana i proveru izgleda;
+        // u normalnom radu traku uključuje diktat pokrenut iz tastature.
+        if argumenti.contains("-DiktatorPovratak") {
+            prikaziPovratak = true
+        }
+        #endif
         Prepisivac.utisajLog()
         modelUMemoriji = prepisivac.ucitano
         prepisivac.naPromenuUcitanosti = { [weak self] ucitan in

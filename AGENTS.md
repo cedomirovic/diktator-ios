@@ -6,6 +6,20 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Status
 
+- **05.11.2026.** — **traka „Vrati se u svoju aplikaciju“ posle diktata iz
+  tastature**: kada **Diktiraj** u tastaturi otvori Diktator, na vrhu ekrana
+  **Diktat** stoji plava traka sa animiranom strelicom ‹ koja tačno kaže šta
+  se dešava (**Snimanje ide dalje — Stop je na tastaturi.**, **Sačekaj
+  trenutak dok se prepis završi.**, **Tekst je spreman i nalepiće se sam.**),
+  a ispod piše gde je sistemska strelica i da se može i prevući prst udesno po
+  donjoj ivici. Povratak više nije nagađanje, a ne koristi se nijedan privatni
+  API — iOS sam vraća korisnika, kao kod Wispr Flow-a. Traku uključuje
+  `prikaziPovratak` u `AppStanje` (isključuje se kada aplikacija ode u pozadinu
+  ili se sesija završi), a stare kratke poruke na dnu ekrana su uklonjene jer
+  ih traka zamenjuje. Provereno u simulatoru na engleskom i srpskom, svetlo i
+  tamno, preko `-DiktatorPovratak 1` (samo DEBUG, kao `-DiktatorTab`); verzija
+  ostaje **0.2.0 (10)**.
+
 - **04.11.2026.** — **engleski je primarni jezik, srpski drugi**: dodat je
   `Prevod.swift` u aplikaciju i tastaturu (`Prevod.t`), a svi tekstovi koji se
   sklapaju u običan `String` prolaze kroz njega. Dodati su
