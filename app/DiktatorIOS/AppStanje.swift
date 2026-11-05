@@ -1365,8 +1365,54 @@ final class AppStanje: ObservableObject {
         modelZaPrepis?.preuzet == true || oblakSpreman
     }
 
+    // MARK: - Prvi koraci, prostor i memorija
+
+    /// Uvod se prikazuje samo prvi put; iz Pomoći može ponovo da se otvori.
+    func oznaciUvodVidjen() {
+        guard !podesavanja.uvodVidjen else { return }
+        podesavanja.uvodVidjen = true
+        SkladistePodesavanja.sacuvaj(podesavanja)
+    }
+
+    /// Slobodan prostor koji iOS daje aplikaciji (uključuje prostor koji
+    /// sistem može da počisti).
+    private var slobodnoNaDisku: Int64 {
+        let vrednosti = try? Putanje.modeli.resourceValues(
+            forKeys: [.volumeAvailableCapacityForImportantUsageKey]
+        )
+        return Int64(vrednosti?.volumeAvailableCapacityForImportantUsage ?? 0)
+    }
+
+    /// Model plus rezerva za privremeni fajl koji URLSession pravi dok
+    /// preuzima. Bez provere preuzimanje pukne na pola puta.
+    func imaProstora(za velicina: Int64) -> Bool {
+        let potrebno = velicina + velicina / 5 + 50 * 1024 * 1024
+        let slobodno = slobodnoNaDisku
+        // Ako sistem ne vrati podatak, ne blokiramo preuzimanje.
+        return slobodno == 0 || slobodno >= potrebno
+    }
+
+    /// Upozorenje za uređaje sa malo radne memorije kada je izabran veliki
+    /// model. Large v3 traži oko 1 GB RAM-a dok radi.
+    var napomenaMemorije: String? {
+        let rama = ProcessInfo.processInfo.physicalMemory
+        guard rama > 0, rama < 4 * 1024 * 1024 * 1024 else { return nil }
+        guard let model = Modeli.nadji(podesavanja.model),
+              model.velicina >= 500 * 1024 * 1024 else { return nil }
+        return Prevod.t("Ovaj uređaj ima malo radne memorije. Ako se prepis prekida ili aplikacija zatvori, izaberi manji model (Base ili Small).")
+    }
+
     func preuzmiModel(_ model: PonudaModela) {
         guard !modelSePreuzima else { return }
+
+        guard imaProstora(za: model.velicina) else {
+            let potrebno = ByteCountFormatter.string(
+                fromByteCount: model.velicina + model.velicina / 5,
+                countStyle: .file
+            )
+            poruka = Prevod.t("Nema dovoljno prostora za model %@. Potrebno je oko %@ slobodno.", model.naziv, potrebno)
+            return
+        }
         if model.preuzet {
             podesavanja.model = model.id
             SkladistePodesavanja.sacuvaj(podesavanja)

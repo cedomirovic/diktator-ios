@@ -260,6 +260,8 @@ struct Podesavanja: Codable, Equatable {
     /// („groq“, „gemini“, „openai“…). Apple traži da se pre prvog slanja
     /// navede servis i podaci, pa se odgovor pamti po servisu i može povući.
     var odobreniServisi: [String] = []
+    /// Kratak uvod se prikazuje samo prvi put; posle se otvara iz Pomoći.
+    var uvodVidjen = false
 
     init() {}
 
@@ -280,6 +282,7 @@ struct Podesavanja: Codable, Equatable {
         case modelOblaka
         case rezimBrzine
         case odobreniServisi
+        case uvodVidjen
     }
 
     init(from decoder: Decoder) throws {
@@ -325,5 +328,6 @@ struct Podesavanja: Codable, Equatable {
             rezimBrzine = RezimBrzine.tacno.rawValue
         }
         odobreniServisi = try kontejner.decodeIfPresent([String].self, forKey: .odobreniServisi) ?? []
+        uvodVidjen = try kontejner.decodeIfPresent(Bool.self, forKey: .uvodVidjen) ?? false
     }
 }

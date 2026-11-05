@@ -6,6 +6,25 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Status
 
+- **05.11.2026.** — **prolazak kroz analizu App Store recenzije (tačke 1–4,
+  9 i 11)**: kod je očišćen pre prijave. Linkovi koji pokreću snimanje
+  (`diktator-ios://dictate`, `sesija`, `sesija-prikaz`, `stop`) postoje samo u
+  ličnom buildu, jer svaka aplikacija može da ih otvori. Dozvole za servise se
+  sada pamte po servisu (`Podesavanja.odobreniServisi`): pre prvog slanja
+  aplikacija imenuje servis („Tekst ide u %@?“), a u Podešavanjima postoji
+  **Povuci** za doterivanje i za Groq; bez dozvole se slanje preskače uz
+  poruku. Automatsko lepljenje više ne čita opšti clipboard — koristi imenovani
+  pasteboard i lokalni server, pa politika privatnosti tačno opisuje šta se
+  čita i kada; tekstovi „sve ostaje na uređaju“ važe samo kada nijedan servis
+  u oblaku nije uključen. Dodat je **uvodni tok** pri prvom pokretanju
+  (`PogledUvod.swift`: model → tastatura → Full Access → sesija), upozorenje
+  za uređaje sa malo RAM-a i provera slobodnog prostora pre preuzimanja
+  modela. Metadata je usklađen sa App Store buildom: engleski subtitle i
+  promotivni tekst, ublažen opis, izbačen `whisper` iz ključnih reči, nove
+  Review Notes (Full Access za dve stvari, bez otvaranja aplikacije iz
+  tastature) i stranica podrške koja opisuje ručno uključivanje sesije.
+  Verzija ostaje **0.2.0 (10)**.
+
 - **05.11.2026.** — **traka „Vrati se u svoju aplikaciju“ posle diktata iz
   tastature**: kada **Diktiraj** u tastaturi otvori Diktator, na vrhu ekrana
   **Diktat** stoji plava traka koja kaže šta se dešava (**Snimanje ide dalje —

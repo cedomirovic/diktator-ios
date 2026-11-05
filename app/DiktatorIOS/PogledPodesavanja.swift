@@ -36,6 +36,12 @@ struct PogledPodesavanja: View {
                 Text("Izabran: \(Modeli.nadji(stanje.podesavanja.model)?.naziv ?? "—")")
                     .font(.headline)
 
+                if let napomena = stanje.napomenaMemorije {
+                    Label(napomena, systemImage: "exclamationmark.triangle.fill")
+                        .font(.caption)
+                        .foregroundStyle(Dizajn.narandzasta)
+                }
+
                 if stanje.modelSePreuzima {
                     ProgressView(value: stanje.napredakPreuzimanja ?? 0) {
                         Text("Preuzimanje modela…")

@@ -9,7 +9,10 @@
 "%lld dana" = "%lld days";
 "1 dan" = "1 day";
 "1 sat" = "1 hour";
+"1. Preuzmi model" = "1. Download a model";
 "15 minuta" = "15 minutes";
+"2. Dodaj tastaturu" = "2. Add the keyboard";
+"3. Uključi sesiju" = "3. Enable the session";
 "API ključ" = "API key";
 "Adresa" = "Address";
 "Adresa mora da koristi https:// (http:// samo za localhost) i da se završava sa /chat/completions. Model piši tačno kako ga servis traži." = "The address must use https:// (http:// only for localhost) and end with /chat/completions. Write the model exactly as the service expects.";
@@ -20,13 +23,16 @@
 "Ako izabereš Groq u Podešavanjima → Brzina, snimak se šalje Groq-u radi bržeg prepisa. U režimima Brzo i Najtačnije sve ostaje na uređaju." = "If you choose Groq in Settings → Speed, the recording is sent to Groq for a faster transcript. In Fast and Most accurate modes everything stays on device.";
 "Ako je Diktator ugašen, Diktiraj ga otvara i odmah snima." = "If Diktator is closed, Dictate opens it and starts recording right away.";
 "Ako sesija nije uključena, Diktiraj te zamoli da otvoriš Diktator i uključiš je." = "If the session is not active, Dictate asks you to open Diktator and start it.";
+"Ako sesija nije uključena, Diktiraj u tastaturi otvara Diktator i uključi je." = "If the session is not enabled, Dictate opens Diktator and starts it.";
 "Ako uključiš doterivanje, samo gotov tekst ide izabranom servisu (Gemini, OpenAI, Claude, DeepSeek ili drugi). Nikada se ne šalje zvuk." = "If you enable refinement, only the finished text goes to the chosen service (Gemini, OpenAI, Claude, DeepSeek or another). Audio is never sent.";
 "Aktivna" = "Active";
 "Automatski (sr/en)" = "Automatic (sr/en)";
 "Ažuriranja" = "Updates";
+"Base je dovoljan za prvi test; Large v3 daje najbolji srpski." = "Base is enough for a first test; Large v3 gives the best Serbian.";
 "Beam search sa 5 kandidata — tačniji, troši više RAM-a." = "Beam search with 5 candidates — more accurate, uses more RAM.";
 "Besplatni Apple ID profil traje 7 dana; posle toga build treba obnoviti." = "A free Apple ID profile lasts 7 days; after that the build must be renewed.";
 "Bez isteka" = "No expiry";
+"Bez naloga i bez reklama." = "No account, no ads.";
 "Brišu se samo brojevi. Tekstovi u istoriji ostaju." = "Only the numbers are deleted. Texts in History remain.";
 "Broj diktiranih reči po danima" = "Dictated words per day";
 "Brz i troši manje memorije. Za srpski ume da pogreši više od Large v3." = "Fast and memory-friendly. Makes more mistakes in Serbian than Large v3.";
@@ -34,6 +40,7 @@
 "Brzo — Turbo, na uređaju" = "Fast — Turbo, on device";
 "ChatGPT API. ChatGPT Plus pretplata nije dovoljna — potreban je API ključ." = "ChatGPT API. A ChatGPT Plus subscription is not enough — you need an API key.";
 "Claude API. Claude Code je druga alatka — ovde ide Anthropic API ključ." = "Claude API. Claude Code is a different tool — use an Anthropic API key here.";
+"Dalje" = "Next";
 "Danas" = "Today";
 "Detalji" = "Details";
 "Diktat" = "Dictate";
@@ -41,7 +48,9 @@
 "Diktator" = "Diktator";
 "Diktator nema dozvolu za mikrofon. Otvori Podešavanja → Privatnost i bezbednost → Mikrofon." = "Diktator does not have microphone permission. Open Settings → Privacy & Security → Microphone.";
 "Diktator ostaje otvoren posle prepisa; vrati se strelicom ‹ u gornjem levom uglu, a pozadinska sesija ostaje uključena." = "Diktator stays open after the transcript; go back with ‹ in the top-left corner and the background session keeps running.";
+"Diktiraj na srpskom ili engleskom, a tekst se sam ubaci u aplikaciju u kojoj pišeš. Snimak se obrađuje na uređaju i ne čuva se." = "Dictate in Serbian or English and the text is inserted into the app you are typing in. Audio is processed on device and never stored.";
 "Dnevno korišćenje" = "Daily use";
+"Dobro došao u Diktator" = "Welcome to Diktator";
 "Dodaj %lld pojmova u rečnik" = "Add %lld terms to vocabulary";
 "Dodaj 1 pojam u rečnik" = "Add 1 term to vocabulary";
 "Dodaj u rečnik" = "Add to vocabulary";
@@ -63,6 +72,7 @@
 "Enkoder se sada računa samo za stvarnu dužinu snimka, pa je kratak diktat nekoliko puta brži nego pre." = "The encoder now runs only for the actual recording length, so a short dictation is several times faster than before.";
 "Full Access je potreban da tastatura pročita clipboard i ubaci tekst u polje u kome pišeš. Ako u traci iznad tastature piše Uključi Full Access, Diktiraj je siv i neće raditi." = "Full Access lets the keyboard read the clipboard and insert text into the field you are typing in. If the strip above the keyboard says Enable Full Access, Dictate is greyed out and will not work.";
 "Full Access je potreban da tastatura pročita clipboard, ubaci tekst i otvori aplikaciju dodirom na Diktiraj (iOS 26+). Ako u traci iznad tastature piše Uključi Full Access, Diktiraj je siv i neće raditi." = "Full Access lets the keyboard read the clipboard, insert text and open the app when you tap Dictate (iOS 26+). If the strip above the keyboard says Enable Full Access, Dictate is greyed out and will not work.";
+"Full Access tastatura koristi da pročita clipboard kada tapneš Nalepi i da preuzme gotov tekst iz Diktatora." = "Full Access lets the keyboard read the clipboard when you tap Paste and fetch the finished text from Diktator.";
 "Gasi sesiju diktata i oslobađa mikrofon." = "Ends the dictation session and releases the microphone.";
 "Gemini API. Google AI Studio ključ; Gemini Advanced pretplata nije dovoljna." = "Gemini API. A Google AI Studio key; a Gemini Advanced subscription is not enough.";
 "GitHub projekat" = "GitHub project";
@@ -104,6 +114,7 @@
 "Kada Diktator otvoriš iz tastature, posle prepisa se sam zatvori i iOS te vrati u aplikaciju u kojoj si diktirao. Tekst se nalepi sam, a pozadinska sesija se pritom gasi." = "When Diktator is opened from the keyboard, it closes itself after the transcript and iOS returns you to the app you were dictating in. The text is pasted automatically and the background session ends.";
 "Kada je sesija uključena, Diktiraj u tastaturi ne otvara aplikaciju. Ako sesija nije uključena, Diktiraj otvara Diktator; tapni Uključi sesiju i vrati se. Posle Stop sačekaj da se tekst ubaci; ako ne uspe, tapni Nalepi u traci iznad tastature." = "While the session is active, Dictate in the keyboard does not open the app. If the session is not active, Dictate opens Diktator; tap Start session and come back. After Stop wait for the text to be inserted; if that fails, tap Paste in the strip above the keyboard.";
 "Kada je sesija uključena, Diktiraj u tastaturi ne otvara aplikaciju. Sesija traje najviše 15 minuta i svaki diktat je produžava; kada istekne, otvori Diktator i uključi je ponovo." = "While the session is active, Dictate in the keyboard does not open the app. The session lasts up to 15 minutes and every dictation extends it; when it expires, open Diktator and start it again.";
+"Kada sesija istekne, otvori Diktator i uključi je ponovo — tastatura sama ne otvara aplikaciju." = "When the session expires, open Diktator and enable it again — the keyboard never opens the app by itself.";
 "Kada sesija nije uključena, Diktiraj u tastaturi ne otvara aplikaciju, nego ti kaže da otvoriš Diktator i uključiš sesiju. Posle Stop sačekaj da se tekst ubaci; ako ne uspe, tapni Nalepi u traci iznad tastature." = "When the session is not active, Dictate in the keyboard does not open the app — it asks you to open Diktator and start the session. After Stop wait for the text to be inserted; if that fails, tap Paste in the strip above the keyboard.";
 "Kako da uključiš tastaturu" = "How to enable the keyboard";
 "Kako radi" = "How it works";
@@ -123,6 +134,8 @@
 "Model" = "Model";
 "Model %@ je preuzet." = "%@ downloaded.";
 "Model %@ je već preuzet i izabran." = "%@ is already downloaded and selected.";
+"Model je fajl sa kojim Diktator pretvara govor u tekst. Preuzima se jednom i ostaje na uređaju." = "The model is what turns speech into text. It is downloaded once and stays on your device.";
+"Model je preuzet." = "Model downloaded.";
 "Model još nije preuzet" = "Model not downloaded yet";
 "Model još nije preuzet. Otvori Podešavanja i izaberi ili preuzmi model." = "The model is not downloaded yet. Open Settings and choose or download a model.";
 "Model nije mogao da se učita. Proveri da li je fajl kompletan." = "The model could not be loaded. Check that the file is complete.";
@@ -142,8 +155,10 @@
 "Najtačnije — Large v3" = "Most accurate — Large v3";
 "Napravi novi ključ na console.groq.com → API Keys, pa ga nalepi ovde i tapni Sačuvaj ključ. Stari je možda obrisan ili je pogrešno iskopiran." = "Create a new key at console.groq.com → API Keys, paste it here and tap Save key. The old one may be deleted or copied incorrectly.";
 "Nastavi" = "Continue";
+"Nazad" = "Back";
 "Način" = "Mode";
 "Nema dostupnog mikrofona." = "No microphone available.";
+"Nema dovoljno prostora za model %@. Potrebno je oko %@ slobodno." = "Not enough space for the %@ model. About %@ free is needed.";
 "Nema nove verzije. Trenutna je %@." = "No new version. You are on %@.";
 "Nema zapisa" = "No records";
 "Nema zapisa koji sadrže „%@“." = "No records contain “%@”.";
@@ -170,9 +185,11 @@
 "Otvori Diktator, tapni Uključi sesiju i vrati se u aplikaciju u kojoj pišeš." = "Open Diktator, tap Start session and return to the app you are typing in.";
 "Otvori Podešavanja" = "Open Settings";
 "Otvori Podešavanja i preuzmi Large v3 (~1,0 GB) — preporučeno za srpski." = "Open Settings and download Large v3 (~1.0 GB) — recommended for Serbian.";
+"Otvori iOS Podešavanja → Opšte → Tastatura → Tastature." = "Open iOS Settings → General → Keyboard → Keyboards.";
 "Otvori ključeve" = "Open keys";
 "Otvori podešavanja iOS-a" = "Open iOS Settings";
 "Ovaj mesec" = "This month";
+"Ovaj uređaj ima malo radne memorije. Ako se prepis prekida ili aplikacija zatvori, izaberi manji model (Base ili Small)." = "This device has limited memory. If transcription stops or the app closes, choose a smaller model (Base or Small).";
 "Očisti" = "Clear";
 "Podešavanja" = "Settings";
 "Podešavanja → General → Keyboard → Keyboards → Add New Keyboard." = "Settings → General → Keyboard → Keyboards → Add New Keyboard.";
@@ -189,6 +206,7 @@
 "Posle 5 minuta" = "After 5 minutes";
 "Poslednji tekst" = "Last text";
 "Povuci" = "Withdraw";
+"Počni" = "Start";
 "Pošalji model uređaja, verziju iOS-a i kratak opis problema." = "Send your device model, iOS version and a short description of the problem.";
 "Predlozi" = "Suggestions";
 "Pregled napretka i načina korišćenja aplikacije." = "An overview of your progress and how you use the app.";
@@ -196,13 +214,17 @@
 "Prepisujem…" = "Transcribing…";
 "Preporučeno" = "Recommended";
 "Preporučeno za srpski. Najbolji kvalitet, traži više RAM-a (~1,0 GB)." = "Recommended for Serbian. Best quality, needs more RAM (~1.0 GB).";
+"Preskoči" = "Skip";
 "Pretraži transkripte…" = "Search transcripts…";
 "Pretvaram govor u tekst." = "Turning speech into text.";
 "Preuzeti model nije kompletan. Pokušaj ponovo." = "The downloaded model is incomplete. Try again.";
+"Preuzimam…" = "Downloading…";
 "Preuzimanje Large v3…" = "Downloading Large v3…";
 "Preuzimanje modela…" = "Downloading model…";
 "Preuzimanje mora da ide preko https:// veze." = "The download must use an https:// connection.";
 "Preuzmi" = "Download";
+"Preuzmi Base (~%@)" = "Download Base (~%@)";
+"Preuzmi Large v3 (~%@)" = "Download Large v3 (~%@)";
 "Preuzmi Large v3 (~1,0 GB)" = "Download Large v3 (~1.0 GB)";
 "Preuzmi Ollama" = "Download Ollama";
 "Preuzmi Turbo (~547 MB)" = "Download Turbo (~547 MB)";
@@ -210,6 +232,7 @@
 "Prevuci prstom udesno po donjoj ivici ekrana" = "Swipe right along the bottom edge of the screen";
 "Pređi u bilo koju aplikaciju i otvori Diktator tastaturu." = "Switch to any app and open the Diktator keyboard.";
 "Prikaži ključ" = "Show key";
+"Prikaži uvod ponovo" = "Show the intro again";
 "Prilagodi Diktator svom načinu rada." = "Adjust Diktator to the way you work.";
 "Pripremam model…" = "Preparing model…";
 "Privatnost" = "Privacy";
@@ -221,6 +244,7 @@
 "Prvi diktat" = "First dictation";
 "Prvi diktat pokreće statistiku." = "Your first dictation starts the statistics.";
 "Prvi diktat će se pojaviti ovde." = "Your first dictation will appear here.";
+"Prvo preuzmi model na prethodnom koraku." = "Download a model in the previous step first.";
 "Rečnik" = "Vocabulary";
 "Rečnik je sačuvan." = "Vocabulary saved.";
 "Rečnik su imena, firme i pojmovi koje Whisper treba da prepozna. Što je tačniji, to je prepis bolji." = "The vocabulary holds names, companies and terms Whisper should recognise. The more accurate it is, the better the transcript.";
@@ -234,12 +258,14 @@
 "Servis" = "Service";
 "Sesija bez isteka drži mikrofon u pripravnosti dok je ne završiš. Kada je završiš, tastatura ponovo otvara Diktator." = "A session with no expiry keeps the microphone ready until you end it. When you do, the keyboard opens Diktator again.";
 "Sesija diktata" = "Dictation session";
+"Sesija drži mikrofon u pripravnosti da bi tastatura mogla da diktira u bilo kojoj aplikaciji. Uključuje se ovde, dodirom." = "The session keeps the microphone ready so the keyboard can dictate in any app. You enable it here, with a tap.";
 "Sesija drži mikrofon u pripravnosti dok je uključena i troši bateriju. Podrazumevano nema istek; u Podešavanjima → Diktat → Trajanje sesije možeš da je ograničiš na 1 sat ili 15 minuta." = "The session keeps the microphone ready while it is active and uses battery. There is no expiry by default; in Settings → Dictate → Session length you can limit it to 1 hour or 15 minutes.";
 "Sesija drži mikrofon u pripravnosti najviše 15 minuta i troši bateriju. Kada istekne, otvori Diktator i uključi je ponovo. Sesiju možeš da završiš i ranije, dugmetom Završi sesiju." = "The session keeps the microphone ready for up to 15 minutes and uses battery. When it expires, open Diktator and start it again. You can also end it earlier with the End session button.";
 "Sesija je aktivna. Pređi u drugu aplikaciju i tapni Diktiraj na tastaturi." = "The session is active. Switch to another app and tap Dictate on the keyboard.";
 "Sesija je uključena — dalji diktati te neće prebacivati ovamo." = "The session is active — further dictations will not bring you back here.";
 "Sesija je završena. Otvori Diktator i uključi sesiju ponovo." = "The session has ended. Open Diktator and start it again.";
 "Sesija podrazumevano nema istek i traje dok je ne završiš, pa se Diktator ne otvara pri svakom diktatu. U Podešavanjima možeš da je ograničiš na 1 sat ili 15 minuta. Kada se završi, prvi dodir na Diktiraj je ponovo uključi." = "By default the session has no expiry and lasts until you end it, so Diktator does not open on every dictation. In Settings you can limit it to 1 hour or 15 minutes. When it ends, the next tap on Dictate starts it again.";
+"Sesija se obnavlja svakim diktatom." = "The session is renewed with every dictation.";
 "Sesija traje 15 minuta i svaki diktat je produžava. Posle isteka otvori Diktator i uključi je ponovo." = "The session lasts 15 minutes and every dictation extends it. When it expires, open Diktator and start it again.";
 "Sesija traje 15 minuta i svaki diktat je produžava. Posle isteka tastatura ponovo otvara Diktator." = "The session lasts 15 minutes and every dictation extends it. When it expires, the keyboard opens Diktator again.";
 "Sesija traje jedan sat i svaki diktat je produžava za novih sat vremena." = "The session lasts one hour and every dictation extends it by another hour.";
@@ -263,6 +289,7 @@
 "Sve što treba da znaš o tastaturi, sesiji i privatnosti." = "Everything you need to know about the keyboard, the session and privacy.";
 "Tapni Diktator i uključi Allow Full Access." = "Tap Diktator and turn on Allow Full Access.";
 "Tapni Diktiraj i govori" = "Tap Dictate and speak";
+"Tapni Dodaj novu tastaturu, pa Diktator." = "Tap Add New Keyboard, then Diktator.";
 "Tapni Uključi sesiju, pa se vrati u aplikaciju i tapni Diktiraj na tastaturi." = "Tap Start session, then return to your app and tap Dictate on the keyboard.";
 "Tapni crveni Stop — tekst ide u polje u kome pišeš. Ako ne uspe, tapni Nalepi iznad tastature." = "Tap the red Stop — the text goes into the field you are typing in. If that fails, tap Paste above the keyboard.";
 "Tapni crveni Stop — tekst se sam ubaci u polje u kome pišeš. Ako ne uspe, tapni Nalepi u traci iznad tastature." = "Tap the red Stop — the text is inserted automatically into the field you are typing in. If that fails, tap Paste in the strip above the keyboard.";
@@ -272,6 +299,7 @@
 "Tastatura ne može direktno da snima — Apple to zabranjuje. Zato snima glavna aplikacija u pozadinskoj sesiji, a tastatura samo šalje start/stop." = "The keyboard cannot record directly — Apple does not allow it. The main app records in a background session and the keyboard only sends start/stop.";
 "Tastatura sada može da snima u pozadini, bez otvaranja Diktatora. Preostalo: %lld:%@" = "The keyboard can now record in the background without opening Diktator. Remaining: %lld:%@";
 "Tastatura sada može da snima u pozadini, bez otvaranja Diktatora. Sesija nema istek i traje dok je ne završiš." = "The keyboard can now record in the background without opening Diktator. The session has no expiry and lasts until you end it.";
+"Tastatura ubacuje prepis u polje u kome pišeš, u bilo kojoj aplikaciji." = "The keyboard inserts the transcript into the field you are typing in, in any app.";
 "Tekst ide u %@?" = "Text goes to %@?";
 "Tekst je kopiran. Otvori tastaturu; ako se ne ubaci sam, tapni Nalepi iznad tastature." = "The text is copied. Open the keyboard; if it is not inserted automatically, tap Paste above the keyboard.";
 "Tekst je spreman i nalepiće se sam." = "Your text is ready and will paste itself.";

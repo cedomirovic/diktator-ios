@@ -6,6 +6,9 @@ struct PogledDiktat: View {
     @Environment(\.scenePhase) private var fazaEkrana
     @State private var prikaziPodesavanja = false
     @State private var predlogRecnika: PredlogRecnika?
+    /// Uvod se prikazuje pri prvom pokretanju, jer bez modela i tastature
+    /// aplikacija deluje kao da ne radi.
+    @State private var prikaziUvod = false
 
     private var jeGreska: Bool {
         if case .greska = stanje.stanje { return true }
@@ -78,6 +81,23 @@ struct PogledDiktat: View {
             .sheet(item: $predlogRecnika) { predlog in
                 PogledDodajRecnik(tekst: predlog.tekst)
                     .environmentObject(stanje)
+            }
+            .sheet(isPresented: $prikaziUvod) {
+                PogledUvod()
+                    .environmentObject(stanje)
+            }
+            .onAppear {
+                if !stanje.podesavanja.uvodVidjen {
+                    prikaziUvod = true
+                } else {
+                    #if DEBUG
+                    // Za snimke: -DiktatorUvod 1 prikaže uvod i posle prvog
+                    // pokretanja, bez brisanja podešavanja.
+                    if UserDefaults.standard.bool(forKey: "DiktatorUvod") {
+                        prikaziUvod = true
+                    }
+                    #endif
+                }
             }
         }
     }
@@ -341,6 +361,12 @@ struct PogledDiktat: View {
                 .font(.system(size: 14))
                 .foregroundStyle(Dizajn.tekstSekundarni)
                 .fixedSize(horizontal: false, vertical: true)
+            if let napomena = stanje.napomenaMemorije {
+                Text(napomena)
+                    .font(.system(size: 12))
+                    .foregroundStyle(Dizajn.narandzasta)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
             Button("Otvori Podešavanja") {
                 prikaziPodesavanja = true
             }

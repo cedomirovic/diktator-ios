@@ -1,8 +1,10 @@
 import SwiftUI
 
 struct PogledPomoc: View {
+    @EnvironmentObject var stanje: AppStanje
     private let podrska = URL(string: "mailto:cedomirovicnemanja@gmail.com?subject=Diktator%20iOS")
     private let github = URL(string: "https://github.com/cedomirovic/diktator-ios")!
+    @State private var prikaziUvod = false
 
     var body: some View {
         NavigationStack {
@@ -53,6 +55,10 @@ struct PogledPomoc: View {
             }
             .background(Dizajn.pozadina)
             .toolbar(.hidden, for: .navigationBar)
+            .sheet(isPresented: $prikaziUvod) {
+                PogledUvod()
+                    .environmentObject(stanje)
+            }
         }
     }
 
@@ -160,6 +166,13 @@ struct PogledPomoc: View {
                 Spacer(minLength: 0)
             }
 
+            Button {
+                prikaziUvod = true
+            } label: {
+                Label("Prikaži uvod ponovo", systemImage: "arrow.counterclockwise")
+            }
+            .buttonStyle(StilDugmetaSvetli())
+
             if let podrska {
                 Link(destination: podrska) {
                     Label("Kontaktiraj podršku", systemImage: "envelope.fill")
@@ -167,11 +180,13 @@ struct PogledPomoc: View {
                 .buttonStyle(StilDugmeta())
             }
 
+            #if !APPSTORE
             Link(destination: github) {
                 Label("GitHub projekat", systemImage: "link")
                     .font(.system(size: 13, weight: .medium))
             }
             .tint(Dizajn.akcenat)
+            #endif
         }
         .kartica()
     }
