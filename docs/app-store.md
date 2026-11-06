@@ -149,20 +149,75 @@ diktiranje,glas u tekst,srpski,prepis,offline,tastatura,transkripcija,beleške
 
 ## App Privacy (App Store Connect)
 
+Koraci u App Store Connect → **Apps → Diktator → App Privacy**:
+
+1. **Get Started** (ili **Edit** ako je upitnik već otvoren).
+2. Pitanje **„Do you or your third-party partners collect data from this
+   app?“** → **No**.
+3. **Save**, pa **Publish**.
+
+Ni jedan tip podataka se ne označava (Contact Info, Health, Audio, User
+Content…), jer aplikacija ne šalje podatke programeru ni trećim licima u ime
+programera.
+
 - **Data Collection:** *Data Not Collected*.
 - Obrazloženje za Review Notes: sve se obrađuje na uređaju; opcioni Groq i
   LLM servisi rade samo ako ih korisnik uključi i unese **svoj** ključ, pa
   programer ne dobija kopiju podataka.
 - `PrivacyInfo.xcprivacy` je dodat u oba targeta: nema tracking-a, nema
   prikupljanja, prijavljeni su `UserDefaults` (`CA92.1`) i file timestamp
-  (`C617.1`).
+  (`C617.1`). Manifest i odgovor u upitniku moraju da se poklope — oba kažu
+  da nema prikupljanja.
 - Zašto ipak „Data Not Collected“ kada postoje Groq i LLM servisi: podatke
   šalje sam korisnik, svom nalogu, svojim ključem, i to samo ako uključi
   servis i da izričitu dozvolu. Programer ne dobija kopiju, nema svog servera
   i ne može da poveže podatke sa korisnikom. Ovo isto napisati u Notes.
-- **Age rating:** ne prepisivati 4+ iz ovog dokumenta. Popuniti aktuelni
-  upitnik u App Store Connect-u i iskreno prijaviti da tekst može da ide
-  servisima trećih strana (Groq, Gemini, OpenAI, Claude, DeepSeek, Ollama).
+
+### Šta se ne prijavljuje i zašto
+
+| Podatak | Gde završi | Zašto nije „collected“ |
+|---|---|---|
+| Snimak govora | Obrađuje se u memoriji i odbacuje | Ne napušta uređaj i ne čuva se |
+| Tekst diktata | Istorija u aplikaciji (do 200 zapisa) | Ostaje na uređaju dok ga korisnik ne obriše |
+| Rečnik i statistika | Lokalni fajlovi | Bez teksta diktata, bez naloga |
+| API ključevi | Keychain (`WhenUnlockedThisDeviceOnly`) | Ne napuštaju uređaj |
+| Groq / LLM tekst | Samo uz dozvolu, na korisnikov nalog | Programer ne dobija kopiju i ne može da poveže podatke |
+
+## Age Rating (App Store Connect)
+
+App Store Connect → **App Information → Age Rating → Edit**. Odgovori za
+verziju **0.2.0**:
+
+| Pitanje | Odgovor |
+|---|---|
+| Cartoon or Fantasy Violence | None |
+| Realistic Violence | None |
+| Prolonged Graphic or Sadistic Realistic Violence | None |
+| Profanity or Crude Humor | None |
+| Mature or Suggestive Themes | None |
+| Horror/Fear Themes | None |
+| Medical/Treatment Information | None |
+| Alcohol, Tobacco, or Drug Use or References | None |
+| Simulated Gambling | None |
+| Sexual Content or Nudity | None |
+| Graphic Sexual Content and Nudity | None |
+| Guns or Other Weapons | None |
+| Gambling and Contests | None |
+| Unrestricted Web Access | No |
+| User-Generated Content | No |
+| Messaging and Chat | No |
+| Advertising | No |
+| In-App Purchases | No |
+| Age Assurance | No |
+| Made for Kids / Kids Category | No |
+
+Rezultat je **4+**. Obrazloženje ako recenzent pita: aplikacija nema svoj
+sadržaj, feed, chat ni pretragu; korisnik diktira sopstveni tekst koji ostaje
+na uređaju. Opcioni servisi u oblaku šalju samo tekst koji je korisnik sam
+izdiktirao, njegovim ključem i uz njegovu dozvolu.
+
+**Ne prepisivati 4+ naslepo** ako se u međuvremenu promeni sadržaj aplikacije
+(npr. doda deljenje teksta u zajednicu) — tada ponovo proći upitnik.
 
 ## Export compliance
 
@@ -287,6 +342,8 @@ Messages-u, sa uključenim Full Access-om.
 - [ ] Privacy policy i support URL dostupni (GitHub Pages).
 - [ ] Metadata popunjen iz ovog dokumenta.
 - [ ] Screenshots za iPhone 6.9" i iPad 13", uključujući tastaturu u aplikaciji.
+- [ ] App Privacy upitnik: **Data Not Collected** (koraci iznad).
+- [ ] Age rating upitnik popunjen po tabeli iznad (rezultat **4+**).
 - [ ] Review Notes nalepljene.
 - [ ] TestFlight internal build prošao.
 - [ ] Export compliance odgovoreno.
