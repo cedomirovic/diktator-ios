@@ -4,6 +4,8 @@ Ovaj projekat je nastao iz macOS aplikacije **Diktator**
 (`/Users/cedomirovic/Downloads/Pitchi`). Cilj je iPhone/iPad aplikacija u
 kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
+## Status
+
 - **06.11.2026.** — **protokol za tačku 5 i demo video**: `docs/app-store.md`
   sada opisuje test na najslabijim podržanim uređajima (iPhone XR / iPad 9.
   generacije, AppStore šema, Base pa Large v3, sesija u pozadini 14 minuta,
