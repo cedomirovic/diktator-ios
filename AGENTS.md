@@ -4,7 +4,13 @@ Ovaj projekat je nastao iz macOS aplikacije **Diktator**
 (`/Users/cedomirovic/Downloads/Pitchi`). Cilj je iPhone/iPad aplikacija u
 kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
-## Status
+- **06.11.2026.** — **protokol za tačku 5 i demo video**: `docs/app-store.md`
+  sada opisuje test na najslabijim podržanim uređajima (iPhone XR / iPad 9.
+  generacije, AppStore šema, Base pa Large v3, sesija u pozadini 14 minuta,
+  gašenje aplikacije, oslobađanje modela, Groq dozvola) i scenario za demo
+  video od 60–90 s koji ide uz Review Notes kao link. To je jedini način da se
+  proveri pozadinski mikrofon (2.5.4), jer simulator ne uključuje custom
+  tastaturu skriptom. Checklista ima nove stavke za test i video.
 
 - **06.11.2026.** — **sitnice u kodu (tačka 14)**: `IsASCIICapable` je sada
   `true` (`project.yml` i `DiktatorKeyboard/Info.plist`), pa se tastatura

@@ -362,6 +362,50 @@ states the download size before any download starts. Models are downloaded
 from huggingface.co; an interrupted download is deleted and can be restarted.
 ```
 
+## Test na uređaju i demo video (tačka 5)
+
+Tačka 5 analize (mikrofon u pripravnosti, pravilo 2.5.4) ne može da se proveri
+u simulatoru: tamo se custom tastatura ne uključuje skriptom, a pozadinski
+audio se ponaša drugačije. Zato pre prijave treba proći ovo na fizičkom
+uređaju i snimiti kratak demo.
+
+### Protokol (najslabiji podržani uređaji)
+
+1. **iPhone XR ili noviji sa 3 GB RAM-a** i **iPad 9. generacije** (iOS/iPadOS
+   17). Obriši aplikaciju, pa je instaliraj iz Xcode-a kao **AppStore** šemu.
+2. Prvo pokretanje: prođi uvod, preuzmi **Base** (~142 MB), pa **Large v3**
+   (~1.0 GB). Gledaj da li se pojavi upozorenje za memoriju i da li se model
+   učita bez pada.
+3. Uključi sesiju, pređi u Notes, prebaci na Diktator tastaturu, diktiraj i
+   sačekaj automatsko lepljenje. Ponovi 3–4 puta.
+4. Ostavi Diktator u pozadini **14 minuta** (ne zaključavaj telefon), pa
+   diktiraj iz Notes-a. Proveri: da li iOS prikazuje indikator mikrofona, da
+   li tekst stiže i da li se sesija posle 15 minuta sama gasi.
+5. Ugasi Diktator iz prekidača aplikacija i diktiraj ponovo: tastatura treba
+   da pokaže **Open Diktator and start the session.**, bez otvaranja
+   aplikacije.
+6. Otvori **Podešavanja → Model → Oslobodi model sada** posle diktata i
+   proveri da se memorija vrati; ponovi sa uključenim Large v3.
+7. Pošalji kratak diktat sa uključenim Groq-om (sopstveni ključ) i proveri da
+   se pre prvog slanja pojavi dijalog **Snimak ide u Groq?** i da **Povuci**
+   zaustavlja dalja slanja.
+
+### Demo video (60–90 s)
+
+Apple-u se u Review Notes lepi link (YouTube „unlisted“ ili iCloud link), ne
+fajl u repou. Kadrovi:
+
+1. Diktator: **Enable session** i obaveštenje da sesija traje 15 minuta.
+2. Notes: Diktator tastatura, **Dictate**, izgovorena rečenica, **Stop**.
+3. Tekst se sam pojavljuje u polju (bez lepljenja).
+4. Prekid na 15 minuta: tastatura kaže da sesija treba ponovo da se uključi,
+   pa povratak u Diktator i novo uključivanje.
+5. Kratko: podešavanja modela i veličina preuzimanja (dokaz da je lokalno).
+
+U Review Notes dodati rečenicu: „A short demo of the background session and
+the keyboard flow: <link>.“ Video ne sme da sadrži lične podatke, tuđe
+poruke ni prikaz Groq ključa.
+
 ## Screenshots
 
 Obavezno za App Store Connect:
@@ -414,4 +458,5 @@ Messages-u, sa uključenim Full Access-om.
 - [ ] Age rating upitnik popunjen po tabeli iznad (rezultat **4+**).
 - [ ] Review Notes nalepljene.
 - [ ] TestFlight internal build prošao.
+- [ ] Demo video (60–90 s) snimljen i link dodat u Review Notes.
 - [ ] Export compliance odgovoreno.
