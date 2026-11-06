@@ -151,6 +151,23 @@ xcrun devicectl device process launch --device <UDID> \
 Telefon mora biti otključan; ako je zaključan, `devicectl` prijavi
 **„Unable to launch … because the device was not, or could not be, unlocked“**.
 
+#### Ponovna instalacija bez kabla
+
+Kada je telefon jednom uparen i u Xcode-u je uključeno **Connect via network**
+(Window → Devices and Simulators → štiklirano), dovoljna je ista Wi-Fi mreža i
+otključan telefon:
+
+```bash
+app/install-bezicno.sh                 # podrazumevani iPhone
+app/install-bezicno.sh <UDID>          # drugi uređaj
+```
+
+Skripta napravi **Debug** build (lični, sa URL linkovima i sesijom bez
+isteka), instalira ga preko mreže i pokrene. Kabl treba samo za prvo
+uparivanje; `xcrun devicectl list devices` tada pokaže
+`Transport Type: localNetwork`. Ako telefon nije dostupan, proveri da je
+otključan i na istoj mreži.
+
 ### 2.6. Dodaj tastaturu
 
 1. iPhone: **Settings → General → Keyboard → Keyboards → Add New Keyboard**.

@@ -6,6 +6,14 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Status
 
+- **06.11.2026.** — **instalacija na iPhone bez kabla**: dodat je
+  `app/install-bezicno.sh`, koji napravi Debug build, instalira ga preko
+  `devicectl`-a na upareni uređaj (`Transport Type: localNetwork`) i pokrene.
+  Uslov je da je telefon jednom uparen kablom, da je u Xcode-u uključeno
+  **Connect via network**, da je na istoj Wi-Fi mreži i otključan; posle toga
+  kabl ne treba. Uputstvo je u `docs/instalacija-bez-naloga.md`. Lični build
+  (0.2.0, build 10) je instaliran i pokrenut na iPhone-u 15 Pro bez kabla.
+
 - **06.11.2026.** — **protokol za tačku 5 i demo video**: `docs/app-store.md`
   sada opisuje test na najslabijim podržanim uređajima (iPhone XR / iPad 9.
   generacije, AppStore šema, Base pa Large v3, sesija u pozadini 14 minuta,
