@@ -219,6 +219,22 @@ izdiktirao, njegovim ključem i uz njegovu dozvolu.
 **Ne prepisivati 4+ naslepo** ako se u međuvremenu promeni sadržaj aplikacije
 (npr. doda deljenje teksta u zajednicu) — tada ponovo proći upitnik.
 
+## Sitnice u kodu (tačka 14)
+
+- **`IsASCIICapable`** je sada `true` u `project.yml` i u
+  `DiktatorKeyboard/Info.plist`. Tastatura je latinična i treba da se pojavi i
+  u poljima tipa `UIKeyboardTypeASCIICapable` (mejl, URL); `čćžšđ` su dodatni
+  znaci, ne drugi alfabet.
+- **Globus** se dodaje samo kada `needsInputModeSwitchKey` kaže da jeste, pa
+  se na iPad-u sa hardverskom tastaturom ne duplira.
+- **Dnevnik** se skraćuje na 200 KB (zadržava poslednjih 100 KB, od početka
+  reda), pa ne raste bez granice.
+- **Opšti clipboard** se posle diktata puni samo kada je diktat pokrenut iz
+  same aplikacije. Kada diktat pokreće tastatura, tekst ide imenovanim
+  pasteboard-om i lokalnim serverom, pa ga druge aplikacije ne vide; ručno
+  **Nalepi** i dalje radi iz imenovanog kanala. `docs/privatnost.html` (SR i
+  EN) opisuje tačno to ponašanje.
+
 ## Export compliance
 
 - Koristi se samo standardni HTTPS/TLS iz iOS-a (`URLSession`) i `CryptoKit`

@@ -1074,20 +1074,26 @@ final class AppStanje: ObservableObject {
         #endif
     }
 
-    /// Tekst ide u opšti clipboard zajedno sa tokenom i vremenom. Token
-    /// služi tastaturi da prepozna novi prepis i da ga sama nalepi, a da
-    /// pritom ne nalepi isti tekst dva puta ili nešto staro.
+    /// Token služi tastaturi da prepozna novi prepis i da ga sama nalepi, a
+    /// da pritom ne nalepi isti tekst dva puta ili nešto staro.
+    ///
+    /// Opšti clipboard se piše samo kada je diktat pokrenut iz same
+    /// aplikacije, da bi korisnik mogao da nalepi tekst u drugu aplikaciju.
+    /// Kada diktat dolazi iz tastature, tekst ide imenovanim pasteboard-om i
+    /// lokalnim serverom, pa nema razloga da ga vide druge aplikacije.
     @discardableResult
     private func postaviClipboard(_ tekst: String, automatski: Bool) -> String? {
         let token = UUID().uuidString
         let vreme = String(Date().timeIntervalSince1970)
-        UIPasteboard.general.items = [[
-            DiktatorClipboard.tekst: tekst,
-            DiktatorClipboard.token: token,
-            DiktatorClipboard.vreme: vreme,
-        ]]
+        if !automatski {
+            UIPasteboard.general.items = [[
+                DiktatorClipboard.tekst: tekst,
+                DiktatorClipboard.token: token,
+                DiktatorClipboard.vreme: vreme,
+            ]]
+        }
         Dnevnik.pisi(
-            "Clipboard spreman, duzina=\(tekst.count), token=\(token.prefix(8)), zaTastaturu=\(automatski)"
+            "Clipboard spreman, duzina=\(tekst.count), token=\(token.prefix(8)), opsti=\(!automatski)"
         )
         NSLog("Diktator: clipboard spreman, duzina=%d", tekst.count)
         return token

@@ -6,6 +6,18 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Status
 
+- **06.11.2026.** — **sitnice u kodu (tačka 14)**: `IsASCIICapable` je sada
+  `true` (`project.yml` i `DiktatorKeyboard/Info.plist`), pa se tastatura
+  pojavljuje i u ASCII poljima kao što su mejl i URL; `čćžšđ` su dodatni
+  znaci, ne drugi alfabet. Globus se i dalje prikazuje samo uz
+  `needsInputModeSwitchKey`, a `Dnevnik` se skraćuje na 200 KB (zadržava
+  poslednjih 100 KB). Opšti clipboard se više ne puni posle diktata
+  pokrenutog iz tastature — tekst tada ide samo imenovanim pasteboard-om i
+  lokalnim serverom, pa ga druge aplikacije ne vide; kada diktiraš iz same
+  aplikacije, upis ostaje da bi ručno **Nalepi** radilo u drugoj aplikaciji.
+  `docs/privatnost.html` (SR i EN) i `docs/app-store.md` opisuju novo
+  ponašanje. Verzija ostaje **0.2.0 (10)**.
+
 - **06.11.2026.** — **App Privacy, Age rating i provera potpisa (tačke 12 i
   13)**: `docs/app-store.md` sada ima tačne korake za App Privacy upitnik
   (**Data Not Collected**, bez označenih tipova podataka), tabelu „šta se ne
