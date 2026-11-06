@@ -10,8 +10,13 @@
 #      com.cedomirovic.diktator.ios (vidi docs/app-store.md).
 #
 # Pokretanje:
-#   app/objavi-testflight.sh                 # koristi nalog iz Xcode-a
+#   app/objavi-testflight.sh                 # tim iz project.yml
+#   DIKTATOR_TIM=ABCDE12345 app/objavi-testflight.sh
 #   ASC_KEY_PATH=... ASC_KEY_ID=... ASC_ISSUER_ID=... app/objavi-testflight.sh
+#
+# `DIKTATOR_TIM` menja tim samo za ovaj build. Kada pređeš na plaćeni
+# Developer Program, upiši novi tim u project.yml i ExportOptions.plist (ili
+# pokreni `app/proveri-potpis.sh` da vidiš šta je trenutno na Mac-u).
 #
 # API ključ (preporučeno za CI): App Store Connect → Users and Access →
 # Integrations → App Store Connect API → "+", uloga "App Manager". Sačuvaj
@@ -34,7 +39,9 @@ fi
 
 VERZIJA="$(grep -m1 'MARKETING_VERSION' "$SKRIPT/project.yml" | sed 's/.*"\(.*\)".*/\1/')"
 BUILD="$(grep -m1 'CURRENT_PROJECT_VERSION' "$SKRIPT/project.yml" | sed 's/.*"\(.*\)".*/\1/')"
+TIM="${DIKTATOR_TIM:-$(grep -m1 'DEVELOPMENT_TEAM' "$SKRIPT/project.yml" | sed 's/.*: *//' | tr -d '"')}"
 echo "Verzija: $VERZIJA ($BUILD)"
+echo "Tim: $TIM"
 
 if ! security find-identity -v -p codesigning 2>/dev/null | grep -q "Apple Distribution"; then
   echo
@@ -67,6 +74,8 @@ xcodebuild \
   -destination 'generic/platform=iOS' \
   -archivePath "$ARHIVA" \
   -allowProvisioningUpdates \
+  DEVELOPMENT_TEAM="$TIM" \
+  CODE_SIGN_IDENTITY="Apple Distribution" \
   archive
 
 APP="$(find "$ARHIVA/Products/Applications" -maxdepth 1 -name '*.app' | head -1)"
@@ -84,13 +93,24 @@ for PUTANJA in \
 done
 echo "Privacy manifest je u arhivi (aplikacija i tastatura)."
 
+POTPIS="$(codesign -dv "$APP" 2>&1 | awk -F= '/^Authority=/{print $2; exit}')"
+echo "Potpis arhive: ${POTPIS:-nepoznat}"
+if [[ "$POTPIS" == *"Apple Development"* ]]; then
+  echo "Greška: arhiva je potpisana razvojnim sertifikatom, a App Store traži" >&2
+  echo "„Apple Distribution“. Proveri tim i sertifikat: app/proveri-potpis.sh" >&2
+  exit 3
+fi
+
 echo "== Izvoz i slanje u App Store Connect =="
+OPCIJE="$KOREN/build/ExportOptions-$TIM.plist"
+cp "$SKRIPT/ExportOptions.plist" "$OPCIJE"
+/usr/libexec/PlistBuddy -c "Set :teamID $TIM" "$OPCIJE" >/dev/null
 if [[ -n "${ASC_KEY_PATH:-}" && -n "${ASC_KEY_ID:-}" && -n "${ASC_ISSUER_ID:-}" ]]; then
   echo "Autentifikacija: App Store Connect API ključ $ASC_KEY_ID"
   xcodebuild \
     -exportArchive \
     -archivePath "$ARHIVA" \
-    -exportOptionsPlist "$SKRIPT/ExportOptions.plist" \
+    -exportOptionsPlist "$OPCIJE" \
     -exportPath "$IZVOZ" \
     -allowProvisioningUpdates \
     -authenticationKeyPath "$ASC_KEY_PATH" \
@@ -101,7 +121,7 @@ else
   xcodebuild \
     -exportArchive \
     -archivePath "$ARHIVA" \
-    -exportOptionsPlist "$SKRIPT/ExportOptions.plist" \
+    -exportOptionsPlist "$OPCIJE" \
     -exportPath "$IZVOZ" \
     -allowProvisioningUpdates
 fi

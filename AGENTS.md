@@ -6,6 +6,23 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Status
 
+- **06.11.2026.** — **App Privacy, Age rating i provera potpisa (tačke 12 i
+  13)**: `docs/app-store.md` sada ima tačne korake za App Privacy upitnik
+  (**Data Not Collected**, bez označenih tipova podataka), tabelu „šta se ne
+  prijavljuje i zašto“ i odgovore na svako pitanje Age rating upitnika
+  (rezultat **4+**, uz napomenu da se upitnik ponovo prolazi ako se doda
+  deljenje sadržaja). Dodata je sekcija **Tim i nalog**: trenutno stanje
+  (besplatni tim `LHQ4Q44425`, samo Apple Development sertifikat, razvojni
+  profili ističu 09.11.2026), koraci za prelazak na plaćeni tim i dve opcije
+  za vlasništvo bundle ID-a/GitHub Pages-a/mejla. Nova skripta
+  `app/proveri-potpis.sh` čita `project.yml`, `ExportOptions.plist`,
+  pbxproj, Keychain i profile i pokaže da li se timovi slažu, ima li Apple
+  Distribution sertifikata i App Store profila za oba bundle ID-a.
+  `app/objavi-testflight.sh` sada prima `DIKTATOR_TIM`, arhivira sa
+  `CODE_SIGN_IDENTITY="Apple Distribution"` i odbija arhivu potpisanu
+  razvojnim sertifikatom; ExportOptions se pravi sa timom iz builda.
+  Verzija ostaje **0.2.0 (10)**.
+
 - **06.11.2026.** — **snimak tastature u „drugoj“ aplikaciji (tačka 10)**:
   dodat je `app/uzmi-snimak-tastature.sh`, koji pravi
   `docs/slike/app-store/tastatura.png` (1320 × 2868) tako što napravi malu

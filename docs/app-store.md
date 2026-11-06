@@ -228,6 +228,55 @@ izdiktirao, njegovim ključem i uz njegovu dozvolu.
 - Ako App Store Connect traži `ITSAppUsesNonExemptEncryption`, postavi na
   `NO` (dodato u `Info.plist`).
 
+## Tim i nalog
+
+Stanje na Mac-u (06.11.2026): tim **`LHQ4Q44425`** je besplatni lični tim,
+postoji samo **Apple Development** sertifikat, a razvojni profili za oba
+bundle ID-a ističu **09.11.2026.** Nema **Apple Distribution** sertifikata ni
+App Store profila, pa u ovom stanju build ne može u App Store Connect. To se
+menja tek kada proradi plaćeni Developer Program.
+
+`app/proveri-potpis.sh` čita `project.yml`, `ExportOptions.plist`, pbxproj,
+Keychain i profile, pa tačno pokaže šta nedostaje:
+
+```sh
+app/proveri-potpis.sh              # tim iz project.yml
+app/proveri-potpis.sh ABCDE12345   # provera drugog tima
+```
+
+### Kada proradi plaćeni nalog
+
+1. Prihvati ugovore u App Store Connect-u i zapiši novi **Team ID**.
+2. Upiši ga na dva mesta: `DEVELOPMENT_TEAM` u `app/project.yml` i `teamID` u
+   `app/ExportOptions.plist`.
+3. `cd app && xcodegen generate` (pbxproj preuzme tim iz `project.yml`).
+4. Xcode → Settings → Accounts → tim → **Manage Certificates** → **+** →
+   **Apple Distribution**.
+5. `app/proveri-potpis.sh` mora da prijavi ✓ za tim, sertifikat i App Store
+   profile za oba bundle ID-a.
+6. `app/objavi-testflight.sh` arhivira sa `DEVELOPMENT_TEAM` i
+   `CODE_SIGN_IDENTITY="Apple Distribution"`, a pre slanja odbija arhivu
+   potpisanu razvojnim sertifikatom. Za privremenu probu drugog tima:
+   `DIKTATOR_TIM=ABCDE12345 app/objavi-testflight.sh`.
+
+### Vlasništvo podataka
+
+Bundle ID, GitHub Pages i mejl podrške (`cedomirovicnemanja@gmail.com`) vezani
+su za drugu osobu, pa prodavac u App Store Connect-u, kontakt i URL-ovi treba
+da pripadaju onome ko objavljuje. Dve čiste opcije:
+
+- **Objavljuje vlasnik naloga** kome pripada `com.cedomirovic.diktator.ios` —
+  tada se menja samo tim u koracima iznad.
+- **Objavljuješ sa svog naloga** — tada promeni bundle ID (npr.
+  `com.<tvoj>.diktator.ios`) na svim mestima: `PRODUCT_BUNDLE_IDENTIFIER` za
+  aplikaciju i tastaturu i `CFBundleURLName` u `app/project.yml`,
+  `CFBundleURLSchemes`/`Info.plist` ako se menja šema, `Podesavanja.servis`
+  (Keychain), `app/proveri-potpis.sh`, `app/uzmi-snimke.sh` i ovaj dokument.
+  Zatim napravi novi app record i postavi svoje GitHub Pages URL-ove i mejl.
+
+Ni u jednoj varijanti ne treba menjati šemu `diktator-ios` ako je već
+objavljena — stari linkovi iz tastature bi prestali da rade.
+
 ## Review Notes (lepi u App Store Connect)
 
 ```
@@ -336,8 +385,11 @@ Messages-u, sa uključenim Full Access-om.
 ## Checklist za prijavu
 
 - [ ] Plaćeni Apple Developer Program (99 USD/god.) i ugovori prihvaćeni.
+- [ ] Novi tim upisan u `project.yml` i `ExportOptions.plist`, pa `xcodegen generate`.
 - [ ] App record napravljen sa bundle ID-em `com.cedomirovic.diktator.ios`.
+- [ ] Vlasništvo bundle ID-a, GitHub Pages-a i mejla podrške rešeno.
 - [ ] Distribution sertifikat i App Store profil (Xcode → Manage Certificates).
+- [ ] `app/proveri-potpis.sh` prolazi bez ✗ i ⚠.
 - [ ] `PrivacyInfo.xcprivacy` u oba targeta (urađeno).
 - [ ] Privacy policy i support URL dostupni (GitHub Pages).
 - [ ] Metadata popunjen iz ovog dokumenta.
