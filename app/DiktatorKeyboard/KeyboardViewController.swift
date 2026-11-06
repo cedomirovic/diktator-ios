@@ -1653,22 +1653,22 @@ final class KeyboardViewController: UIInputViewController {
             privremeniStatusVreme = nil
 
             if !hasFullAccess {
-                status.text = "Uključi Full Access"
+                status.text = Prevod.t("Uključi Full Access")
                 status.textColor = .systemOrange
             } else if obradaSesije {
-                status.text = "Prepisujem…"
+                status.text = Prevod.t("Prepisujem…")
                 status.textColor = .secondaryLabel
             } else if snimaSesijom {
-                status.text = "Snimam…"
+                status.text = Prevod.t("Snimam…")
                 status.textColor = .systemRed
             } else if tekstSpreman {
-                status.text = "Spremno za lepljenje"
+                status.text = Prevod.t("Spremno za lepljenje")
                 status.textColor = .systemGreen
             } else if sesijaAktivna {
-                status.text = "Sesija ✓"
+                status.text = Prevod.t("Sesija ✓")
                 status.textColor = .systemGreen
             } else if hasFullAccess {
-                status.text = "Sesija ✗"
+                status.text = Prevod.t("Sesija ✗")
                 status.textColor = .tertiaryLabel
             } else {
                 status.text = ""

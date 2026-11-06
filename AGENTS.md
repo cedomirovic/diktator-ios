@@ -6,6 +6,23 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Status
 
+- **06.11.2026.** — **snimak tastature u „drugoj“ aplikaciji (tačka 10)**:
+  dodat je `app/uzmi-snimak-tastature.sh`, koji pravi
+  `docs/slike/app-store/tastatura.png` (1320 × 2868) tako što napravi malu
+  probnu aplikaciju (`app/alati/pregled-tastature/PregledApp.swift`) i u nju
+  ugradi pravi `KeyboardViewController`. Simulator ne može skriptom da
+  uključi custom tastaturu, pa bi ručni kadar bio jedina alternativa; ovako
+  snimak prikazuje stvarni kod tastature sa tekstom iznad nje. Probna
+  aplikacija se ne gradi u okviru Diktatora i ne ide u App Store. Usput je
+  tastatura dovršeno lokalizovana: statusi **Prepisujem…**, **Spremno za
+  lepljenje**, **Sesija ✓**, **Sesija ✗** i **Uključi Full Access** idu kroz
+  `Prevod.t`, a u `app/alati/prevedi.py` su dodati u rečnik tastature.
+  `PogledDiktat` prima `-DiktatorBezUvoda 1` (radi i u AppStore buildu, gde
+  nema `DEBUG`), pa `app/uzmi-snimke.sh` sada pravi snimke bez uvodnog toka;
+  regenerisani su iPhone i iPad snimci u engleskom App Store buildu.
+  `docs/app-store.md` ima slot za tastaturu, opis skripte i ažuriranu
+  checklistu. Verzija ostaje **0.2.0 (10)**.
+
 - **05.11.2026.** — **prolazak kroz analizu App Store recenzije (tačke 1–4,
   9 i 11)**: kod je očišćen pre prijave. Linkovi koji pokreću snimanje
   (`diktator-ios://dictate`, `sesija`, `sesija-prikaz`, `stop`) postoje samo u

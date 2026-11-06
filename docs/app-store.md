@@ -181,6 +181,8 @@ the device with the open-source whisper.cpp engine, and the text is inserted
 into whatever app the user is typing in. No account is required.
 
 HOW TO TEST QUICKLY (2-3 minutes)
+0. On first launch the app shows a four-step intro (model, keyboard, Full
+   Access, session). Tap "Skip" in the top-right corner, or follow it.
 1. Launch Diktator and open Settings > Model. Download "Base" (~142 MB) or
    "Turbo" (~547 MB). Base is enough to review the flow. Test audio is not
    needed; any sentence works, and English is detected automatically.
@@ -248,6 +250,7 @@ Obavezno za App Store Connect:
 |---|---|---|
 | iPhone 6.9" | 1320 × 2868 | `app/uzmi-snimke.sh` (iPhone 17 Pro Max) |
 | iPad 13" | 2064 × 2752 | `app/uzmi-snimke.sh` (iPad Pro 13") |
+| Tastatura u aplikaciji | 1320 × 2868 | `app/uzmi-snimak-tastature.sh` |
 
 Poželjni kadrovi (5–6):
 
@@ -263,8 +266,17 @@ Snimci su na engleskom, jer je to primarni jezik. `app/uzmi-snimke.sh` gradi
 sesija od 15 minuta.
 
 `app/uzmi-snimke.sh` pravi snimke iz simulatora u
-`docs/slike/app-store/`. Snimak tastature u drugoj aplikaciji mora ručno, jer
-simulator ne uključuje custom tastaturu skriptom.
+`docs/slike/app-store/`; snimci se prave iz App Store šeme i sa
+`-DiktatorBezUvoda 1`, da uvod ne bi ušao u kadar.
+
+**Snimak tastature** (`docs/slike/app-store/tastatura.png`) pravi
+`app/uzmi-snimak-tastature.sh`. Simulator ne može da uključi custom tastaturu
+skriptom, pa skripta napravi malu probnu aplikaciju
+(`app/alati/pregled-tastature/PregledApp.swift`) i u nju ugradi pravi
+`KeyboardViewController`. Snimak tako prikazuje stvarni kod tastature sa
+tekstom iznad nje. Probna aplikacija se ne gradi u okviru Diktatora i ne ide u
+App Store. Ako se snima na uređaju, isti kadar se pravi ručno u Notes-u ili
+Messages-u, sa uključenim Full Access-om.
 
 ## Checklist za prijavu
 
@@ -274,7 +286,7 @@ simulator ne uključuje custom tastaturu skriptom.
 - [ ] `PrivacyInfo.xcprivacy` u oba targeta (urađeno).
 - [ ] Privacy policy i support URL dostupni (GitHub Pages).
 - [ ] Metadata popunjen iz ovog dokumenta.
-- [ ] Screenshots za iPhone 6.9" i iPad 13".
+- [ ] Screenshots za iPhone 6.9" i iPad 13", uključujući tastaturu u aplikaciji.
 - [ ] Review Notes nalepljene.
 - [ ] TestFlight internal build prošao.
 - [ ] Export compliance odgovoreno.

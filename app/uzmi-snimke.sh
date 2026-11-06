@@ -50,7 +50,7 @@ for IME in "${uredjaji[@]}"; do
 
   APP="$DERIVED/Build/Products/AppStore-iphonesimulator/DiktatorIOS.app"
   xcrun simctl install "$UDID" "$APP"
-  xcrun simctl launch "$UDID" com.cedomirovic.diktator.ios >/dev/null
+  xcrun simctl launch "$UDID" com.cedomirovic.diktator.ios -DiktatorBezUvoda 1 >/dev/null
   # Prvo pokretanje na iPad-u ume da potraje; bez ovoga snimak bude prazan.
   sleep 9
 
@@ -59,7 +59,7 @@ for IME in "${uredjaji[@]}"; do
     # URL scheme bi prikazao „Open in Diktator?“ dijalog, pa tab biramo
     # argumentom pri pokretanju (vidi AppStanje.init).
     xcrun simctl terminate "$UDID" com.cedomirovic.diktator.ios 2>/dev/null || true
-    xcrun simctl launch "$UDID" com.cedomirovic.diktator.ios -DiktatorTab "$TAB" >/dev/null
+    xcrun simctl launch "$UDID" com.cedomirovic.diktator.ios -DiktatorTab "$TAB" -DiktatorBezUvoda 1 >/dev/null
     sleep 4
     xcrun simctl io "$UDID" screenshot "$IZLAZ/$PREFIKS-$TAB.png"
     echo "  $IZLAZ/$PREFIKS-$TAB.png"

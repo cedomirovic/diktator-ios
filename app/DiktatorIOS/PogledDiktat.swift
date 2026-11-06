@@ -87,6 +87,12 @@ struct PogledDiktat: View {
                     .environmentObject(stanje)
             }
             .onAppear {
+                // Snimci za App Store (i skripta uzmi-snimke.sh) pale ovu
+                // zastavicu da uvod ne bi ušao u kadar. Radi i u AppStore
+                // buildu, koji nema DEBUG uslov.
+                if UserDefaults.standard.bool(forKey: "DiktatorBezUvoda") {
+                    stanje.oznaciUvodVidjen()
+                }
                 if !stanje.podesavanja.uvodVidjen {
                     prikaziUvod = true
                 } else {

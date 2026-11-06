@@ -15,12 +15,17 @@
 "Otvori Diktator i uključi sesiju." = "Open Diktator and start the session.";
 "Otvori app ručno." = "Open the app manually.";
 "Prepis nije stigao — tapni Diktiraj." = "Transcript did not arrive — tap Dictate.";
+"Prepisujem…" = "Transcribing…";
 "Sačekaj da se završi prepis." = "Wait for transcription to finish.";
 "Sesija nije počela — tapni Diktiraj." = "Session did not start — tap Dictate.";
+"Sesija ✓" = "Session ✓";
+"Sesija ✗" = "Session ✗";
 "Sledeća tastatura" = "Next keyboard";
 "Snimam…" = "Recording…";
 "Spremno je, nalepi." = "Ready, paste it.";
+"Spremno za lepljenje" = "Ready to paste";
 "Stop" = "Stop";
+"Uključi Full Access" = "Turn on Full Access";
 "Uključi Full Access." = "Enable Full Access.";
 "Velika slova" = "Shift";
 "razmak" = "space";
