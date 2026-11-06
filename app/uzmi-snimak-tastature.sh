@@ -36,7 +36,27 @@ novo = """    private var sesijaAktivna = ProcessInfo.processInfo.arguments.cont
     /// U probnoj aplikaciji nema sistemske tastature, pa je Full Access uvek dat.
     override var hasFullAccess: Bool { true }"""
 assert staro in s
-io.open(cilj, "w", encoding="utf-8").write(s.replace(staro, novo, 1))
+s = s.replace(staro, novo, 1)
+# Polling bi odmah vratio „sesija isključena“ jer aplikacija ne radi; za
+# snimak zadržavamo uključenu sesiju.
+staro = "        sesijaAktivna = sesija\n"
+assert staro in s
+s = s.replace(
+    staro,
+    "        sesijaAktivna = sesija"
+    " || ProcessInfo.processInfo.arguments.contains(\"-Sesija\")\n",
+    1,
+)
+# I „stale stanje“ bi ugasilo sesiju jer aplikacija ne radi; za snimak ne.
+staro = "    private func obradiStaleStanje() {\n"
+assert staro in s
+s = s.replace(
+    staro,
+    staro
+    + "        if ProcessInfo.processInfo.arguments.contains(\"-Sesija\") { return }\n",
+    1,
+)
+io.open(cilj, "w", encoding="utf-8").write(s)
 PY
 
 xcrun swiftc \
@@ -100,7 +120,8 @@ xcrun simctl bootstatus "$UDID" -b >/dev/null
 xcrun simctl terminate "$UDID" com.cedomirovic.pregledtastature 2>/dev/null || true
 xcrun simctl uninstall "$UDID" com.cedomirovic.pregledtastature 2>/dev/null || true
 xcrun simctl install "$UDID" "$APP"
-xcrun simctl launch "$UDID" com.cedomirovic.pregledtastature >/dev/null
+# `-Sesija` pali zelenu oznaku „Session ✓“ u traci, kao kod uključene sesije.
+xcrun simctl launch "$UDID" com.cedomirovic.pregledtastature -Sesija >/dev/null
 sleep 5
 mkdir -p "$(dirname "$IZLAZ")"
 xcrun simctl io "$UDID" screenshot "$IZLAZ"
