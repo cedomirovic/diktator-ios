@@ -6,6 +6,18 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Status
 
+- **12.11.2026.** — **odgovor na Guideline 2.1 (Information Needed)**: Apple
+  je tražio snimak na fizičkom uređaju i pet opisa u **App Review Information
+  → Notes**. `docs/app-store.md` sada ima gotov engleski tekst (3831 znak, pod
+  limitom) koji pokriva svih šest stavki: snimak, svrhu i publiku, podešavanje
+  bez naloga, spoljne servise (Hugging Face, whisper.cpp, opcioni Groq/LLM),
+  regionalne razlike i odsustvo regulisanog sadržaja. Dodat je scenario za
+  snimak: mora da počne pokretanjem aplikacije, koristi build iz TestFlight-a,
+  prikaže model, tastaturu, Full Access, sesiju od 15 minuta i automatsko
+  lepljenje. Istaknuto je da nema naloga, UGC-a ni kupovina. Verzija ostaje
+  **0.2.0 (10)**; dovoljna je dopuna Notes i ponovno slanje na review, novi
+  build nije potreban.
+
 - **06.11.2026.** — **instalacija na iPhone bez kabla**: dodat je
   `app/install-bezicno.sh`, koji napravi Debug build, instalira ga preko
   `devicectl`-a na upareni uređaj (`Transport Type: localNetwork`) i pokrene.
