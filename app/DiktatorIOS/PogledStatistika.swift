@@ -22,6 +22,7 @@ struct PogledStatistika: View {
                 }
 
                 mreza
+                nedeljniKartica
                 grafikon
                 detalji
                 jezici
@@ -110,6 +111,134 @@ struct PogledStatistika: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .kartica(padding: 14)
+    }
+
+    // MARK: - Nedeljni pregled
+
+    private var prethodnaNedelja: NedeljniPregled {
+        s.prethodnaNedelja()
+    }
+
+    private var nedeljaPre: NedeljniPregled {
+        let kalendar = Calendar.current
+        let pocetak = kalendar.date(
+            byAdding: .day,
+            value: -7,
+            to: prethodnaNedelja.pocetak
+        ) ?? prethodnaNedelja.pocetak
+        let kraj = kalendar.date(
+            byAdding: .day,
+            value: -7,
+            to: prethodnaNedelja.kraj
+        ) ?? prethodnaNedelja.kraj
+        return s.pregled(od: pocetak, do: kraj)
+    }
+
+    /// Promena u odnosu na nedelju pre, npr. „18% više“. `nil` kada nema sa
+    /// čim da se uporedi.
+    private var promenaTekst: String? {
+        let sada = prethodnaNedelja.reci
+        let pre = nedeljaPre.reci
+        guard pre > 0 else { return nil }
+        let procenat = Int((Double(sada - pre) / Double(pre) * 100).rounded())
+        if procenat == 0 {
+            return Prevod.t("isto kao nedelju pre")
+        }
+        if procenat > 0 {
+            return Prevod.t("%lld%% više nego nedelju pre", procenat)
+        }
+        return Prevod.t("%lld%% manje nego nedelju pre", -procenat)
+    }
+
+    private func diktata(_ broj: Int) -> String {
+        broj == 1
+            ? Prevod.t("1 diktat")
+            : Prevod.t("%@ diktata", broj.formatted())
+    }
+
+    private var nedeljniKartica: some View {
+        let pregled = prethodnaNedelja
+
+        return VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 12) {
+                IkonaUKrugu(simbol: "calendar", boja: Dizajn.akcenat)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Nedeljni pregled")
+                        .font(.system(size: 17, weight: .semibold))
+                    Text(pregled.rasponTekst)
+                        .font(.system(size: 13))
+                        .foregroundStyle(Dizajn.tekstSekundarni)
+                }
+                Spacer(minLength: 0)
+                if stanje.podesavanja.nedeljniPregled {
+                    Oznaka(tekst: Prevod.t("Uključen"))
+                }
+            }
+
+            if pregled.prazan {
+                Text("Prošle nedelje nije bilo diktata. Prvi diktat pokreće pregled.")
+                    .font(.system(size: 14))
+                    .foregroundStyle(Dizajn.tekstSekundarni)
+            } else {
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    Text(pregled.reci.formatted())
+                        .font(.system(size: 30, weight: .bold))
+                        .foregroundStyle(Dizajn.tekst)
+                    Text("reči")
+                        .font(.system(size: 14))
+                        .foregroundStyle(Dizajn.tekstSekundarni)
+                    Spacer(minLength: 8)
+                    if let promena = promenaTekst {
+                        Text(promena)
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(Dizajn.tekstTercijarni)
+                            .multilineTextAlignment(.trailing)
+                    }
+                }
+
+                Text(Prevod.t(
+                    "%@ · ušteđeno %@ · %@ reči/min",
+                    diktata(pregled.snimci),
+                    pregled.ustedaTekst,
+                    "\(Int(pregled.prosecnoReciUMinuti.rounded()))"
+                ))
+                .font(.system(size: 12))
+                .foregroundStyle(Dizajn.tekstTercijarni)
+            }
+
+            if stanje.podesavanja.nedeljniPregled {
+                Text(Prevod.t(
+                    "Obaveštenje stiže %@ u %@.",
+                    NedeljniPodsetnik.nazivDana(stanje.podesavanja.danNedeljnogPregleda),
+                    NedeljniPodsetnik.vremeTekst(stanje.podesavanja.minutaNedeljnogPregleda)
+                ))
+                .font(.system(size: 12))
+                .foregroundStyle(Dizajn.tekstTercijarni)
+            } else {
+                Button {
+                    stanje.postaviNedeljniPregled(true)
+                } label: {
+                    Label("Uključi nedeljni pregled", systemImage: "bell.badge")
+                }
+                .buttonStyle(StilDugmeta(pun: false))
+
+                if stanje.nedeljniPregledOdbijen {
+                    Text(Prevod.t("Obaveštenja su isključena za Diktator u iOS Podešavanjima."))
+                        .font(.system(size: 12))
+                        .foregroundStyle(Dizajn.narandzasta)
+
+                    Button("Otvori podešavanja iOS-a") {
+                        stanje.otvoriPodesavanjaIOS()
+                    }
+                    .font(.system(size: 13, weight: .semibold))
+                } else {
+                    Text("Jednom nedeljno dobijaš pregled prethodne nedelje kao obaveštenje. Možeš ga isključiti u Podešavanjima.")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Dizajn.tekstTercijarni)
+                }
+            }
+        }
+        .kartica()
     }
 
     // MARK: - Grafikon

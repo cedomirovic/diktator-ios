@@ -179,6 +179,8 @@ final class AppStanje: ObservableObject {
     @Published var porukaAzuriranja: String?
     @Published var porukaObavestenja: String?
     @Published var obavestenjaOdbijena = false
+    @Published var porukaNedeljnogPregleda: String?
+    @Published var nedeljniPregledOdbijen = false
     @Published var kljucDoterivanja = ""
     @Published var testiraDoterivanje = false
     @Published var porukaDoterivanja: String?
@@ -233,6 +235,20 @@ final class AppStanje: ObservableObject {
         if argumenti.contains("-DiktatorPovratak") {
             prikaziPovratak = true
         }
+        // `-DiktatorStatistika 1` odmah otvori statistiku (snimci ekrana).
+        if argumenti.contains("-DiktatorStatistika") {
+            NavigacijaZahteva.deljena.otvoriStatistiku = true
+        }
+        // `-DiktatorNedeljniPregled 1` uključi nedeljni pregled bez
+        // sistemskog dijaloga, da se proveri izračunavanje termina.
+        if argumenti.contains("-DiktatorNedeljniPregled") {
+            podesavanja.nedeljniPregled = true
+        }
+        // `-BezNedeljnogPregleda 1` isključi ga za snimak stanja kada
+        // obaveštenje nije uključeno.
+        if argumenti.contains("-BezNedeljnogPregleda") {
+            podesavanja.nedeljniPregled = false
+        }
         #endif
         Prepisivac.utisajLog()
         modelUMemoriji = prepisivac.ucitano
@@ -283,6 +299,10 @@ final class AppStanje: ObservableObject {
                 )
             }
         }
+
+        // Sadržaj obaveštenja se osveži pri pokretanju, da brojevi odgovaraju
+        // onome što je zaista diktirano.
+        osveziNedeljniPodsetnik()
     }
 
     deinit {
@@ -577,6 +597,86 @@ final class AppStanje: ObservableObject {
     func otvoriPodesavanjaIOS() {
         guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
         UIApplication.shared.open(url)
+    }
+
+    // MARK: - Nedeljni pregled
+
+    /// Postavlja ili uklanja nedeljno obaveštenje prema podešavanjima. Zove se
+    /// pri pokretanju, posle svakog diktata i kada se podešavanja promene.
+    func osveziNedeljniPodsetnik() {
+        guard podesavanja.nedeljniPregled else {
+            NedeljniPodsetnik.otkazi()
+            return
+        }
+        let dan = podesavanja.danNedeljnogPregleda
+        let minuta = podesavanja.minutaNedeljnogPregleda
+        Task { @MainActor in
+            await NedeljniPodsetnik.zakazi(
+                statistika: statistika,
+                dan: dan,
+                minuta: minuta
+            )
+        }
+    }
+
+    /// Uključivanje traži dozvolu za obaveštenja tek sada, na korisnikov
+    /// dodir — bez sistemskog dijaloga pri prvom pokretanju.
+    func postaviNedeljniPregled(_ ukljucen: Bool) {
+        guard ukljucen else {
+            podesavanja.nedeljniPregled = false
+            porukaNedeljnogPregleda = nil
+            nedeljniPregledOdbijen = false
+            sacuvajPodesavanja()
+            NedeljniPodsetnik.otkazi()
+            return
+        }
+
+        Task { @MainActor in
+            let status = await Azuriranja.statusDozvole()
+            guard Azuriranja.jeDozvoljeno(status) else {
+                podesavanja.nedeljniPregled = false
+                nedeljniPregledOdbijen = true
+                porukaNedeljnogPregleda = Prevod.t(
+                    "Obaveštenja su isključena za Diktator u iOS Podešavanjima."
+                )
+                sacuvajPodesavanja()
+                return
+            }
+
+            podesavanja.nedeljniPregled = true
+            nedeljniPregledOdbijen = false
+            porukaNedeljnogPregleda = nil
+            sacuvajPodesavanja()
+            await NedeljniPodsetnik.zakazi(
+                statistika: statistika,
+                dan: podesavanja.danNedeljnogPregleda,
+                minuta: podesavanja.minutaNedeljnogPregleda
+            )
+        }
+    }
+
+    func testirajNedeljniPregled() {
+        guard !proveraObavestenjaUToku else { return }
+        proveraObavestenjaUToku = true
+        porukaNedeljnogPregleda = Prevod.t("Šaljem nedeljni pregled…")
+        Task { @MainActor in
+            defer { proveraObavestenjaUToku = false }
+            switch await NedeljniPodsetnik.posaljiTestni(statistika: statistika) {
+            case .poslato:
+                porukaNedeljnogPregleda = Prevod.t(
+                    "Nedeljni pregled je poslat — treba da se pojavi odmah."
+                )
+                nedeljniPregledOdbijen = false
+            case .odbijeno:
+                porukaNedeljnogPregleda = Prevod.t(
+                    "Obaveštenja su isključena za Diktator u iOS Podešavanjima."
+                )
+                nedeljniPregledOdbijen = true
+            case .greska:
+                porukaNedeljnogPregleda = Prevod.t("Obaveštenje nije poslato. Pokušaj ponovo.")
+                nedeljniPregledOdbijen = false
+            }
+        }
     }
 
     private func osigurajDozvolu() async -> Bool {
@@ -991,6 +1091,7 @@ final class AppStanje: ObservableObject {
             jezik: jezik
         )
         StatistikaSkladiste.sacuvaj(statistika)
+        osveziNedeljniPodsetnik()
         Dnevnik.pisi("Prepis gotov, dužina=\(sredjen.count), saTastature=\(pokrenutSaTastature)")
         let token = postaviClipboard(sredjen, automatski: pokrenutSaTastature) ?? ""
         let vreme = Date().timeIntervalSince1970
@@ -1796,6 +1897,7 @@ final class AppStanje: ObservableObject {
     func obrisiStatistiku() {
         statistika = Statistika()
         StatistikaSkladiste.sacuvaj(statistika)
+        osveziNedeljniPodsetnik()
         poruka = Prevod.t("Statistika je obrisana.")
     }
 

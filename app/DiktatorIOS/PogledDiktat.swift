@@ -3,6 +3,7 @@ import Foundation
 
 struct PogledDiktat: View {
     @EnvironmentObject var stanje: AppStanje
+    @EnvironmentObject var navigacija: NavigacijaZahteva
     @Environment(\.scenePhase) private var fazaEkrana
     @State private var prikaziPodesavanja = false
     @State private var predlogRecnika: PredlogRecnika?
@@ -79,6 +80,9 @@ struct PogledDiktat: View {
             }
             .navigationDestination(isPresented: $prikaziPodesavanja) {
                 PogledPodesavanja()
+            }
+            .navigationDestination(isPresented: $navigacija.otvoriStatistiku) {
+                PogledStatistika()
             }
             .sheet(item: $predlogRecnika) { predlog in
                 PogledDodajRecnik(tekst: predlog.tekst)

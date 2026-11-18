@@ -6,6 +6,21 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Status
 
+- **18.11.2026.** — **nedeljni pregled kao obaveštenje**: nova kartica
+  **Nedeljni pregled** u statistici sabira prethodnu nedelju
+  (ponedeljak–nedelja) i poredi je sa nedeljom pre (reči, diktati, ušteđeno
+  vreme, prosečna brzina). Ako je uključen u Podešavanjima → **Nedeljni
+  pregled**, isti brojevi stižu kao lokalno obaveštenje izabranim danom i
+  vremenom (podrazumevano ponedeljak u 09:00), a tap otvara statistiku.
+  Sadržaj se osveži pri pokretanju, posle svakog diktata i kada se promeni
+  dan/vreme; obaveštenje je `UNCalendarNotificationTrigger` sa ponavljanjem,
+  pa stiže i kada aplikacija nije otvorena. Dozvola se traži tek na
+  korisnikov dodir, a podrazumevano je isključen. Novi fajl je
+  `NedeljniPregled.swift` (`NedeljniPregled`, `NedeljniPodsetnik`,
+  `NavigacijaZahteva`), `Podesavanja` ima tri nova polja, a tekstovi su u
+  `app/alati/prevedi.py`. Provereno u iPhone i iPad simulatoru; oba builda
+  prolaze. Verzija ostaje **0.2.0 (10)**.
+
 - **18.11.2026.** — **lokalno sređivanje pred build sa pravim nalogom**:
   kartica **Ažuriranja** u `PogledDiktat` je sada u `#if !APPSTORE`, pa se
   GitHub kod u App Store buildu i ne kompajlira (ranije se nije prikazivala,

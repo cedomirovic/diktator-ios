@@ -95,6 +95,13 @@ vreme. Tap na karticu otvara detalje: ukupno reči i diktata, prosečnu brzinu
 prosečan diktat. Statistika se računa lokalno iz broja reči i trajanja; ne
 čuva tekst i može se obrisati nezavisno od istorije.
 
+Kartica **Nedeljni pregled** sabira prethodnu nedelju (ponedeljak–nedelja) i
+poredi je sa nedeljom pre: broj reči, diktata, ušteđeno vreme i prosečna
+brzina. Ako je pregled uključen, isti brojevi stižu i kao lokalno obaveštenje
+izabranim danom (podrazumevano ponedeljak u 09:00). Sadržaj obaveštenja se
+osveži pri svakom pokretanju i posle svakog diktata, a tap na obaveštenje
+otvara statistiku. Ništa se ne šalje na mrežu.
+
 ## Dizajn
 
 Izgled je preuzet sa desktop Diktatora: svetla pozadina, bele kartice sa
@@ -112,8 +119,8 @@ tamniju pozadinu, tamnije kartice i svetliji akcenat **#4C93FF**.
 - **Istorija** — polje pretrage, kartice sa trajanjem u formatu `01:32`,
   meni sa kopiranjem i brisanjem, tap na karticu kopira tekst.
 - **Statistika** — četiri kartice sa brojevima (danas, niz, prosečno,
-  ušteđeno), stubičasti grafikon sa vrednostima iznad stubova, detalji,
-  jezici i crveno dugme za brisanje.
+  ušteđeno), kartica nedeljnog pregleda, stubičasti grafikon sa vrednostima
+  iznad stubova, detalji, jezici i crveno dugme za brisanje.
 - **Podešavanja** — `Form` sa karticama, zaglavlja grupa su bold bez
   velikih slova; kontrole su ostale iste.
 - **Pomoć** — kartice sa numerisanim koracima i kartica podrške.

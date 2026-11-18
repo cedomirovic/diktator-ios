@@ -2,12 +2,18 @@
 
 "%@ API ključ nije unet." = "No API key entered for %@.";
 "%@ Lokalni model nije preuzet, pa nema rezervnog prepisa." = "%@ The local model is not downloaded, so there is no fallback transcription.";
+"%@ diktata" = "%@ dictations";
 "%@ je vratio prazan tekst." = "%@ returned empty text.";
 "%@ reči" = "%@ words";
+"%@ reči i %@ ušteđenog vremena prošle nedelje." = "%@ words and %@ of time saved last week.";
+"%@ · ušteđeno %@ · %@ reči/min" = "%@ · %@ saved · %@ words/min";
 "%lld" = "%lld";
 "%lld %@" = "%lld %@";
 "%lld dana" = "%lld days";
+"%lld%% manje nego nedelju pre" = "%lld%% less than the week before";
+"%lld%% više nego nedelju pre" = "%lld%% more than the week before";
 "1 dan" = "1 day";
+"1 diktat" = "1 dictation";
 "1 sat" = "1 hour";
 "1. Preuzmi model" = "1. Download a model";
 "15 minuta" = "15 minutes";
@@ -41,6 +47,7 @@
 "ChatGPT API. ChatGPT Plus pretplata nije dovoljna — potreban je API ključ." = "ChatGPT API. A ChatGPT Plus subscription is not enough — you need an API key.";
 "Claude API. Claude Code je druga alatka — ovde ide Anthropic API ključ." = "Claude API. Claude Code is a different tool — use an Anthropic API key here.";
 "Dalje" = "Next";
+"Dan" = "Day";
 "Danas" = "Today";
 "Detalji" = "Details";
 "Diktat" = "Dictate";
@@ -107,6 +114,8 @@
 "Izabran je model %@." = "%@ selected.";
 "Izabran: %@" = "Selected: %@";
 "Jedan pojam po redu. Whisper ih koristi kao nagoveštaj pri prepisu." = "One term per line. Whisper uses them as hints while transcribing.";
+"Jednom nedeljno dobijaš pregled prethodne nedelje kao obaveštenje. Možeš ga isključiti u Podešavanjima." = "Once a week you get last week's recap as a notification. You can turn it off in Settings.";
+"Jednom nedeljno ti stiže kratak pregled: broj reči, diktata i ušteđeno vreme. Obaveštenje je lokalno — ništa ne napušta uređaj." = "Once a week you get a short recap: words, dictations and time saved. The notification is local — nothing leaves your device.";
 "Jeftin i brz servis za srpski i engleski. Traži API ključ." = "A cheap and fast service for Serbian and English. Requires an API key.";
 "Jezici" = "Languages";
 "Jezik" = "Language";
@@ -157,6 +166,9 @@
 "Nastavi" = "Continue";
 "Nazad" = "Back";
 "Način" = "Mode";
+"Nedelja" = "Sunday";
+"Nedeljni pregled" = "Weekly recap";
+"Nedeljni pregled je poslat — treba da se pojavi odmah." = "Weekly recap sent — it should appear right away.";
 "Nema dostupnog mikrofona." = "No microphone available.";
 "Nema dovoljno prostora za model %@. Potrebno je oko %@ slobodno." = "Not enough space for the %@ model. About %@ free is needed.";
 "Nema nove verzije. Trenutna je %@." = "No new version. You are on %@.";
@@ -170,6 +182,7 @@
 "O aplikaciji" = "About";
 "Obaveštenja su isključena za Diktator u iOS Podešavanjima." = "Notifications are turned off for Diktator in iOS Settings.";
 "Obaveštenje nije poslato. Pokušaj ponovo." = "The notification was not sent. Try again.";
+"Obaveštenje stiže %@ u %@." = "The notification arrives on %@ at %@.";
 "Obrisati statistiku?" = "Delete statistics?";
 "Obriši" = "Delete";
 "Obriši istoriju" = "Delete history";
@@ -191,6 +204,7 @@
 "Ovaj mesec" = "This month";
 "Ovaj uređaj ima malo radne memorije. Ako se prepis prekida ili aplikacija zatvori, izaberi manji model (Base ili Small)." = "This device has limited memory. If transcription stops or the app closes, choose a smaller model (Base or Small).";
 "Očisti" = "Clear";
+"Petak" = "Friday";
 "Podešavanja" = "Settings";
 "Podešavanja → General → Keyboard → Keyboards → Add New Keyboard." = "Settings → General → Keyboard → Keyboards → Add New Keyboard.";
 "Pojmovi koji počinju velikim slovom se predlažu, a imena koja nisu na početku rečenice su unapred označena. Ako nešto nije predloženo, upiši ga ručno, više pojmova odvoji zarezom." = "Words that start with a capital letter are suggested, and names that are not at the start of a sentence are pre-selected. If something is missing, type it manually and separate multiple terms with commas.";
@@ -198,6 +212,7 @@
 "Polje je prazno — unesi Groq ključ pa tapni Sačuvaj." = "The field is empty — enter the Groq key and tap Save.";
 "Polje je prazno — unesi ključ pa tapni Sačuvaj." = "The field is empty — enter the key and tap Save.";
 "Pomoć" = "Help";
+"Ponedeljak" = "Monday";
 "Popravi interpunkciju i imena" = "Fix punctuation and names";
 "Popravljam interpunkciju i imena preko izabranog servisa." = "Fixing punctuation and names with the selected service.";
 "Posle 1 minuta" = "After 1 minute";
@@ -234,6 +249,7 @@
 "Prikaži ključ" = "Show key";
 "Prikaži uvod ponovo" = "Show the intro again";
 "Prilagodi Diktator svom načinu rada." = "Adjust Diktator to the way you work.";
+"Primer: 1.240 reči i 38 min ušteđenog vremena. Tvoji brojevi stižu posle prve nedelje diktata." = "Sample: 1,240 words and 38 min of time saved. Your own numbers arrive after your first full week of dictation.";
 "Pripremam model…" = "Preparing model…";
 "Privatnost" = "Privacy";
 "Prosečan diktat" = "Average dictation";
@@ -241,6 +257,8 @@
 "Provera nije uspela. Proveri internet vezu i pokušaj ponovo." = "The check failed. Check your internet connection and try again.";
 "Proveri nove verzije" = "Check for new versions";
 "Proveri sada" = "Check now";
+"Prošle nedelje nije bilo diktata. Otvori Diktator i nastavi niz." = "No dictations last week. Open Diktator and keep the streak going.";
+"Prošle nedelje nije bilo diktata. Prvi diktat pokreće pregled." = "No dictations last week. Your first dictation starts the recap.";
 "Prvi diktat" = "First dictation";
 "Prvi diktat pokreće statistiku." = "Your first dictation starts the statistics.";
 "Prvi diktat će se pojaviti ovde." = "Your first dictation will appear here.";
@@ -282,10 +300,12 @@
 "Snimanje ide dalje — Stop je na tastaturi." = "Recording continues — Stop is on the keyboard.";
 "Solidan balans. Veći od Base, ali manji i brži od Turbo modela." = "A solid balance. Bigger than Base, but smaller and faster than Turbo.";
 "Spreman" = "Ready";
+"Sreda" = "Wednesday";
 "Srpski" = "Serbian";
 "Statistika" = "Statistics";
 "Statistika je obrisana." = "Statistics deleted.";
 "Statistika se računa lokalno iz broja reči i trajanja diktata. Ne čuva tekst; možeš je obrisati bez brisanja istorije." = "Statistics are computed locally from word counts and dictation length. No text is stored; you can delete them without deleting history.";
+"Subota" = "Saturday";
 "Sve što treba da znaš o tastaturi, sesiji i privatnosti." = "Everything you need to know about the keyboard, the session and privacy.";
 "Tapni Diktator i uključi Allow Full Access." = "Tap Diktator and turn on Allow Full Access.";
 "Tapni Diktiraj i govori" = "Tap Dictate and speak";
@@ -306,22 +326,27 @@
 "Tekst je spreman. Vraćam te u tvoju aplikaciju…" = "Text is ready. Taking you back to your app…";
 "Tekst se sam ubaci" = "Text inserts itself";
 "Test veze" = "Test connection";
+"Testiraj nedeljni pregled" = "Test weekly recap";
 "Testiraj obaveštenje" = "Test notification";
 "Testiram…" = "Testing…";
 "Testno obaveštenje je poslato — treba da se pojavi odmah." = "Test notification sent — it should appear right away.";
 "Trajanje sesije" = "Session length";
 "Turbo je izabran zbog brzine. Ako želiš tačniji srpski, prebaci na Large v3 (~1,0 GB)." = "Turbo is selected for speed. For more accurate Serbian, switch to Large v3 (~1.0 GB).";
 "Turbo model, kraći audio kontekst i najbrža obrada. Nekoliko puta brže, uz moguće greške u imenima i završecima." = "Turbo model, shorter audio context and the fastest processing. Several times faster, with possible mistakes in names and endings.";
+"Tvoja nedelja u Diktatoru" = "Your week in Diktator";
 "U bilo kojoj aplikaciji prebaci na Diktator tastaturu." = "In any app, switch to the Diktator keyboard.";
 "U ovom diktatu nema novih imena. Upiši pojam ispod." = "No new names in this dictation. Type a term below.";
 "U rečnik" = "To vocabulary";
 "U rečnik je dodato %lld pojmova." = "Added %lld terms to the vocabulary.";
 "U režimu Groq snimak se šalje servisu Groq radi prepisa i tada napušta uređaj. U režimima Brzo i Najtačnije sve ostaje na telefonu. Možeš se vratiti na lokalni prepis u svakom trenutku." = "In Groq mode the recording is sent to Groq for transcription and leaves your device. In Fast and Most accurate modes everything stays on your phone. You can switch back to on-device transcription at any time.";
+"Uključen" = "On";
+"Uključi nedeljni pregled" = "Enable weekly recap";
 "Uključi sesiju" = "Start session";
 "Uključi sesiju da mikrofon u tastaturi snima dok je otvorena bilo koja aplikacija. Ako sesija nije uključena ili je aplikacija ugašena, tastatura sama otvara Diktator i uključi je." = "Start the session so the keyboard's microphone can record while any app is open. If the session is not active or the app was closed, the keyboard opens Diktator and starts it.";
 "Uključi sesiju da mikrofon u tastaturi snima dok je otvorena bilo koja aplikacija. Ako sesija nije uključena, Diktiraj u tastaturi će te zamoliti da otvoriš Diktator i uključiš je." = "Start the session so the keyboard's microphone can record while any app is open. If the session is not active, Dictate in the keyboard asks you to open Diktator and start it.";
 "Ukupno %@" = "Total %@";
 "Ukupno vremena govora" = "Total speaking time";
+"Utorak" = "Tuesday";
 "Ušteđeno" = "Saved";
 "Ušteđeno %@" = "Saved %@";
 "Vaše prethodne diktacije na jednom mestu." = "Your previous dictations in one place.";
@@ -330,6 +355,7 @@
 "Veza radi: %@" = "Connection works: %@";
 "Vrati me u aplikaciju posle diktata" = "Return me to my app after dictation";
 "Vrati se u svoju aplikaciju" = "Go back to your app";
+"Vreme" = "Time";
 "Whisper nije uspeo da prepiše snimak." = "Whisper could not transcribe the recording.";
 "Za najbolji srpski izaberi **Srpski**. Automatska detekcija je korisna kada smenjuješ srpski i engleski, ali na kratkim snimcima ume da pogreši." = "For the best Serbian choose **Serbian**. Automatic detection helps when you switch between Serbian and English, but it can make mistakes on short recordings.";
 "Za najbolji srpski: Jezik = Srpski i Brzina = Najtačnije — Large v3." = "For the best Serbian: Language = Serbian and Speed = Most accurate — Large v3.";
@@ -338,6 +364,7 @@
 "dan" = "day";
 "dana" = "days";
 "ili tapni ‹ u gornjem levom uglu ekrana" = "or tap ‹ in the top-left corner of the screen";
+"isto kao nedelju pre" = "same as the week before";
 "nije učitan" = "not loaded";
 "npr. Nemanja, Pitchi, Beograd" = "e.g. Nemanja, Pitchi, Belgrade";
 "pretraga snopom" = "beam search";
@@ -349,8 +376,10 @@
 "skraćen audio kontekst" = "shortened audio context";
 "u memoriji" = "in memory";
 "vremena" = "time";
+"Četvrtak" = "Thursday";
 "Čuvaj istoriju" = "Keep history";
 "Šalje samo gotov tekst izabranom servisu, nikada zvuk. Isključeno znači da ništa ne napušta uređaj." = "Sends only the finished text to the chosen service, never audio. When off, nothing leaves your device.";
 "Šalje se samo gotov tekst, nikada zvuk. Dozvola važi samo za taj servis i možeš je povući ovde u Podešavanjima." = "Only the finished text is sent, never audio. This permission applies to that service only and you can withdraw it here in Settings.";
+"Šaljem nedeljni pregled…" = "Sending weekly recap…";
 "Šaljem testno obaveštenje…" = "Sending test notification…";
 "„%@“ je dodat u rečnik." = "“%@” added to the vocabulary.";

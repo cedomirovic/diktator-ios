@@ -22,7 +22,14 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
             intentIdentifiers: [],
             options: []
         )
-        centar.setNotificationCategories([kategorija])
+        // Nedeljni pregled samo otvara statistiku na dodir, bez dodatnih akcija.
+        let pregled = UNNotificationCategory(
+            identifier: "diktator.pregled",
+            actions: [],
+            intentIdentifiers: [],
+            options: []
+        )
+        centar.setNotificationCategories([kategorija, pregled])
         return true
     }
 
@@ -37,7 +44,14 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
         _ center: UNUserNotificationCenter,
         didReceive response: UNNotificationResponse
     ) async {
-        guard let tekst = response.notification.request.content.userInfo["url"] as? String,
+        let informacije = response.notification.request.content.userInfo
+        if informacije["pregled"] as? String == "1" {
+            await MainActor.run {
+                NavigacijaZahteva.deljena.otvoriStatistiku = true
+            }
+            return
+        }
+        guard let tekst = informacije["url"] as? String,
               let url = URL(string: tekst) else {
             return
         }
@@ -50,6 +64,7 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
 @main
 struct DiktatorApp: App {
     @StateObject private var stanje = AppStanje()
+    @StateObject private var navigacija = NavigacijaZahteva.deljena
     @Environment(\.scenePhase) private var scenePhase
     @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
@@ -57,8 +72,16 @@ struct DiktatorApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(stanje)
+                .environmentObject(navigacija)
                 .onOpenURL { url in
                     stanje.obradiURL(url)
+                }
+                .onChange(of: navigacija.otvoriStatistiku) { _, novo in
+                    // Obaveštenje o nedeljnom pregledu vodi na statistiku,
+                    // koja je deo taba Diktat.
+                    if novo {
+                        stanje.izabraniTab = 0
+                    }
                 }
                 .onChange(of: scenePhase) { _, nova in
                     switch nova {
@@ -79,6 +102,8 @@ struct DiktatorApp: App {
                         // obaveštenje“ ne čeka proveru sistema.
                         Task { await Azuriranja.osveziDozvolu() }
                         stanje.proveriAzuriranja()
+                        // Brojevi u nedeljnom pregledu prate poslednje stanje.
+                        stanje.osveziNedeljniPodsetnik()
                     }
                 }
                 .task {

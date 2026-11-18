@@ -30,6 +30,7 @@
 		933944E1BC2F012E332A1849 /* PogledIstorija.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6D579545458783F98DD33B /* PogledIstorija.swift */; };
 		93DB9F36BE0006AB9F198783 /* PrepisOblak.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCB893F47646B0D69B230036 /* PrepisOblak.swift */; };
 		94F8BCCE51B02101CE009BF0 /* PogledStatistika.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E2D48993A765741AFA31BE8 /* PogledStatistika.swift */; };
+		985AE7F6A74F14ED37976415 /* NedeljniPregled.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCA839A6AA29F7186C5B065 /* NedeljniPregled.swift */; };
 		9B1AD4661F980D3502864CF7 /* PogledDiktat.swift in Sources */ = {isa = PBXBuildFile; fileRef = E98742B6EFA7462CED1983E6 /* PogledDiktat.swift */; };
 		A9741BFAC2D228E53F350A8E /* Podesavanja.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31EB7D7F59EF1CFE3D869AEF /* Podesavanja.swift */; };
 		AC0B7199C043F205B40732FE /* PogledUvod.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11893B3B8839168BBDA5642 /* PogledUvod.swift */; };
@@ -72,6 +73,7 @@
 /* Begin PBXFileReference section */
 		028BADA4F19CAFBD0194A000 /* DiktatorKeyboard.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = DiktatorKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		0827D1D5A6339E92ECEE10C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		0BCA839A6AA29F7186C5B065 /* NedeljniPregled.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NedeljniPregled.swift; sourceTree = "<group>"; };
 		0D151EFE97E9DBD96818BDCA /* ProvajderiDoterivanja.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProvajderiDoterivanja.swift; sourceTree = "<group>"; };
 		189D48705D4DAA54A219CC28 /* Snimac.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Snimac.swift; sourceTree = "<group>"; };
 		1CEE400B2694A19D19BC1C36 /* Prevod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Prevod.swift; sourceTree = "<group>"; };
@@ -140,6 +142,7 @@
 				F04EB5CE75811FF1188C1A13 /* Doterivanje.swift */,
 				0827D1D5A6339E92ECEE10C6 /* Info.plist */,
 				4C8F1B72EEE3D1C830799DF0 /* Modeli.swift */,
+				0BCA839A6AA29F7186C5B065 /* NedeljniPregled.swift */,
 				31EB7D7F59EF1CFE3D869AEF /* Podesavanja.swift */,
 				E98742B6EFA7462CED1983E6 /* PogledDiktat.swift */,
 				5B23CEF9C6F77BE75E18DBCA /* PogledDodajRecnik.swift */,
@@ -311,6 +314,7 @@
 				6B61792E6B401CC7B1959EDC /* Dizajn.swift in Sources */,
 				486BC131FDB3E93A4976D069 /* Doterivanje.swift in Sources */,
 				589916A2679B3B7EFA8A3BFF /* Modeli.swift in Sources */,
+				985AE7F6A74F14ED37976415 /* NedeljniPregled.swift in Sources */,
 				A9741BFAC2D228E53F350A8E /* Podesavanja.swift in Sources */,
 				9B1AD4661F980D3502864CF7 /* PogledDiktat.swift in Sources */,
 				B82B631648C233889689676E /* PogledDodajRecnik.swift in Sources */,

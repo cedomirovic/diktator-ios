@@ -20,6 +20,24 @@ struct PogledPodesavanja: View {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
     }
 
+    /// Vreme nedeljnog pregleda se u podešavanjima čuva kao minuti od ponoći,
+    /// a `DatePicker` radi sa `Date`.
+    private var vremeNedeljnogPregleda: Binding<Date> {
+        Binding(
+            get: {
+                var komponente = DateComponents()
+                komponente.hour = stanje.podesavanja.minutaNedeljnogPregleda / 60
+                komponente.minute = stanje.podesavanja.minutaNedeljnogPregleda % 60
+                return Calendar.current.date(from: komponente) ?? Date()
+            },
+            set: { novo in
+                let komponente = Calendar.current.dateComponents([.hour, .minute], from: novo)
+                stanje.podesavanja.minutaNedeljnogPregleda =
+                    (komponente.hour ?? 9) * 60 + (komponente.minute ?? 0)
+            }
+        )
+    }
+
     var body: some View {
         Form {
             Section {
@@ -174,6 +192,58 @@ struct PogledPodesavanja: View {
                         .foregroundStyle(.secondary)
                 }
                 #endif
+            }
+
+            Section(header: zaglavlje("Nedeljni pregled")) {
+                Toggle(
+                    "Nedeljni pregled",
+                    isOn: Binding(
+                        get: { stanje.podesavanja.nedeljniPregled },
+                        set: { stanje.postaviNedeljniPregled($0) }
+                    )
+                )
+
+                if stanje.podesavanja.nedeljniPregled {
+                    Picker(
+                        "Dan",
+                        selection: $stanje.podesavanja.danNedeljnogPregleda
+                    ) {
+                        ForEach(NedeljniPodsetnik.dostupniDani, id: \.self) { dan in
+                            Text(NedeljniPodsetnik.nazivDana(dan)).tag(dan)
+                        }
+                    }
+
+                    DatePicker(
+                        "Vreme",
+                        selection: vremeNedeljnogPregleda,
+                        displayedComponents: .hourAndMinute
+                    )
+
+                    Button {
+                        stanje.testirajNedeljniPregled()
+                    } label: {
+                        Label(
+                            "Testiraj nedeljni pregled",
+                            systemImage: "bell.badge"
+                        )
+                    }
+                }
+
+                if let poruka = stanje.porukaNedeljnogPregleda {
+                    Text(poruka)
+                        .font(.caption)
+                        .foregroundStyle(stanje.nedeljniPregledOdbijen ? .orange : .secondary)
+                }
+
+                if stanje.nedeljniPregledOdbijen {
+                    Button("Otvori podešavanja iOS-a") {
+                        stanje.otvoriPodesavanjaIOS()
+                    }
+                }
+
+                Text("Jednom nedeljno ti stiže kratak pregled: broj reči, diktata i ušteđeno vreme. Obaveštenje je lokalno — ništa ne napušta uređaj.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
 
             Section(header: zaglavlje("Brzina")) {
@@ -595,6 +665,12 @@ struct PogledPodesavanja: View {
         }
         .onChange(of: stanje.podesavanja.trajanjeSesije) { _, novo in
             stanje.postaviTrajanjeSesije(novo)
+        }
+        .onChange(of: stanje.podesavanja.danNedeljnogPregleda) { _, _ in
+            stanje.osveziNedeljniPodsetnik()
+        }
+        .onChange(of: stanje.podesavanja.minutaNedeljnogPregleda) { _, _ in
+            stanje.osveziNedeljniPodsetnik()
         }
         .onChange(of: stanje.podesavanja.proveravajAzuriranja) { _, novo in
             if novo {

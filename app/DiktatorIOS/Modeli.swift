@@ -262,6 +262,14 @@ struct Podesavanja: Codable, Equatable {
     var odobreniServisi: [String] = []
     /// Kratak uvod se prikazuje samo prvi put; posle se otvara iz Pomoći.
     var uvodVidjen = false
+    /// Nedeljno obaveštenje sa pregledom prethodne nedelje. Podrazumevano
+    /// isključeno, jer se dozvola za obaveštenja traži tek kada korisnik
+    /// izričito uključi pregled.
+    var nedeljniPregled = false
+    /// Dan nedelje po `Calendar.weekday` (1 = nedelja, 2 = ponedeljak).
+    var danNedeljnogPregleda = 2
+    /// Vreme slanja, u minutima od ponoći.
+    var minutaNedeljnogPregleda = 9 * 60
 
     init() {}
 
@@ -283,6 +291,9 @@ struct Podesavanja: Codable, Equatable {
         case rezimBrzine
         case odobreniServisi
         case uvodVidjen
+        case nedeljniPregled
+        case danNedeljnogPregleda
+        case minutaNedeljnogPregleda
     }
 
     init(from decoder: Decoder) throws {
@@ -329,5 +340,15 @@ struct Podesavanja: Codable, Equatable {
         }
         odobreniServisi = try kontejner.decodeIfPresent([String].self, forKey: .odobreniServisi) ?? []
         uvodVidjen = try kontejner.decodeIfPresent(Bool.self, forKey: .uvodVidjen) ?? false
+        nedeljniPregled = try kontejner.decodeIfPresent(Bool.self, forKey: .nedeljniPregled) ?? false
+        danNedeljnogPregleda = try kontejner.decodeIfPresent(Int.self, forKey: .danNedeljnogPregleda) ?? 2
+        if !(1...7).contains(danNedeljnogPregleda) {
+            danNedeljnogPregleda = 2
+        }
+        minutaNedeljnogPregleda = try kontejner.decodeIfPresent(Int.self, forKey: .minutaNedeljnogPregleda)
+            ?? 9 * 60
+        if !(0..<(24 * 60)).contains(minutaNedeljnogPregleda) {
+            minutaNedeljnogPregleda = 9 * 60
+        }
     }
 }
