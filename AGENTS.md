@@ -6,6 +6,17 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Status
 
+- **18.11.2026.** — **lična kopija za bežičnu instalaciju**: pošto
+  `com.cedomirovic.diktator.ios` pripada plaćenom timu, a na Mac-u je
+  prijavljen samo besplatni `LHQ4Q44425`, dodat je `app/project-licni.yml` sa
+  istim izvorima i ID-jevima `com.cedomirovic.diktator.ios.licni` /
+  `...licni.keyboard`, a nova `app/install-licni.sh` generiše projekat u
+  `build/licni`, pravi Debug build, instalira ga preko mreže i pokrene. Build
+  je prošao, aplikacija je instalirana na iPhone 15 Pro i pokrenuta posle
+  odobravanja profila na telefonu. Pravi projekat i `Info.plist` nisu dirani.
+  Uputstvo je u `docs/instalacija-bez-naloga.md`. Verzija ostaje
+  **0.2.0 (10)**; profil traje 7 dana, pa se skripta ponavlja.
+
 - **18.11.2026.** — **nedeljni pregled kao obaveštenje**: nova kartica
   **Nedeljni pregled** u statistici sabira prethodnu nedelju
   (ponedeljak–nedelja) i poredi je sa nedeljom pre (reči, diktati, ušteđeno

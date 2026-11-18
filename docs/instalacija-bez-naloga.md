@@ -178,6 +178,31 @@ DIKTATOR_TIM=ABCDE12345 app/install-bezicno.sh
 
 `app/proveri-potpis.sh` pokaže da li su tim, sertifikati i profili spremni.
 
+#### Lična kopija sa drugim bundle ID-em
+
+Ako pravi bundle ID već pripada plaćenom timu, a na Mac-u je prijavljen samo
+besplatni, Xcode prijavi „identifier is not available“. Za brzu instalaciju
+na svoj telefon tada postoji kopija sa novim ID-jevima:
+
+```bash
+app/install-licni.sh                  # podrazumevani iPhone
+app/install-licni.sh <UDID>           # drugi uređaj
+```
+
+Skripta uzima `app/project-licni.yml` (isti izvori, ali
+`com.cedomirovic.diktator.ios.licni` i `...licni.keyboard`), generiše projekat
+u `build/licni`, pravi Debug build besplatnim timom `LHQ4Q44425`, instalira ga
+preko mreže i pokrene. Pravi projekat i `Info.plist` se ne diraju.
+
+Kopija je **odvojena aplikacija**: druga ikona (**Diktator Lični**), svoji
+podaci (istorija, rečnik, statistika, podešavanja) i svoja tastatura. Zato
+posle instalacije dodaj **Diktator Lični** u tastature i uključi **Allow Full
+Access**; staru istoimenu tastaturu možeš ukloniti da se ne pomešaju.
+
+Prvi put iOS traži potvrdu profila: **Podešavanja → Opšte → VPN i upravljanje
+uređajem → Developer App → Trust**. Profil traje 7 dana, pa se skripta
+ponavlja.
+
 ### 2.6. Dodaj tastaturu
 
 1. iPhone: **Settings → General → Keyboard → Keyboards → Add New Keyboard**.
