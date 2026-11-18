@@ -6,6 +6,15 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Status
 
+- **18.11.2026.** — **snimak za 2.1 mora iz builda u review-u**: prvi snimak je
+  napravljen sa lične kopije (`Diktator Lični`), što Apple ne može da prihvati
+  jer u kadru nema isti build (drugo ime, kartica **Ažuriranja**, opcija **Bez
+  isteka**). `docs/app-store.md` sada ima odeljak **Snimak mora biti iz builda
+  koji je u review-u** (TestFlight instalacija, provera prvog kadra) i
+  **Ponovno slanje posle 2.1 (resubmit)** sa koracima za Notes, Resolution
+  Center i Submit for Review. Novi binarni build nije potreban. Verzija ostaje
+  **0.2.0 (10)**.
+
 - **18.11.2026.** — **lična kopija za bežičnu instalaciju**: pošto
   `com.cedomirovic.diktator.ios` pripada plaćenom timu, a na Mac-u je
   prijavljen samo besplatni `LHQ4Q44425`, dodat je `app/project-licni.yml` sa

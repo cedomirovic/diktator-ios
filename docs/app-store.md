@@ -390,6 +390,29 @@ ADDITIONAL CONTEXT
   minutes; audio outside an active dictation is discarded.
 ```
 
+## Ponovno slanje posle 2.1 (resubmit)
+
+Kada je nedostajala samo informacija (Guideline 2.1, „Information Needed“),
+novi binarni build nije potreban — dovoljni su dopunjeni Notes i snimak:
+
+1. **Snimi iz builda u review-u** (TestFlight, vidi odeljak iznad) i postavi
+   video na YouTube kao **Unlisted**; link mora da se otvori bez prijave.
+2. **App Store Connect → Diktator → App Store → verzija** → **App Review
+   Information → Notes**: nalepi blok iz ovog dokumenta i zameni `<LINK>`
+   stvarnim URL-om. Ceo blok mora ostati ispod 4.000 znakova.
+3. **Resolution Center** → odgovori na poruku kratko, na engleskom, sa istim
+   linkom, npr.:
+   `We have added the requested screen recording of the submitted build to App
+   Review Information → Notes: <LINK> (unlisted, no sign-in required). It shows
+   launching the app, the model, adding the keyboard and enabling Full Access,
+   starting the 15-minute session, and dictating from the keyboard in Notes.`
+4. **Submit for Review** na strani verzije (isti build, bez novog uploada).
+5. Proveri: build u verziji je i dalje onaj koji je u review-u, Notes nemaju
+   lične podatke, a u snimku nema poruka, mejlova, istorije ni API ključa.
+
+Ako Apple ipak traži novi build (npr. zbog promene koda), `CURRENT_PROJECT_VERSION`
+mora biti veći od 10 i tada ide ceo tok iz `docs/distribucija.md`.
+
 ## Test na uređaju i demo video (tačka 5)
 
 Tačka 5 analize (mikrofon u pripravnosti, pravilo 2.5.4) ne može da se proveri
@@ -456,6 +479,27 @@ Snimak ne mora da bude savršen: Apple proverava da aplikacija radi na uređaju,
 da nema naloga/UGC/kupovina i da je tok razumljiv. Ako snimaš u delovima,
 spojevi su u redu, ali prvi kadar mora biti pokretanje aplikacije.
 
+#### Snimak mora biti iz builda koji je u review-u
+
+Ne snimati sa **lične kopije** (`Diktator Lični`, `app/install-licni.sh`).
+Ta kopija je Debug build sa besplatnim timom i u kadru se vidi da nije ista
+aplikacija: drugo ime, kartica **Ažuriranja** koje u App Store buildu nema i
+opcija **Bez isteka** koju App Store build ne nudi. Apple tada dobija dokaz
+koji protivreči Review Notes (sesija najviše 15 minuta, tastatura ne otvara
+aplikaciju), pa sledi novo odbijanje.
+
+Ispravan izvor je **App Store build iz TestFlight-a** (isti build broj koji je
+u review-u). Instalira se iz TestFlight aplikacije na telefonu, bez Xcode-a:
+
+1. TestFlight → Diktator → **Install** (build koji je poslat Apple-u).
+2. Obriši prethodnu instalaciju ako je potrebno, da prvi kadar bude pokretanje.
+3. Snimi tok iz liste iznad i proveri prvi kadar: na njemu se vidi **Diktator**,
+   a u aplikaciji nema sekcije **Ažuriranja**.
+
+Ako u TestFlight-u više nema tog builda (istekao posle 90 dana), treba novi
+build: `CURRENT_PROJECT_VERSION` veći od poslednjeg, pa
+`app/objavi-testflight.sh` sa plaćenim timom.
+
 ## Screenshots
 
 Obavezno za App Store Connect:
@@ -511,4 +555,5 @@ Messages-u, sa uključenim Full Access-om.
 - [ ] Build ponovo poslat na review posle dopune Notes.
 - [ ] TestFlight internal build prošao.
 - [ ] Snimak za 2.1 počinje pokretanjem aplikacije i prikazuje diktat iz tastature.
+- [ ] Snimak je iz App Store builda (TestFlight), ne sa lične kopije, i vidi se **Diktator** bez sekcije **Ažuriranja**.
 - [ ] Export compliance odgovoreno.
