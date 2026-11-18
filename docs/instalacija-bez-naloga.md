@@ -168,6 +168,16 @@ uparivanje; `xcrun devicectl list devices` tada pokaže
 `Transport Type: localNetwork`. Ako telefon nije dostupan, proveri da je
 otključan i na istoj mreži.
 
+Ako se bundle ID koristi na plaćenom timu, besplatni tim ga ne može
+registrovati. Tada prebaci projekat na pravi tim i koristi ga i za uređaj:
+
+```bash
+app/prebaci-tim.sh ABCDE12345
+DIKTATOR_TIM=ABCDE12345 app/install-bezicno.sh
+```
+
+`app/proveri-potpis.sh` pokaže da li su tim, sertifikati i profili spremni.
+
 ### 2.6. Dodaj tastaturu
 
 1. iPhone: **Settings → General → Keyboard → Keyboards → Add New Keyboard**.

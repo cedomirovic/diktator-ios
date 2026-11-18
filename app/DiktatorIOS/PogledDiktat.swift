@@ -35,7 +35,9 @@ struct PogledDiktat: View {
 
                     statistikaKartica
 
+                    #if !APPSTORE
                     azuriranjeKartica
+                    #endif
 
                     if !stanje.modelJePreuzet {
                         modelKartica
@@ -329,6 +331,7 @@ struct PogledDiktat: View {
 
     // MARK: - Ažuriranje
 
+    #if !APPSTORE
     @ViewBuilder
     private var azuriranjeKartica: some View {
         if let azuriranje = stanje.dostupnoAzuriranje {
@@ -353,6 +356,8 @@ struct PogledDiktat: View {
             .kartica()
         }
     }
+
+    #endif
 
     // MARK: - Model
 

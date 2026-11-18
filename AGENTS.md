@@ -6,6 +6,19 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Status
 
+- **18.11.2026.** — **lokalno sređivanje pred build sa pravim nalogom**:
+  kartica **Ažuriranja** u `PogledDiktat` je sada u `#if !APPSTORE`, pa se
+  GitHub kod u App Store buildu i ne kompajlira (ranije se nije prikazivala,
+  ali je kod ostajao). `app/install-bezicno.sh` prima `DIKTATOR_TIM`, a nova
+  `app/prebaci-tim.sh <TEAM_ID>` menja tim u `project.yml`,
+  `ExportOptions.plist` i pbxproj i pokrene proveru. Ustanovljeno je da
+  bundle ID `com.cedomirovic.diktator.ios` sada pripada plaćenom timu, pa
+  besplatni `LHQ4Q44425` ne može da ga registruje — zato lokalni build sa
+  besplatnim timom prijavi „identifier is not available“. Oba builda prolaze,
+  a App Store build je proveren u simulatoru (engleski, bez sekcije
+  **Ažuriranja**, sesija 15 minuta). Uputstva za prelazak tima su u
+  `docs/app-store.md` i `docs/instalacija-bez-naloga.md`.
+
 - **12.11.2026.** — **odgovor na Guideline 2.1 (Information Needed)**: Apple
   je tražio snimak na fizičkom uređaju i pet opisa u **App Review Information
   → Notes**. `docs/app-store.md` sada ima gotov engleski tekst (3831 znak, pod
@@ -415,14 +428,14 @@ kojoj se diktira srpski ili engleski i tekst se ubacuje u bilo koju aplikaciju.
 
 ## Sledeći korak
 
-1. Uplatiti **Apple Developer Program** (99 USD/god.), prihvatiti ugovore i u
-   Xcode-u napraviti **Apple Distribution** sertifikat za tim.
-2. Napraviti app record u App Store Connect-u (`com.cedomirovic.diktator.ios`)
-   i popuniti metadata iz `docs/app-store.md`.
-3. Pokrenuti `app/objavi-testflight.sh` i sačekati obradu builda.
-4. Testirati TestFlight internal, pa external; prikupiti prve povratne
-   informacije o srpskom prepisu i preuzimanju modela.
-5. Testirati AltStore/SideStore potpisivanje i instalaciju IPA-e, uključujući
-   keyboard extension.
-6. Proveriti osvežavanje profila posle 7 dana.
-7. Pripremiti release tag i objaviti App Store/TestFlight rezultate.
+1. Snimiti ekran na fizičkom uređaju po uputstvu za **Guideline 2.1** iz
+   `docs/app-store.md`, postaviti link u Review Notes i ponovo poslati na
+   review. Novi build nije potreban ako se menja samo Notes.
+2. Prijaviti pravi tim u Xcode-u na ovom Mac-u (ili raditi na Mac-u gde je
+   nalog), pa `app/prebaci-tim.sh <TEAM_ID>` i
+   `DIKTATOR_TIM=<TEAM_ID> app/install-bezicno.sh`.
+3. Posle odobrenja: TestFlight external radi provere pozadinskog mikrofona i
+   povratnih informacija o srpskom prepisu.
+4. Testirati iPad i najslabiji podržani iPhone po protokolu iz
+   `docs/app-store.md`.
+5. Pripremiti release tag i objaviti rezultate.

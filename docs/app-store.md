@@ -275,6 +275,22 @@ app/proveri-potpis.sh ABCDE12345   # provera drugog tima
    potpisanu razvojnim sertifikatom. Za privremenu probu drugog tima:
    `DIKTATOR_TIM=ABCDE12345 app/objavi-testflight.sh`.
 
+Sve izmene tima može da uradi i jedna komanda:
+
+```sh
+app/prebaci-tim.sh ABCDE12345
+```
+
+Ona menja `DEVELOPMENT_TEAM` u `project.yml`, `teamID` u
+`ExportOptions.plist` i sve unose u pbxproj, pa pokrene proveru. Posle toga
+samo prijavi nalog u Xcode-u i napravi sertifikate.
+
+**Važno:** bundle ID `com.cedomirovic.diktator.ios` sada pripada plaćenom
+timu (onome koji je poslao aplikaciju Apple-u). Besplatni tim `LHQ4Q44425`
+više ne može da registruje isti ID, pa lokalni build sa njim prijavi
+„identifier is not available“. Za uređaj zato koristi pravi tim:
+`DIKTATOR_TIM=ABCDE12345 app/install-bezicno.sh`.
+
 ### Vlasništvo podataka
 
 Bundle ID, GitHub Pages i mejl podrške (`cedomirovicnemanja@gmail.com`) vezani

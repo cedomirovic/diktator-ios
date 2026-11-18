@@ -1,8 +1,9 @@
 #!/bin/zsh
 # Bežična instalacija ličnog (Debug) builda na iPhone.
 #
-#   app/install-bezicno.sh                 # podrazumevani uređaj
+#   app/install-bezicno.sh                 # tim iz project.yml
 #   app/install-bezicno.sh <UDID>          # drugi uređaj
+#   DIKTATOR_TIM=ABCDE12345 app/install-bezicno.sh   # drugi tim
 #
 # Uslovi: telefon je uparen u Xcode-u, uključen je „Connect via network“,
 # telefon je na istoj Wi-Fi mreži i otključan. Kabl nije potreban.
@@ -15,9 +16,11 @@ SKRIPT="$(cd "$(dirname "$0")" && pwd)"
 KOREN="$(dirname "$SKRIPT")"
 UREDJAJ="${1:-00008130-0012213E3A61001C}"
 BUNDLE="com.cedomirovic.diktator.ios"
+TIM="${DIKTATOR_TIM:-$(grep -m1 'DEVELOPMENT_TEAM' "$SKRIPT/project.yml" | sed 's/.*: *//' | tr -d '"')}"
 IZLAZ="$KOREN/build/ota"
 
 echo "== Diktator iOS: bežična instalacija =="
+echo "Tim: $TIM"
 if ! xcrun devicectl device info details --device "$UREDJAJ" >/dev/null 2>&1; then
   echo "Greška: uređaj $UREDJAJ nije dostupan." >&2
   echo "Proveri da je telefon otključan, na istoj Wi-Fi mreži i uparen u" >&2
@@ -34,6 +37,7 @@ xcodebuild \
   -destination 'generic/platform=iOS' \
   -derivedDataPath "$IZLAZ" \
   -allowProvisioningUpdates \
+  DEVELOPMENT_TEAM="$TIM" \
   build
 
 APP="$IZLAZ/Build/Products/Debug-iphoneos/DiktatorIOS.app"
